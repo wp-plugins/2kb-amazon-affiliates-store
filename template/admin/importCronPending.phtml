@@ -1,0 +1,27 @@
+<?php
+if (count($this->asins) == 0) {
+    return;
+}
+?>
+<form role="form" method="post">
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary" name="clear" value="load"><?php echo __('Clear All'); ?></button>
+    </div>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th><?php echo __('Asin') . ' ('.count($this->asins).')'; ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php $i = 1; ?>
+        <?php foreach ($this->asins as $asin): ?>
+            <tr>
+                <td> 
+                    <?php echo $asin;?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>

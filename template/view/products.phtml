@@ -1,0 +1,36 @@
+<?php
+$posts = array();
+global $post;
+if (!is_array($this->posts) && have_posts()) {
+    while (have_posts()) : the_post();
+        $posts[] = $post;
+    endwhile;
+} else if (is_array($this->posts)) {
+    $posts = $this->posts;
+}
+
+if (!empty($posts)) {
+    echo '<div class="kb-amz-product-list-wrapper">';
+        if ($this->title) {
+            echo '<h1 class="entry-title">'.$this->title.'</h1>';
+        }
+        $ul = '<ul class="row kb-amz-products-list">';
+        $i = 0;
+        $c = getKbAmz()->getOption('ListItemsPerRow', 6);
+        echo $ul;
+        foreach ($posts as $p): 
+            if ($i == $c) {
+                echo '</ul>';
+                echo $ul;
+                $i = 0;
+            }
+            include dirname(__FILE__) . '/partial/product.phtml';
+            $i++;
+        endforeach;
+        echo '</ul>';
+    echo '</div>';
+
+    if (null === $this->pagination || $this->pagination) {
+        kbAmzNavigation($this->maxNumPages);
+    }
+}

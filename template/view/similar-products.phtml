@@ -1,0 +1,12 @@
+<?php
+if (count($this->posts)) {
+    $i = 0;
+    echo '<ul class="row kb-products-list">';
+    foreach ($this->posts as $post) {
+        if (++$i == $this->count) {
+            break;
+        }
+        include dirname(__FILE__) . '/partial/products-list.phtml';
+    }
+    echo '</ul>'; 
+}

@@ -1,0 +1,76 @@
+<div id="kb-amz-admin" class="<?php echo $this->bodyClass; ?>">
+    <br/>
+    <?php
+    $params = array();
+    $params['page'] = $_GET['page'];
+    ?>
+    <div id="kb-amz-header">
+        <ul class="nav nav-tabs">
+        <?php
+            $i = 0;
+            foreach($this->actions as $action):
+                if (isset($action['pages'])) {
+                    $isActive = false;
+                    $subMenuStr = '';
+                    foreach ($action['pages'] as $page) {
+                        $subPageAction = false;
+                        if (isset($_GET['kbAction']) && $_GET['kbAction'] == $page['action']) {
+                            $isActive = $subPageAction = true;
+                        } 
+                        $subMenuStr .= sprintf(
+                            '<li class="%s"><a href="?%s">%s</a></li>',
+                            $subPageAction ? 'active' : '',
+                            http_build_query(array_merge($_GET, array('kbAction' => $page['action']))),
+                            $page['label']
+                        );
+                    }
+
+                    echo sprintf(
+                        '<li class="dropdown %s"><a class="dropdown-toggle" data-toggle="dropdown" href="#">%s %s</a><ul class="dropdown-menu">%s</ul></li>',
+                        $isActive ? 'active' : '',
+                        (isset($action['icon']) ? '<span class="glyphicon '.$action['icon'].'"></span>' : ''),
+                        $action['label'],
+                        $subMenuStr
+                    );
+                } else {
+                    $isActive = false;
+                    if (isset($_GET['kbAction']) && $_GET['kbAction'] == $action['action']) {
+                        $isActive= true;
+                    } else if (!isset($_GET['kbAction']) && ++$i == 1) {
+                        $isActive= true;
+                    }
+                    echo sprintf(
+                        '<li class="%s"><a href="?%s">%s %s</a></li>',
+                        $isActive ? 'active' : '',
+                        http_build_query(array_merge($_GET, array('kbAction' => $action['action']))),
+                        (isset($action['icon']) ? '<span class="glyphicon '.$action['icon'].'"></span>' : ''),
+                        $action['label']
+                    );
+                }
+            endforeach;
+        ?>
+        </ul>
+
+    </div>
+
+    <div id="kb-amz-content">
+        <br/>
+        <?php 
+        if (!empty($this->messages)) {
+            foreach ($this->messages as $m) {
+                echo kbAmzAdminMessage($m[0], $m[1]);
+            }
+        }
+        ?>
+        <?php echo $this->getContent(); ?>
+    </div>
+    <hr/>
+    <div id="kb-amz-footer">
+        <div>
+            Support Id - <?php echo getKbAmz()->getStoreId(); ?>
+        </div>
+        <div class="credit">
+            2014 <a href="http://www.2kblater.com?click=<?php echo getKbHostname();?>" title="Web & Software Development">2kblater.com</a> Consultations, Web & Software Development
+        </div>
+    </div>
+</div>

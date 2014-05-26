@@ -1,0 +1,37 @@
+<form role="form" method="post">
+    <div class="kb-amz-checkbox-toggle">
+        <div data-target="#kb-amz-categories-products" class="btn btn-default"><?php echo __('Toggle Checkbox'); ?></div>
+    </div>
+    <div class="row kb-amz-url-upload" id="kb-amz-categories-products">
+        <?php foreach ($this->items as $item): ?>
+        <label class="col-sm-3 col-md-2">
+            <div class="thumbnail">
+                <div class="import-image">
+                    <img src="<?php echo is_array($item) ? $item['src'] : $item->getImageThumbSrc();?>">
+                </div>
+                <div class="caption">
+                    <div class="import-title">
+                         <a><?php echo is_array($item) ? $item['asin'] : htmlspecialchars($item->getTitle());?></a>
+                    </div>
+                    <input type="checkbox" name="asin[]" value="<?php echo is_array($item) ? $item['asin'] : $item->getAsin();?>" checked="checked"/>
+                </div>
+            </div>
+        </label>
+        <?php endforeach; ?>
+    </div>
+    
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="asin" class="control-label">
+                    <?php echo __('Import in Categories or Uncheck for Amazon Categories'); ?>
+                </label>
+                <ul class="categorychecklist form-no-clear" id="categorychecklist" style="max-height: 200px;overflow-y: scroll;">
+                    <?php wp_category_checklist(null, null, (isset($_POST['post_category']) ? $_POST['post_category'] : null)); ?>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <button type="submit" class="btn btn-primary" name="import" value="import"><?php echo __('Import'); ?></button>
+</form>

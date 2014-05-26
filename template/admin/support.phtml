@@ -1,0 +1,79 @@
+<form role="form" method="post">
+    
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="form-group">
+                <label for="from" class="control-label">
+                    <?php echo __('First and Last Name'); ?>
+                </label>
+                <input name="from" class="form-control" value="<?php echo getKbPostVar('from', sprintf('%s %s', $this->user->first_name, $this->user->last_name))?>"/>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="form-group">
+                <label for="type" class="control-label">
+                    <?php echo __('I want to:'); ?>
+                </label>
+                <select name="type" class="form-control">
+                    <option value="help"><?php echo __('get help');?></option>
+                    <option value="bug"><?php echo __('report a bug');?></option>
+                    <option value="suggest"><?php echo __('suggest');?></option>
+                    <option value="hello"><?php echo __('say hello');?></option>
+                    <option value="buy_themes"><?php echo __('buy themes');?></option>
+                    <option value="other"><?php echo __('express other matter');?></option>
+                </select>
+            </div>
+        </div>
+    </div> 
+    
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="form-group">
+                <label for="title" class="control-label">
+                    <?php echo __('Title'); ?>
+                </label>
+                <input name="title" class="form-control" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="form-group">
+                <label for="comment" class="control-label">
+                    <?php echo __('Tell us more'); ?>*
+                </label>
+                <textarea name="comment" class="form-control" rows="5"></textarea>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="form-group">
+                <label for="replyto" class="control-label">
+                    <?php echo __('Reply to'); ?>*
+                </label>
+                <input name="replyto" value="<?php echo $this->user->user_email; ?>" class="form-control" />
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="form-group">
+                <label for="support_id" class="control-label">
+                    <?php echo __('Support Id'); ?>*
+                </label>
+                <input name="support_id" value="<?php echo getKbAmz()->getStoreId(); ?>" class="form-control" disabled="disabled"/>
+            </div>
+        </div>
+    </div>
+        
+    <button type="submit" class="btn btn-primary" name="import" value="submit"><?php echo __('Send'); ?></button>
+</form>
+
+

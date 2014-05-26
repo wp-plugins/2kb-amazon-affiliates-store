@@ -1,0 +1,25 @@
+<div class="row">
+    <div class="col-sm-6 col-md-6">
+        <h5 class="label label-info"><?php echo __('Available Attributes'); ?></h5>
+        <div class="list-group">
+        <?php foreach($this->attributes as $att => $val): ?>
+            <a class="list-group-item <?php echo isset($_GET['attr']) && $_GET['attr'] == $att ? 'active' : '';?>" href="<?php echo kbGetUrlWithParams(array('attr' => $att));?>">
+                <?php echo $val; ?>
+            </a>
+        <?php endforeach; ?>
+        </div>
+    </div>
+    <?php if (isset($_GET['attr'])): ?>
+    <div class="col-sm-6 col-md-6">
+        <h5 class="label label-info"><?php echo __('Unique Values For') . ' ' . $_GET['attr']; ?></h5>
+        <ul class="list-group">
+        <?php foreach($this->values as $att => $val): ?>
+            <li class="list-group-item">
+                <?php echo $val->meta_value; ?>
+                <span class="badge"><?php echo $val->count; ?></span>
+            </li>
+        <?php endforeach; ?>
+        </ul>
+    </div>
+    <?php endif; ?>
+</div>

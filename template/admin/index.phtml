@@ -1,0 +1,116 @@
+<div class="row">
+    <div class="col-sm-12">
+        <h4><?php echo __('Owner TODO List');?></h4>
+    </div>
+    <div class="col-sm-6">
+        <?php if (hasKbAmazonApiDetails()) { ?>
+            <div class="alert alert-success">
+                <span class="glyphicon glyphicon-check"></span>
+                <?php  echo __('Amazon API is Configured.'); ?>
+            </div>
+        <?php } else { ?>
+            <div class="alert alert-danger">
+                <span class="glyphicon glyphicon-fire"></span>
+                <a href="?page=kbAmz&kbAction=settingsAmazonApi">
+                    <?php echo __('Click to setup you Amazon API Configuration.'); ?>
+                </a>
+            </div>
+            <?php
+        }
+        ?>
+        
+        <?php if (getKbAmz()->getProductsCount()) { ?>
+            
+            <?php
+            $count = getKbAmz()->getProductsCount();
+            $max = getKbAmz()->getOption('maxProductsCount');
+
+            ?>
+        
+            <?php if ($max > $count && $count > $max * 0.8) { ?>
+                <div class="alert alert-warning">
+                    <span class="glyphicon glyphicon-check"></span>
+                    <?php  echo sprintf(__('You have %s of %s products.'), getKbAmz()->getProductsCount(), getKbAmz()->getOption('maxProductsCount')); ?>
+                </div>
+            <?php } else if ($count < $max) { ?>
+                <div class="alert alert-success">
+                    <span class="glyphicon glyphicon-check"></span>
+                    <?php  echo sprintf(__('You have %s of %s products.'), getKbAmz()->getProductsCount(), getKbAmz()->getOption('maxProductsCount')); ?>
+                </div>
+            <?php
+            } else {
+            ?>
+                <div class="alert alert-danger">
+                    <span class="glyphicon glyphicon-check"></span>
+                    <?php
+                        $params = $_GET;
+                        $params['kbAction'] = 'premium';
+                        echo sprintf(
+                            __('You have %s of %s products. You can upgrade from <a href="?%s">here</a>.'),
+                            getKbAmz()->getProductsCount(),
+                            getKbAmz()->getOption('maxProductsCount'),
+                            http_build_query($params)
+                        ); ?>
+                </div>
+            <?php
+            }
+            ?>
+        
+        <?php } else { ?>
+            <div class="alert alert-danger">
+                <span class="glyphicon glyphicon-fire"></span>
+                <a href="?page=kbAmz&kbAction=importBySearch">
+                    <?php echo __('You have no products imported. Click here to start importing Amazon Products.'); ?>
+                </a>
+            </div>
+        <?php
+        }
+        ?>
+    </div>
+    
+    <div class="col-sm-6">
+        <?php if (extension_loaded('soap')) { ?>
+            <div class="alert alert-success">
+                <span class="glyphicon glyphicon-check"></span>
+                <?php  echo __('SOAP extension is activated on this server.'); ?>
+            </div>
+        <?php } else { ?>
+            <div class="alert alert-danger">
+                <span class="glyphicon glyphicon-fire"></span>
+                <?php echo __('SOAP extension is not activated for this server. Please contact your hosting company and request activation.'); ?>
+            </div>
+            <?php
+        }
+        if (function_exists('curl_init')) {
+            ?>
+            <div class="alert alert-success">
+                <span class="glyphicon glyphicon-check"></span>
+                <?php  echo __('cURL extension is activated for this server.'); ?>
+            </div>
+            <?php
+        } else {
+            ?>
+            <div class="alert alert-danger">
+                <span class="glyphicon glyphicon-fire"></span>
+                <?php echo __('cURL extension is not activated for this server. Please contact your hosting company and request activation.'); ?>
+            </div>
+            <?php
+        }
+        
+        if ((int) ini_get('allow_url_fopen') > 0) {
+            ?>
+            <div class="alert alert-success">
+                <span class="glyphicon glyphicon-check"></span>
+                <?php echo __('allow_url_fopen is enabled. This option allows product`s images download.'); ?>
+            </div>
+            <?php
+        } else {
+            ?>
+            <div class="alert alert-danger">
+                <span class="glyphicon glyphicon-fire"></span>
+                <?php echo __('allow_url_fopen is disabled. This option allows product`s images download. Please contact your hosting company and request activation.'); ?>
+            </div>
+        <?php }
+        ?>
+    </div>
+</div>

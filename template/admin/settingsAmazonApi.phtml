@@ -1,0 +1,36 @@
+<form role="form" method="post">
+    <div class="form-group">
+        <label class="control-label">
+            <?php echo __('Access Key'); ?>
+        </label>
+        <input value="<?php echo getKbPostVar('amazon.accessKey', getKbAmz()->getOption('amazon.accessKey'));?>" type="text" name="amazon[accessKey]" class="form-control">
+    </div>
+    
+    <div class="form-group">
+        <label class="control-label">
+            <?php echo __('Secret Key'); ?>
+        </label>
+        <input value="<?php echo getKbPostVar('amazon.secretKey', getKbAmz()->getOption('amazon.secretKey'));?>" type="text" name="amazon[secretKey]" class="form-control">
+    </div>
+    
+    <div class="form-group">
+        <label class="control-label">
+            <?php echo __('Country'); ?>
+        </label>
+        
+        <select name="amazon[country]" class="form-control"  value="<?php echo getKbPostVar('amazon.country', getKbAmz()->getOption('amazon.country', 'com'));?>">
+            <?php echo kbAmzSelect($this->groups, getKbPostVar('amazon.country', getKbAmz()->getOption('amazon.country', 'com'))); ?>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label class="control-label">
+            <?php echo __('Associate Tag'); ?>
+        </label>
+        <input value="<?php echo getKbPostVar('amazon.associateTag', getKbAmz()->getOption('amazon.associateTag'));?>" type="text" name="amazon[associateTag]" class="form-control">
+    </div>
+    
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary" name="submit"><?php echo __('Update'); ?></button>
+    </div>
+</form>

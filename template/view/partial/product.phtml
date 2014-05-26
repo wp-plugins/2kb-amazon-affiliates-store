@@ -1,0 +1,79 @@
+<?php
+/**
+ * The default template for displaying content
+ *
+ * Used for both single and index/archive/search.
+ *
+ * @package WordPress
+ * @subpackage Twenty_Fourteen
+ * @since Twenty Fourteen 1.0
+ */
+
+
+$meta = getKbAmz()->getProductMeta($p->ID);
+$title = htmlentities(str_replace('"', '', get_the_title($p->ID)));
+$c = getKbAmz()->getOption('ListItemsPerRow', 6);
+$lg = 2;
+$md = 2;
+$sm = 3;
+$xs = 4;
+if ($c == 4) {
+    $lg = 3;
+    $md = 3;
+    $sm = 3;
+    $xs = 3;
+} else if($c == 3) {
+    $lg = 4;
+    $md = 4;
+    $sm = 4;
+    $xs = 4;
+}
+
+?>
+
+<li class="kb-amz-per-row-<?php echo $c; ?> col-lg-<?php echo $lg; ?> col-md-<?php echo $md; ?> col-sm-<?php echo $sm; ?> col-xs-<?php echo $xs; ?> kb-amz-row-item-part <?php echo getKbAmz()->getOption('productListImageSize'); ?>">
+    <article id="post-<?php echo $p->ID; ?>" <?php post_class('kb-amz-product', $p->ID); ?>>
+        <header>
+            <div class="kb-amz-item-list-img animate <?php echo getKbAmz()->getOption('imageHoverSwitch') ? 'kb-amz-hover-switch-active' : 'kb-amz-hover-switch-not-active'; ?>">
+                <?php 
+                $images = getKbAmz()->getProductImages($p->ID);
+                ?>
+                <a href="<?php echo get_permalink($p->ID); ?>" title="<?php echo $title; ?>">
+                    <?php
+                    $thumbId = get_post_thumbnail_id($p->ID);
+                    echo wp_get_attachment_image($thumbId, getKbAmz()->getOption('productListImageSize'), null, array('class' => 'animate kb-amz-first')); 
+
+                    if (isset($images[1])) {
+                        echo wp_get_attachment_image($images[1]->ID, getKbAmz()->getOption('productListImageSize'),null, array('class' => 'animate kb-amz-second'));
+                    }
+                    ?>
+                </a>
+                <?php echo getKbAmz()->getProductSticker($p->ID); ?>
+            </div>
+            <div class="kb-amz-item-list-content">
+                <div class="kb-amz-item-list-title">
+
+                    <?php
+                    echo '<a class="kb-amz-item-list-name" href="'.get_permalink($p->ID).'" title="'.$title.'">' .get_the_title($p->ID). '</a>';
+                    ?>
+
+    <!--                <div class="description">Well, reading books as a hobby...</div>-->
+                </div>
+                <div class="kb-amz-item-actions">
+                    <?php if (getKbAmz()->isProductAvailable($p->ID)): ?>
+                    <div class="kb-amz-item-price">
+                        <?php echo getKbAmz()->getProductPriceHtml($p->ID);?>
+                    </div>
+                    <div class="kb-amz-item-cart-button">
+                        <?php
+                        echo getKbAmz()->getCartButtonHtml($p->ID);
+                        ?>
+                    </div>
+                    <span class="clear"></span>
+                     <?php endif; ?>
+                </div>
+            </div>
+        </header>
+    </article>
+</li>
+

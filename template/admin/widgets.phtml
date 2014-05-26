@@ -1,0 +1,19 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th><?php echo __('Type'); ?></th>
+            <th><?php echo __('Description'); ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php $i = 1; ?>
+        <?php foreach ($this->widgetsTypes as $key => $widget): ?>
+            <tr>
+                <td><?php echo $i++; ?></td>
+                <td><?php echo $widget['label']; ?></td>
+                <td><?php echo isset($widget['description']) ? $widget['description'] : null; ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>

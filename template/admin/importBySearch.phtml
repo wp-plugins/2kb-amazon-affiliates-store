@@ -1,0 +1,39 @@
+<form role="form" method="post">
+    <div class="row">
+        <div class="col-xs-4">
+            <div class="form-group">
+                <label for="search" class="control-label">
+                    <?php echo __('Search Word'); ?>
+                </label>
+                <input value="<?php echo getKbPostVar('search');?>" type="text" name="search" class="form-control" placeholder="<?php echo __('e.g. iphone'); ?>">
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="form-group">
+                <label for="category" class="control-label">
+                    <?php echo __('Category'); ?>
+                </label>
+                <select name="category" class="form-control"  value="<?php echo getKbPostVar('category');?>">
+                    <?php echo kbAmzSelect($this->categories, getKbPostVar('category'), null); ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="form-group">
+                <label for="categoryName" class="control-label">
+                    <?php echo __('Category Name'); ?>
+                </label>
+                <input type="text" name="categoryName" class="form-control" value="<?php echo getKbPostVar('categoryName');?>" />
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary" name="submit" value="load"><?php echo __('Search'); ?></button>
+    </div>
+</form>
+
+<?php
+if ($this->addItemsTemplate) {
+    include $this->addItemsTemplate.'.phtml';
+}
+?>

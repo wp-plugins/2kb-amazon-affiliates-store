@@ -1,0 +1,34 @@
+<?php
+if (count($this->errors) == 0) {
+    return;
+}
+?>
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th><?php echo __('Time'); ?></th>
+            <th><?php echo __('Type'); ?></th>
+            <th><?php echo __('Message'); ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php $i = 1; ?>
+        <?php foreach ($this->errors as $error): ?>
+            <tr>
+                <td> 
+                    <?php echo $i++;?>
+                </td>
+                <td> 
+                    <?php echo $error['date'];?>
+                </td>
+                <td> 
+                    <?php echo $error['type'];?>
+                </td>
+                <td> 
+                    <?php echo $error['msg'];?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>

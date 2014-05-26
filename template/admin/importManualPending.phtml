@@ -1,0 +1,31 @@
+<?php
+if (count($this->asins) == 0) {
+    return;
+}
+?>
+<div class="kb-amz-checkbox-toggle">
+    <div data-target="#kb-amz-manual-import-pending" class="btn btn-default"><?php echo __('Toggle Checkbox'); ?></div>
+</div>
+<form role="form" method="post">
+    <table class="table" id="kb-amz-manual-import-pending">
+        <thead>
+            <tr>
+                <th><?php echo __('Asin'); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php $i = 1; ?>
+            <?php foreach ($this->asins as $asin): ?>
+                <tr>
+                    <td><label style="width: 100%;">
+                            <input type="checkbox" name="asin[]" value="<?php echo $asin; ?>" style="margin-top: 0;"/>
+                            <?php echo $asin;?>
+                        </label></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary" name="load" value="load"><?php echo __('Add to Cron Queue'); ?></button>
+    </div>
+</form>

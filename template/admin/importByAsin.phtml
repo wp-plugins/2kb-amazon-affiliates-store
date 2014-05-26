@@ -1,0 +1,25 @@
+<form role="form" method="post">
+    <div class="row">
+        <div class="col-xs-2">
+            <div class="form-group">
+                <label for="asin" class="control-label">
+                    <?php echo __('Amazon ASIN Number'); ?>
+                </label>
+                <input value="<?php echo getKbPostVar('asin');?>" type="text" name="asin" class="form-control" placeholder="ASIN">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" name="submit"><?php echo __('Import'); ?></button>
+            </div>
+        </div>
+        <div class="col-xs-10">
+            <div class="form-group">
+                <label for="asin" class="control-label">
+                    <?php echo __('Import in Categories or Uncheck for Amazon Categories');?>
+                </label>
+                <ul class="categorychecklist form-no-clear" id="categorychecklist" style="max-height: 200px;overflow-y: scroll;">
+                    <?php wp_category_checklist(null, null, $_POST['post_category']); ?>
+                </ul>
+            </div>
+        </div>
+    </div>
+</form>

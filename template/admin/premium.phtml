@@ -1,0 +1,64 @@
+<?php if ($this->isAjax) : ?>
+    <?php echo $this->premium; ?>
+<?php else: ?>
+    <div id="kb-amz-premium">
+        <div class="progress progress-striped active">
+            <div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+            <span class="sr-only">45% Complete</span>
+        </div>
+    </div>
+
+    <script>
+        (function($, data, url) {
+            $(function(){
+                $('body').on('click', '.kb-amz-buttom-activate-purchase:not(.clicked)', function() {
+                    var $this = $(this);
+                    var text = $this.html();
+                    $this.html($this.attr('data-loading-text'));
+                    $.ajax({
+                        type: "POST",
+                        url : url,
+                        async: false,
+                        dataType: 'json',
+                        data: {
+                            'action' : 'kbAmzPremiumActivateAction',
+                            'purchaseId' : $this.attr('data-purchase-id'),
+                        }
+                    }).done(function(data) {
+                        if (undefined !== data['msg'] && data['msg'].length > 0) {
+                            alert(data['msg']);
+                            $this.html(text);
+                        }
+                        
+                        if (data['success']) {
+                            $this.html($this.attr('data-activated-text'));
+                            $this.unbind();
+                            $this.addClass('clicked');
+                            $this.closest('tr').addClass('success');
+                        }
+                    }).error(function(){
+                        $this.html(text);
+                        alert('Unable to connect to the server. Please try again.');
+                    });
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url : url,
+                    data: {
+                        'action' : 'kbAmzPremiumAction'
+                    }
+                }).done(function(data) {
+                    $('#kb-amz-premium').html(data);
+                    $('.kb-amz-buttom-activate-purchase').button();
+                }).error(function(){
+                    alert('Unable to connect to the server. Please try again.');
+                });
+            });
+        })(jQuery, '<?php echo $this->postData; ?>', '<?php echo getKbAmzAjaxUrl(); ?>');
+    </script>
+
+<?php endif; ?>
+
+
+

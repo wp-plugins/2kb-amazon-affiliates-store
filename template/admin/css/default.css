@@ -1,0 +1,75 @@
+#kb-amz-admin .categorychecklist ul{
+    margin-left: 20px;
+}
+#kb-amz-admin img{
+    max-width: 100%!important;
+    max-height: 100%;
+    height: auto;
+}
+#kb-amz-admin{
+    padding: 0 20px;
+    padding-bottom: 20px;
+    min-height: 300px;
+    background: white;
+    color: black;
+}
+.kb-amz-url-upload .caption a{
+    line-height: 1.1;
+    height: 4.4em;
+
+}
+.kb-amz-url-upload .import-title{
+    line-height: 1.1;
+    height: 4.4em;
+    overflow: hidden;
+}
+.kb-amz-url-upload .import-image{
+    height: 180px;
+    overflow: hidden;
+}
+.kb-amz-product-attributes #sortable2 input{
+    display: none;
+}
+.kb-amz-product-attributes #sortable1 input{
+float: right;
+    height: 30px;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    z-index: 5000;
+}
+.kb-amz-product-attributes #sortable1 .list-group-item{
+    position: relative;
+}
+
+#kb-amz-admin .form-control{
+    height: 34px !important;
+    line-height: 1.42857 !important;
+    padding: 6px 12px !important;
+}
+#kb-amz-admin textarea.form-control{
+    height: auto !important;
+}
+.kb-amz-checkbox-toggle{
+    margin-bottom: 10px;   
+}
+.badge .kbbr{
+    display: none;
+}
+.kb-amz-select-width-100{
+    width: 100%;
+}
+
+.kb-amz-select-width select{
+    width: 100%;
+}
+#kb-amz-version ul, #kb-amz-version li{
+    list-style-type: disc;
+}
+#kb-amz-version ul{
+    padding-left: 15px;
+}
+#kb-amz-footer .credit{
+    text-align: center;
+    margin-top: 10px;
+}

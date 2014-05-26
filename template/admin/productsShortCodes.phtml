@@ -1,0 +1,60 @@
+<form role="form" method="post">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th><?php echo __('Short Code'); ?></th>
+                <th><?php echo __('Params'); ?></th>
+                <th><?php echo __('Enabled'); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php $i = 1; ?>
+            <?php foreach ($this->shortCodes as $name => $code): ?>
+                <tr>
+                    <td><?php echo $i++; ?></td>
+                    <td>[<?php echo $code['code']; ?>]</td>
+                    <td>
+                        <?php
+                            $params = array();
+                            foreach ($code['params'] as $nameParamName => $avaialbe) {
+                                $params[] = $nameParamName . '="'.$avaialbe.'"';
+                            }
+                            echo implode(', ', $params);
+                        ?>
+                    </td>
+                    <td>
+                        <input type="checkbox" value="1" name="<?php echo $name; ?>[active]" <?php echo $code['active'] ? 'checked="checked"' : '';?>/>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <div class="form-group">
+        <label class="control-label" for="shortCodePostContent">
+            <?php echo __('ShortCode Post Content. This content is inserted with every product.'); ?>
+        </label>
+        
+<?php wp_editor(getKbAmz()->getShortCodePostContent(), 'shortCodePostContent', array(
+	'dfw' => true,
+	'drag_drop_upload' => true,
+	'tabfocus_elements' => 'insert-media-button,save-post',
+	'editor_height' => 360,
+	'tinymce' => array(
+		'resize' => false,
+		'add_unload_trigger' => false,
+	),
+) ); ?>
+    </div>
+    <div class="form-group">
+        <label class="control-label" for="updateForAllPosts">
+            <?php echo __('Update For All Existing Products.'); ?>
+        </label>
+        <select value="<?php echo getKbPostVar('updateForAllPosts', 0);?>" name="updateForAllPosts" class="form-control">
+            <?php echo kbAmzSelect(array(1 => __('Yes'), 0 => __('No')), getKbPostVar('updateForAllPosts', 0)); ?>
+        </select>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary" name="submit" value="load"><?php echo __('Update'); ?></button>
+    </div>
+</form>

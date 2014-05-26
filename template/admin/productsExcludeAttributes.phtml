@@ -1,0 +1,56 @@
+<h4><?php echo __('Drag and Drop to Exclude Attributes From Your Product Importing.'); ?></h4>
+<div class="row kb-amz-product-attributes">
+    <div class="col-sm-6 col-md-6">
+        <h5 class="label label-info"><?php echo __('Excluded Attributes'); ?></h5>
+        <form role="form" method="post">
+            <ul id="sortable1" class="list-group connectedSortable" style="min-height: 50px;">
+            <?php foreach($this->excludedAttributes as $att => $val): ?>
+                <li class="list-group-item">
+                    <?php echo substr($val, 5); ?>
+                    <input 
+                          type="hidden"
+                          name="excludedAttributes[]"
+                          value="<?php echo $val?>"
+                    />
+                </li>
+            <?php endforeach; ?>
+            </ul>
+            <div class="form-group">
+                <label class="control-label" for="deleteExcluded">
+                    <?php echo __('Delete Existing Excluded Attributes'); ?>
+                </label>
+                <select value="<?php echo getKbPostVar('deleteExcluded', 0);?>" name="deleteExcluded" class="form-control">
+                    <?php echo kbAmzSelect(array(1 => __('Yes'), 0 => __('No')), getKbPostVar('deleteExcluded', 0)); ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" name="submit" value="load"><?php echo __('Update'); ?></button>
+            </div>
+        </form>
+    </div>
+    <div class="col-sm-6 col-md-6">
+        <h5 class="label label-info"><?php echo __('Available Attributes'); ?></h5>
+        <ul id="sortable2" class="list-group connectedSortable" style="min-height: 300px;overflow-y: scroll;">
+        <?php foreach($this->attributes as $att => $val): ?>
+            <li class="list-group-item <?php echo in_array($att, $this->excludedAttributesDisabled) ? ' ui-state-disabled list-group-item-danger' : ''?>">
+                <?php echo $val; ?>
+                <input type="hidden" name="excludedAttributes[]" value="<?php echo $att?>" />
+            </li>
+        <?php endforeach; ?>
+        </ul>
+    </div>
+</div>
+
+<script>
+    (function($){
+        $(function() {
+            $("#sortable1, #sortable2").sortable({
+                connectWith: ".connectedSortable",
+                items: "li:not(.ui-state-disabled)",
+                cancel: ".ui-state-disabled"
+            });
+            $("#sortable2").disableSelection();
+            $("#sortable2").height($("#sortable1").height());
+        });
+    })(jQuery);
+</script>

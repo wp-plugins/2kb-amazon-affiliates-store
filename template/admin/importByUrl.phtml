@@ -1,0 +1,20 @@
+<form role="form" method="post">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="asin" class="control-label">
+                    <?php echo __('Amazon Url'); ?>
+                </label>
+                <input value="<?php echo getKbPostVar('url');?>" type="text" name="url" class="form-control" placeholder="Url From Amazon.com">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" name="load" value="load"><?php echo __('Load'); ?></button>
+            </div>
+        </div>
+    </div>
+</form>
+<?php
+if ($this->addItemsTemplate) {
+    include $this->addItemsTemplate.'.phtml';
+}
+?>

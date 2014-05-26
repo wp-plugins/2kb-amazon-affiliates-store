@@ -1,0 +1,21 @@
+<form role="form" method="post">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="defaultPostStatus" class="control-label">
+                    <?php echo __('By default products will not show in your blog. By using Pending post status your products will be only visible with [kb_amz_list_products].'); ?>
+                </label>
+                <select value="<?php echo getKbPostVar('defaultPostStatus', getKbAmz()->getOption('defaultPostStatus', 'pending')); ?>" name="defaultPostStatus" class="form-control">
+                    <?php echo kbAmzSelect(array('pending' => __('Pending'), 'publish' => __('Publish')), getKbPostVar('defaultPostStatus', getKbAmz()->getOption('defaultPostStatus', 'pending'))); ?>
+                </select>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary" name="submit" value="load"><?php echo __('Update'); ?></button>
+        <button type="submit" class="btn btn-primary" name="update" value="load"><?php echo __('Update And Change To All Products'); ?></button>
+    </div>
+</form>
