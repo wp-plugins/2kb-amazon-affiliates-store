@@ -26,9 +26,7 @@ Features
 
 This section describes how to install the plugin and get it working.
 
-e.g.
-
-1. Upload `2kb-amazon-store` folder to the `/wp-content/plugins/` directory
+1. Upload `2kb-amazon-affiliates-store` folder to the `/wp-content/plugins/` directory
 1. Activate 2kb Amazon Affiliates Store plugin through the 'Plugins' menu in WordPress
 1. Open 2kb Amazon Store from admin menu or go to link YOUR_BLOG.COM/wp-admin/admin.php?page=kbAmz and follow the instructions.
 
