@@ -115,7 +115,8 @@ function kb_amz_product_content_func($atts) {
 	$atts = shortcode_atts( array(
             'show-all-reviews' => 'Yes',
             'show-title' => 'Yes',
-            'strip-tags' => 'No'
+            'strip-tags' => 'No',
+            'id' => null
 	), $atts);
 
         $shortCodes = getKbAmz()->getShortCodes();
@@ -135,8 +136,8 @@ function kb_amz_product_content_func($atts) {
     </div>
 </div>
 HTML;
-        
-        $meta = getKbAmz()->getProductMetaArray(get_the_ID());
+        $postId = $atts['id'] ? $atts['id'] : get_the_ID();
+        $meta = getKbAmz()->getProductMetaArray($postId);
         $tabs = '';
         if (isset($meta['KbAmzEditorialReviews']['EditorialReview'])) {
             $reviews = isset($meta['KbAmzEditorialReviews']['EditorialReview'][0])
@@ -353,7 +354,19 @@ function kbAmzShortCodeBool($str)
 }
 
 
-
+function kbAmzShortCodeAttrToStr($code, $atts)
+{
+    $code = str_replace(array('[', ']', ' '), '', $code);
+    $params = array();
+    foreach ($atts as $key => $val) {
+        $params[] = $key.'="'.$val.'"';
+    }
+    return sprintf(
+        '[%s%s]',
+        $code,
+        (empty($params) ? null : ' '.implode(' ', $params))
+    );
+}
 
 
 add_filter('post_thumbnail_html', 'filterKbAmzThumbnailGallery', 99999);

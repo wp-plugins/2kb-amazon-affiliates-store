@@ -74,7 +74,9 @@ class KbAmzTemplate
 
     public function initDefaultScripts()
     { 
-    
+        if (is_admin()) {
+            return;
+        }
         wp_enqueue_style(
             'KbAmzStoreDefaultStyle',
             getKbPluginUrl() . '/template/default/css/style.css'
@@ -85,11 +87,6 @@ class KbAmzTemplate
             getKbPluginUrl() . '/template/js/default.js',
             array('jquery')
         );
-
-//        wp_enqueue_style(
-//            'KbAmzBootstrapIconsCss',
-//            getKbPluginUrl() . '/template/admin/vendors/bootstrap/css/icons.css'
-//        );
     }
     
     public function initDefaultAdminScripts()

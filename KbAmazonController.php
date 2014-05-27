@@ -306,26 +306,33 @@ class KbAmzAdminController {
     {
         $data = array();
         if (!empty($_POST)) {
+            $action = $_POST['submit'];
             unset($_POST['submit']);
-            
-            $codes = getKbAmz()->getShortCodes();
-            $updated = array();
-            foreach ($codes as $name => $code) {
-                if (isset($_POST[$name]['active']) && $_POST[$name]['active']) {
-                    $updated[$name]['active'] = true;
-                } else {
-                    $updated[$name]['active'] = false;
+            if ($action == 'defaults') {
+                getKbAmz()->setOption('shortCodePostContent', null);
+                $this->messages[] = array(__('Defaults restored.'), 'alert-success'); 
+            } else if ($action == 'update') {
+                $codes = getKbAmz()->getShortCodes();
+                $updated = array();
+                foreach ($codes as $name => $code) {
+                    if (isset($_POST[$name]['active']) && $_POST[$name]['active']) {
+                        $updated[$name]['active'] = true;
+                    } else {
+                        $updated[$name]['active'] = false;
+                    }
                 }
+                getKbAmz()->setOption('productShortCodes', $updated);
+
+                $shortCodeContent = $_POST['shortCodePostContent'];
+                getKbAmz()->setOption('shortCodePostContent', $shortCodeContent);
+                if ($_POST['updateForAllPosts']) {
+                    getKbAmz()->updateAllProductsContent($shortCodeContent);
+                }
+
+                $this->messages[] = array(__('Product Short Codes Updated'), 'alert-success');
+                $this->messages[] = array(__('If the content shortcode has param replace="Yes", the content will be updated on the next product update via the cron job.'), 'alert-success');
             }
-            getKbAmz()->setOption('productShortCodes', $updated);
-            
-            $shortCodeContent = $_POST['shortCodePostContent'];
-            getKbAmz()->setOption('shortCodePostContent', $shortCodeContent);
-            if ($_POST['updateForAllPosts']) {
-                getKbAmz()->updateAllProductsContent($shortCodeContent);
-            }
-            
-            $this->messages[] = array(__('Product Short Codes Updated'), 'alert-success');
+
         }
         
         $data['shortCodes'] = getKbAmz()->getShortCodes();

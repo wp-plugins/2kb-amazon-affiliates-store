@@ -452,7 +452,6 @@ class KbAmazonImporter
             $postId = $postExists;
         }
              
-        // set last update time;
         update_post_meta($postId, 'KbAmzLastUpdateTime', time() + getKbAmz()->getOption('uproductsUpdateOlderThanHours', self::SECONDS_BEFORE_UPDATE));
         
         // Images
@@ -533,6 +532,8 @@ class KbAmazonImporter
         if (!getKbAmz()->isProductAvailable($postId)) {
             wp_update_post(array('ID' => $postId, 'post_status' => 'pending'));
         }
+        
+        $this->updateProductContent($postId);
 
         return array(
             'post_id' => $postId,
@@ -540,7 +541,6 @@ class KbAmazonImporter
             'error' => null
         );
     }
-    
     
     /**
      * @param KbAmazonItem $item
@@ -550,6 +550,34 @@ class KbAmazonImporter
         return getKbAmz()->getShortCodePostContent();
     }
     
+    public function updateProductContent($postId)
+    {
+        $pattern = get_shortcode_regex();
+        $post = get_post($postId);
+        $matches = array();
+        $contentShortCode = getKbAmz()->getShortCode('content', true);
+        preg_match_all('/'. $pattern .'/s', $post->post_content, $matches);
+        if (isset($matches[0]) && is_array($matches[0])) {
+            foreach ($matches[0] as $shortCode) {
+                if (strpos($shortCode, $contentShortCode) !== false) {
+                    $codeStr = str_replace(array('[', ']', $contentShortCode), '', $shortCode);
+                    $atts = shortcode_parse_atts($codeStr);
+                    if (isset($atts['replace']) && kbAmzShortCodeBool($atts['replace'])) {
+                        $atts['id'] = $postId;
+                        $doShortCodeStr = kbAmzShortCodeAttrToStr($contentShortCode, $atts);
+                        $shortCodeContent = do_shortcode($doShortCodeStr);
+                        $post->post_content = str_replace(
+                            $shortCode,
+                            "\n" . $shortCodeContent . "\n",
+                            $post->post_content
+                        );
+                        wp_update_post($post);
+                    }
+                }
+            }
+        }
+    }
+
     public function downloadAndSaveImage($imageUrl, $postId, $num, KbAmazonItem $item)
     {
         if (!empty($imageUrl)) {
@@ -664,7 +692,9 @@ class KbAmazonImporter
     
     function getCategoriesFromResult($node, &$categories)
     {
-        $categories[] = $node['Name'];
+        if (isset($node['Name'])) {
+           $categories[] = $node['Name'];
+        }
         if(isset($node['Ancestors']) && isset($node['Ancestors']['BrowseNode'])) {
                 $this->getCategoriesFromResult($node['Ancestors']['BrowseNode'], $categories);
         }

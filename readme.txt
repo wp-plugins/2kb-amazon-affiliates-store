@@ -2,7 +2,7 @@
 Tags: amazon, affiliate, associate, online store, selling products
 Requires at least: 3.9
 Tested up to: 3.9
-Stable tag: 1.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,8 +33,11 @@ This section describes how to install the plugin and get it working.
 == Frequently Asked Questions ==
 
 == Screenshots ==
-1./2kb-amazon-store/presentation.jpg
+
 == Changelog ==
 
+= 1.0.1 =
+Day 1 update
+Products -> Short Codes, restore default content shortcodes. Option to replace content shortcode with the product content insuring better SEO and editability.
 = 1.0.0 =
 Initial realise version.

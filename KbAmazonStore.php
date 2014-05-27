@@ -44,7 +44,8 @@ class KbAmazonStore
             'params' => array(
                 'show-all-reviews' => 'Yes/No',
                 'show-title' => 'Yes/No',
-                'strip-tags' => 'No/Yes'
+                'strip-tags' => 'No/Yes',
+                'replace' => 'No/Yes - replace the short code result directly in the post'
             ),
             'active' => true,
         ),
@@ -331,11 +332,17 @@ class KbAmazonStore
         return empty($attributes) ? $this->getDefaultAttributes() : $attributes;
     }
 
-    public function getShortCode($code, $clean = false)
+    public function getShortCode($code, $mixed = false)
     {
         if (isset($this->shortCodes[$code])) {
-            return $clean ? $this->shortCodes[$code]['code']
-                          : '[' . $this->shortCodes[$code]['code'] . ']';
+            $codeName = $this->shortCodes[$code]['code'];
+            if ($mixed === true) {
+                return $codeName;
+            } else if (is_array($mixed)) {
+                return kbAmzShortCodeAttrToStr($codeName, $mixed);
+            } else {
+                return '[' . $codeName . ']';
+            }
         }
     }
     
@@ -369,13 +376,13 @@ class KbAmazonStore
 %s
 %s
 HTML;
-        
+
         return sprintf(
             $content,
             getKbAmz()->getShortCode('gallery'),
             getKbAmz()->getShortCode('attributes'),
             getKbAmz()->getShortCode('actions'),
-            getKbAmz()->getShortCode('content'),
+            getKbAmz()->getShortCode('content', array('replace' => 'Yes')),
             getKbAmz()->getShortCode('similar')
         );
     }
