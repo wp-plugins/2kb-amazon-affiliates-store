@@ -888,6 +888,22 @@ HTML;
         return $this->productsCount;
     }
     
+    public function getProductsToDownloadCount()
+    {
+        $pr =  getKbAmz()->getOption('ProductsToDownload', array());
+        return count($pr);
+    }
+    
+    public function getProductsToUpdateCount()
+    {
+        static $count;
+        if (null === $count){
+            $pr =  getKbAmz()->getProductsAsinsToUpdate();
+            $count = count($pr);
+        }
+        return $count;
+    }
+
     public function addProductCount($addup)
     {
         $this->productsCount += $addup;

@@ -15,8 +15,8 @@ if (!session_id()) {
   session_start();
 }
 
-define('KbAmazonVersion', '1.0.1');
-define('KbAmazonVersionNumber', 101);
+define('KbAmazonVersion', '1.0.2');
+define('KbAmazonVersionNumber', 102);
 define('KbAmazonStoreFolderName',  pathinfo(dirname(__FILE__), PATHINFO_FILENAME));
 define('KbAmazonStorePluginPath',  dirname(__FILE__) . '/');
 
