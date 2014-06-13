@@ -306,7 +306,7 @@ class kbAmazonShopSliderWidget extends KbAmzWidget
         $minMax = getKbAmz()->getMinMaxMetaWidgetMethod(
             $instance['meta_key']
         );
-        // var_dump($minMax);
+
         $dbMin = $minMax[0];
         $dbMax = $minMax[1];
         
@@ -491,7 +491,6 @@ class kbAmazonShopAttributeCount extends KbAmzWidget
         if (!empty($_GET)) {
             foreach ($_GET as $name => $metaId) {
                 if (substr($name, 0, $baseLength) == $base) {
-                    //var_dump($metaId);die;
                     $row = getKbAmz()->getMetaDataById($metaId);
                     if ($row) {
                         $dbkey = uniqid('nm');

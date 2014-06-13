@@ -12,6 +12,7 @@ function getKbAmzDefaultOptions()
        'enableSalePrice' => 1,
        'productListImageSize' => 1,
        'replaceThumbnailWithGallery' => 0,
+       'downloadImages' => 1,
        'numberImagesToDownload' => 3,
        'canImportFreeItems' => 0,
        'loadSimilarItems' => 3, // NO

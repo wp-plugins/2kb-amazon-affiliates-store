@@ -7,17 +7,17 @@
         <div class="row">
             <div class="col-sm-12" style="font-size: 16px;">
                 <span class="label label-info">
-                    <span class="glyphicon glyphicon-usd"></span>Products:
+                    <span class="glyphicon glyphicon-usd"></span> Products:
                     <?php echo getKbAmz()->getProductsCount(); ?>
                 </span>
                 &nbsp;&nbsp;
                 <span class="label label-info">
-                    <span class="glyphicon glyphicon-download-alt"></span>To Download:
+                    <span class="glyphicon glyphicon-download-alt"></span> To Download:
                     <?php echo getKbAmz()->getProductsToDownloadCount(); ?>
                 </span>
                 &nbsp;&nbsp;
                 <span class="label label-info">
-                    <span class="glyphicon glyphicon-refresh"></span>To Update:
+                    <span class="glyphicon glyphicon-refresh"></span> To Update:
                     <?php echo getKbAmz()->getProductsToUpdateCount(); ?>
                 </span>
                 &nbsp;&nbsp;
@@ -39,8 +39,15 @@
                     }
 
                     ?>
-                    <span class="glyphicon glyphicon-time"></span>Time To Update:
+                    <span class="glyphicon glyphicon-time"></span> Time To Update:
                     <?php echo $hours; ?>h
+                </span>
+                &nbsp;&nbsp;
+                <span class="label label-info">
+                    <span class="glyphicon glyphicon-repeat"></span> Requests/Avg. Time:
+                    <?php echo getKbAmz()->getOption('AmazonRequests', 1); ?>
+                    /
+                    <?php echo getKbAmz()->getOption('averageTimeToFetch', 1) * 1000; ?>ms
                 </span>
             </div>
             <br/><br/>

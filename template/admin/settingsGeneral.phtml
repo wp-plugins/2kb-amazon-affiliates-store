@@ -53,6 +53,19 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="form-group">
+                <label for="replaceThumbnailWithGallery" class="control-label">
+                    <?php echo __('Download images from Amazon.'); ?>
+                </label>
+                <select value="<?php echo getKbPostVar('downloadImages', getKbAmz()->getOption('downloadImages'));?>" name="downloadImages" class="form-control">
+                    <?php echo kbAmzSelect(array(1 => __('Yes'), 0 => __('No')), getKbPostVar('downloadImages', getKbAmz()->getOption('downloadImages'))); ?>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
                 <label for="imageHoverSwitch" class="control-label">
                     <?php echo __('Switch images on hover in the listing.'); ?>
                 </label>

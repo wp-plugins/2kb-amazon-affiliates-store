@@ -15,8 +15,8 @@ if (!session_id()) {
   session_start();
 }
 
-define('KbAmazonVersion', '1.0.2');
-define('KbAmazonVersionNumber', 102);
+define('KbAmazonVersion', '1.0.3');
+define('KbAmazonVersionNumber', 103);
 define('KbAmazonStoreFolderName',  pathinfo(dirname(__FILE__), PATHINFO_FILENAME));
 define('KbAmazonStorePluginPath',  dirname(__FILE__) . '/');
 
@@ -29,6 +29,8 @@ require_once KbAmazonStorePluginPath . 'KbTemplate.php';
 require_once KbAmazonStorePluginPath . 'lib/KbAmazonApi.php';
 require_once KbAmazonStorePluginPath . 'lib/KbAmazonItem.php';
 require_once KbAmazonStorePluginPath . 'lib/KbAmazonItems.php';
+require_once KbAmazonStorePluginPath . 'lib/KbAmazonImage.php';
+require_once KbAmazonStorePluginPath . 'lib/KbAmazonImages.php';
 require_once KbAmazonStorePluginPath . 'lib/KbView.php';
 require_once KbAmazonStorePluginPath . 'lib/kbAmzApi.php';
 // @IMPORTED only for the files they use it.

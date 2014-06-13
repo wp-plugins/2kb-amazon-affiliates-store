@@ -319,15 +319,29 @@ class KbAmazonImporter
      * @param str $asin
      * @return array|null
      */
-    public function find($asin)
+    public function find($asin, $responseGroup = 'Large')
     {
         $key = $this->getCacheItemKey($asin);
         if (!$data = getKbAmz()->getCache($key)) {
+            $this->countAmazonRequest();
+            $time = microtime(true);
             $result = getKbAmazonApi()
-                      ->responseGroup('Large')
+                      ->responseGroup($responseGroup)
                       ->optionalParameters(array('MerchantId' => 'All'))
                       ->lookup($asin);
-            $this->countAmazonRequest();
+            
+            /**
+             * STATS
+             */
+            $ttf = microtime(true) - $time;
+            $ttfOpt = getKbAmz()->getOption('averageTimeToFetch', 1);
+            getKbAmz()->setOption('averageTimeToFetch', round(($ttfOpt + $ttf) / 2, 3));
+            $timeSpent = getKbAmz()->getOption('timeSpentFetchingAmzProducts', 0);
+            getKbAmz()->setOption('timeSpentFetchingAmzProducts', round($timeSpent + $time, 3));
+            
+            /**
+             * STATS END
+             */
             $data = new KbAmazonItem($result);
             self::cacheItem($data);
         }
@@ -373,19 +387,47 @@ class KbAmazonImporter
         return $ids;
     }
     
+    /**
+     * 
+     * @param type $asins
+     */
+    public function updatePrice($asins)
+    {
+        if (!is_array($asins)) {
+            $asins = array($asins);
+        }
+        foreach ($asins as $asin) {
+            $item = $this->find($asin, 'OfferSummary');
+            if (!$item->getError()) {
+                $this->updateProductPrice($item);
+            }
+        }
+    }
+
     public function itemExists(KbAmazonItem $item)
     {
         $post = getKbAmz()->getProductByAsin($item->getAsin());
         return $post ? $post->ID : null;
     }
     
-    protected function saveProduct(KbAmazonItem $item, $isSimilar = false)
+    /**
+     * 
+     * @param KbAmazonItem $item
+     */
+    public function updateProductPrice(KbAmazonItem $item)
     {
-        $postExists = $this->itemExists($item);
+        $postId = $this->itemExists($item);
         
-        $meta = $item->getFlattenArray();
+        if ($postId) {
+            $meta = $item->getFlattenArray();
+            $this->priceToMeta($meta);
+            $this->updateProductPostMeta($meta, $postId);
+            wp_update_post(array('ID' => $postId, 'post_modified' => date('Y-m-d H:i:s')));
+        }
+    }
 
-        $meta['SimilarProducts'] = $item->getSimilarProducts();
+    protected function priceToMeta(&$meta)
+    {
         $meta['PriceAmount'] = 0;
         $meta['PriceAmountFormatted'] = 0;
         if (isset($meta['OfferSummary.LowestNewPrice.FormattedPrice'])) {
@@ -406,9 +448,34 @@ class KbAmazonImporter
         }
         
         $meta['PriceAmount'] = self::paddedNumberToDecial($meta['PriceAmount']);
+    }
+    
+    /**
+     * returns inserted meta key => val
+     */
+    protected function updateProductPostMeta($meta, $postId)
+    {
+        $metaToInsert = array();
+        foreach ($meta as $key => $val) {
+           $metaToInsert['KbAmz' . $key] = $val;
+        }
+        kbAmzFilterAttributes($metaToInsert);
+        foreach ($metaToInsert as $key => $val) {
+            update_post_meta($postId, $key, $val);
+        }
+        
+        return $metaToInsert;
+    }
+
+
+    protected function saveProduct(KbAmazonItem $item, $isSimilar = false)
+    {
+        $postExists = $this->itemExists($item);
+        $meta = $item->getFlattenArray();
+        $meta['SimilarProducts'] = $item->getSimilarProducts();
+        $this->priceToMeta($meta);
         
         $canImportFreeItems = getKbAmz()->getOption('canImportFreeItems', true);
-
         if (!$canImportFreeItems && empty($meta['PriceAmountFormatted']) && !$postExists) {
             return array(
                 'post_id' => null,
@@ -450,9 +517,10 @@ class KbAmazonImporter
             getKbAmz()->addProductCount(1);
         } else {
             $postId = $postExists;
+            wp_update_post(array('ID' => $postId, 'post_modified' => date('Y-m-d H:i:s')));
         }
              
-        update_post_meta($postId, 'KbAmzLastUpdateTime', time() + getKbAmz()->getOption('uproductsUpdateOlderThanHours', self::SECONDS_BEFORE_UPDATE));
+        update_post_meta($postId, 'KbAmzLastUpdateTime', time());
         
         // Images
         $uploadedProductImages = getKbAmz()->getProductImages($postId);
@@ -472,17 +540,10 @@ class KbAmazonImporter
             if (!empty($postImages)) {
                 update_post_meta($postId, "_thumbnail_id", $postImages[0]);
             }
-        }
+        } 
         
-        $metaToInsert = array();
-        foreach ($meta as $key => $val) {
-           $metaToInsert['KbAmz' . $key] = $val;
-        }
-        kbAmzFilterAttributes($metaToInsert);
-
-        foreach ($metaToInsert as $key => $val) {
-            update_post_meta($postId, $key, $val);
-        }
+        
+        $metaToInsert = $this->updateProductPostMeta($meta, $postId);
         
         $specialMeta = array();
         $specialMeta['KbAmzNewProduct'] = 'no';
@@ -581,6 +642,8 @@ class KbAmazonImporter
     public function downloadAndSaveImage($imageUrl, $postId, $num, KbAmazonItem $item)
     {
         if (!empty($imageUrl)) {
+            $canDowloadImages = getKbAmz()->getOption('downloadImages');
+            
             $asinNum = $item->getAsin() . 'KBAMZIMG' . $num;
             $attachmentExists = getKbAmz()->getAttachmentsFromMeta('KbAmzAttachmentASIN', $asinNum);
             if (!empty($attachmentExists)) {
@@ -592,29 +655,30 @@ class KbAmazonImporter
                 $item->getTitle(),
                 $num
             );
-            
-            $uploads = wp_upload_dir();
-            $uploads_path = $uploads['path'];
-            // check if folder exist, if not create it
-            if (!is_dir( $uploads_path )) {
-                mkdir( $uploads_path );
+
+            if ($canDowloadImages) {
+                $uploads = wp_upload_dir();
+                $uploads_path = $uploads['path'];
+                // check if folder exist, if not create it
+                if (!is_dir( $uploads_path )) {
+                    mkdir( $uploads_path );
+                }
+
+                $fileExt = end(explode(".", $imageUrl));
+
+                $filename = $asinNum . '-' . $item->getTitle();
+                $filename = sanitize_title($filename);
+                $filename = sanitize_file_name($filename);
+                $filename = substr($filename, 0, 120);
+                $filename = $filename . "." . $fileExt;
+                // Save image in uploads folder
+                $image = file_get_contents($imageUrl);
+                file_put_contents( $uploads_path . '/' . $filename, $image );
+                $image_path = $uploads_path . '/' . $filename; // Path of the image on the disk
+            } else {
+                $image_path = $imageUrl; // Path of the image on the disk
             }
 
-            $uploads_url = $uploads['url'];
-            $fileExt = end(explode(".", $imageUrl));
-            
-            $filename = $asinNum . '-' . $item->getTitle();
-            $filename = sanitize_title($filename);
-            $filename = sanitize_file_name($filename);
-            $filename = substr($filename, 0, 120);
-            $filename = $filename . "." . $fileExt;
-            // Save image in uploads folder
-            $image = file_get_contents($imageUrl);
-            
-            file_put_contents( $uploads_path . '/' . $filename, $image );
-
-            $image_url = $uploads_url . '/' . $filename; // URL of the image on the disk
-            $image_path = $uploads_path . '/' . $filename; // Path of the image on the disk
             
             $wp_filetype = wp_check_filetype(basename( $image_path ), null);
             $attachment = array(
@@ -623,10 +687,22 @@ class KbAmazonImporter
                'post_content'   => $imageUrl,
                'post_status'    => 'inherit'
             );
-           
-            $attach_id = wp_insert_attachment( $attachment, $image_path, $postId);
-            $attach_data = wp_generate_attachment_metadata( $attach_id, $image_path );
-            wp_update_attachment_metadata($attach_id, $attach_data);
+            if ($canDowloadImages) {
+                $attach_id = wp_insert_attachment( $attachment, $image_path, $postId);
+                $attach_data = wp_generate_attachment_metadata( $attach_id, $image_path );
+                wp_update_attachment_metadata($attach_id, $attach_data);
+            } else {
+                $attach_id = wp_insert_attachment( $attachment, false, $postId);
+                update_post_meta($attach_id, '_wp_attached_file', $image_path );
+                update_post_meta($postId, '_thumbnail_id', $attach_id );
+                /* METADATA */
+                $imagesize = getimagesize( $image_path );
+		$metadata['width'] = $imagesize[0];
+		$metadata['height'] = $imagesize[1];
+		$metadata['file'] = $image_path;
+                $metadata['sizes'] = array();
+                wp_update_attachment_metadata($attach_id, $metadata);
+            }
             update_post_meta($attach_id, 'KbAmzAttachmentASIN', $asinNum);
             return $attach_id;
         }
@@ -641,11 +717,6 @@ class KbAmazonImporter
             $cats = array();
             $this->getCategoriesFromResult($node, $cats);
             $categories[$key] = array_reverse($cats);
-            // get only the forst tree of cats
-            //@TODO Make this option
-//            if (count($categories[$key]) > 1) {
-//                break;
-//            }
         }
         return $categories;
     }

@@ -19,7 +19,7 @@ class KbAmazonStore
 {
     const PRICE_ATTRIBUTE = 'KbAmzFormattedPrice';
     const SUPPORT_EMAIL = 'support@2kblater.com';
-    
+
     protected $secret = 'INLINE';
     
     protected $productMeta = array();
@@ -401,18 +401,13 @@ HTML;
             if (isset($meta['KbAmzSimilarProducts'])) {
                 $meta['KbAmzSimilarProducts'] = unserialize($meta['KbAmzSimilarProducts']);
             }
+            
             $this->productMeta[$id] = $meta;
             $this->productMeta[$id]['KbAmzFormattedPrice'] = $this->getProductPriceHtml($id);
         }
         return $this->productMeta[$id];
     }
-    
-    public function getProductPrice($id)
-    {
-        $meta = $this->getProductMeta($id);
-        var_dump($meta);die;
-    }
-    
+
     public function getSimilarProductsHtml($id) {
         $posts = getKbAmz()->getSimilarProducts($id);
         $data = array();
@@ -447,15 +442,34 @@ HTML;
 
     public function getProductImages($id)
     {
-        $args = array(
-          'post_type' => 'attachment',
-          'numberposts' => -1,
-          'post_parent' => $id,
-           'order' => 'asc'
-         );
-         $posts = get_posts($args);
-         wp_reset_query();
-         return $posts;
+        static $cache;
+        if (!isset($cache[$id])) {
+            $args = array(
+              'post_type' => 'attachment',
+              'numberposts' => -1,
+              'post_parent' => $id,
+              'order' => 'asc'
+             );
+             $images = get_posts($args);
+             reset($images);
+             wp_reset_query();
+             foreach ($images as $key => $img) {
+                 $meta = get_post_meta($img->ID);
+                  foreach ($meta as $k => $val) {
+                      if (isset($val[0])) {
+                          $meta[$k] = $val[0];
+                      }
+                  }
+                  if (isset($meta['_wp_attachment_metadata'])) {
+                      $meta['_wp_attachment_metadata'] = unserialize($meta['_wp_attachment_metadata']);
+                  }
+                 $img->amzMeta = $meta;
+                 $images[$key] = new KbAmazonImage($img);
+             }
+
+            $cache[$id] = new KbAmazonImages($images, $id);
+        }
+        return $cache[$id];
     }
     
     
@@ -542,8 +556,15 @@ HTML;
     
     public function getProductByAsin($asin)
     {
-        $posts = $this->getProductsFromMeta('KbAmzASIN', $asin);
-        return isset($posts[0]) ? $posts[0] : null;
+        global $wpdb;
+        $sql = "
+           SELECT post_id
+           FROM $wpdb->postmeta
+           WHERE meta_key = 'KbAmzASIN' AND meta_value = '$asin'
+        ";
+        
+        $result = $this->getSqlResult($sql);
+        return isset($result[0]) ? get_post($result[0]->post_id) : null;
     }
     
     function getCurrentCategoryId()
@@ -709,7 +730,7 @@ HTML;
            ORDER BY count DESC
         ";
         
-        $rows = $this->getSqlResult($sql);
+        $rows = $this->getSqlCachedResult($sql);
         
         $attributes = array();
         foreach ($rows as $row) {
@@ -757,7 +778,7 @@ HTML;
            LIMIT 1
         ";
         //echo $sql;die;
-        $rows = $this->getSqlResult($sql);
+        $rows = $this->getSqlCachedResult($sql);
         if (!empty($rows)) {
             $min = $rows[0]->min ? $rows[0]->min : 0;
             $max = $rows[0]->max ? $rows[0]->max : 0;
@@ -809,7 +830,7 @@ HTML;
            LIMIT $count
         ";
         
-        $defaultValues = $this->getSqlResult($sql);
+        $defaultValues = $this->getSqlCachedResult($sql);
 
         $this->mergeWidgetFilters(KbAmzWidget::getWidgetsFilters(), $join, $where);
         
@@ -823,7 +844,7 @@ HTML;
            LIMIT $count
         ";
         
-        $filteredValues = $this->getSqlResult($sql);
+        $filteredValues = $this->getSqlCachedResult($sql);
         foreach ($defaultValues as &$row) {
             $inFiltered = false;
             foreach ($filteredValues as $srow) {
@@ -956,15 +977,17 @@ HTML;
     public function getProductsAsinsToUpdate()
     {
         global $wpdb;
-        $time = time();
+        $add = getKbAmz()->getOption('uproductsUpdateOlderThanHours', KbAmazonImporter::SECONDS_BEFORE_UPDATE);
+        $time = time() - $add;
+        
         $sql = "
            SELECT t1.meta_value AS asin
-           FROM $wpdb->postmeta AS t
-           JOIN $wpdb->postmeta AS t1 ON t.post_id = t1.post_id AND t1.meta_key = 'KbAmzASIN'
-           WHERE t.meta_key = 'KbAmzLastUpdateTime' AND t.meta_value < $time
-           ORDER BY t.meta_value ASC
+           FROM $wpdb->posts AS t
+           JOIN $wpdb->postmeta AS t1 ON t.ID = t1.post_id AND t1.meta_key = 'KbAmzASIN'
+           WHERE t.post_modified < '".date('Y-m-d H:i:s', $time)."'
+           ORDER BY t.post_modified ASC
         ";
-        
+        //echo $sql;die;
         $result = $this->getSqlResult($sql);
 
         $asins = array();
@@ -973,14 +996,21 @@ HTML;
         }
         return $asins;
     }
-            
-    protected function getSqlResult($sql)
+     
+    protected function getSqlCachedResult($sql)
     {
         global $wpdb;
         if (!$rows = $this->getCache($sql)) {
             $rows = $wpdb->get_results($sql);
+            $this->setCache($sql, $rows);
         }
         return $rows;
+    }
+    
+    protected function getSqlResult($sql)
+    {
+        global $wpdb;
+        return $wpdb->get_results($sql);
     }
     
     protected function mergeWidgetFilters($filters, &$join, &$where)

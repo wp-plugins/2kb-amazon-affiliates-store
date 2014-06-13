@@ -28,7 +28,6 @@ HTML;
         
         $meta = getKbAmz()->getProductMeta(get_the_ID());
         $attributes = getKbAmz()->getShortCodeAttributes();
-        // var_dump($attributes, $meta);die;
         $markup = '';
         foreach ($attributes as $attr => $label) {
             if (isset($meta[$attr]) && !empty($meta[$attr])) {
@@ -68,21 +67,11 @@ function getKbProductGalleryContent($atts)
 HTML;
         
         $images = getKbAmz()->getProductImages(get_the_ID());
-        $imagesHtml = '';
-        if (count($images) > 1) {
-            foreach ($images as $img) {
-                $maxImage = wp_get_attachment_image_src($img->ID, $atts['size']);
-                $imagesHtml .= wp_get_attachment_image($img->ID, $atts['size'], null, array('data-image' => $maxImage[0]));
-            }
-        }
-
-        $post_thumbnail_id = get_post_thumbnail_id( get_the_ID() );
-        $thumb = wp_get_attachment_image( $post_thumbnail_id, $atts['size']);
-                
+        $imagesHtml = $images->getImagesHtmlSkipFirst($atts['size']);
+        $thumb = $images->getFirst($atts['size']);
         if (empty($thumb)) {
             return;
         }
-        
         return sprintf(
             $html,
             empty($images) ? 'has-no-thumbs' : 'has-thumbs',

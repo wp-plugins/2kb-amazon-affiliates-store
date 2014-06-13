@@ -51,16 +51,16 @@ function kbAmzDownloadProductsCronFunction($execute = false)
          try {
             $result = $importer->import($asin);
             if (empty($result[0]['error'])) {
-                unset($products[$key]);
             } else {
                 getKbAmz()->addException('Cron Import Product (AMZ Item)', $result[0]['error']);
             }
+            unset($products[$key]);
+            getKbAmz()->setOption('ProductsToDownload', $products);
             $i++;
         } catch (Exception $e) {
             getKbAmz()->addException('Cron Import Product', $e->getMessage());
         }
      }
-    getKbAmz()->setOption('ProductsToDownload', $products);
     getKbAmz()->setOption('LastCronRun', date('Y-m-d H:i:s'));
 }
 
@@ -93,7 +93,7 @@ function kbAmzkbAmzProductsUpdateCronFunction($execute = false)
             break;
         }
         try {
-            $importer->import($asin);
+            $importer->updatePrice($asin);
             $i++;
         } catch (Exception $e) {
             getKbAmz()->addException('Cron Update Product', $e->getMessage());

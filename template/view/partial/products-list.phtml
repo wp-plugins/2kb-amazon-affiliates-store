@@ -11,8 +11,8 @@ $nm = 12 / $ListItemsPerRow;
             <div class="kb-product-list-image">
                 <a href="<?php echo get_permalink($post->ID); ?>" title="<?php echo $title; ?>">
                     <?php
-                    $post_thumbnail_id = get_post_thumbnail_id($post->ID);
-                    echo wp_get_attachment_image($post_thumbnail_id);
+                    $images = getKbAmz()->getProductImages($post->ID);
+                    echo $images->getFirst();
                     ?>
                 </a>
                 <?php echo getKbAmz()->getProductSticker($post->ID); ?>
