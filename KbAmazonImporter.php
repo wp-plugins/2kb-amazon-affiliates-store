@@ -4,7 +4,7 @@
 /*
  * @SEE http://codex.wordpress.org/Function_Reference/wp_generate_attachment_metadata
  */
-include(ABSPATH . 'wp-admin/includes/image.php');
+require_once ABSPATH . 'wp-admin/includes/image.php';
 
 class KbAmazonImporter
 {
