@@ -3,7 +3,7 @@
  * Plugin Name: 2kb Amazon Affiliates Store
  * Plugin URI: http://www.2kblater.com/?p=8318
  * Description: Amazon Affiliate Store Plugin With Cart, Checkout, Custom Themes. Easy to manage and setup. Sell wide range of physical and digital products imported from Amazon Affiliate API using 90 days cookie reference. This plugin is released with GPL2 license.
- * Version: 1.0.1
+ * Version: 1.0.3
  * Author: 2kblater.com
  * Author URI: http://www.2kblater.com
  * License: GPL2
