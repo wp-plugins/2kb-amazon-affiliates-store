@@ -2,7 +2,7 @@
 Tags: amazon, affiliate, associate, online store, selling products
 Requires at least: 3.9
 Tested up to: 3.9
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,6 +36,11 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+= 1.0.3 =
+New Option = Download Images. This option allows you to store only the link of product`s images. This will save you space and time to import.
+Maintenance fixes
+lib/KbAmazonImage
+lib/KbAmazonImages
 = 1.0.2 =
 Dashboard info update - products counts, products to download, products to sync, time to sync.
 = 1.0.1 =
