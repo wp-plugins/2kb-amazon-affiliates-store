@@ -303,18 +303,17 @@ function kb_amz_list_products($atts) {
     
     $category = null;
     if (!empty($atts['category'])) {
-        $id = is_numeric($atts['category'])
+        $category = is_numeric($atts['category'])
             ? $atts['category']
             : get_cat_ID($atts['category']);
-        $category = get_category($id);
     }
     
-    $atts['category']       = is_object($category) ? $category->ID : null;
+    $atts['cat']            = $category;
     $atts['post_type']      = 'post';
     $atts['meta_key']       = 'KbAmzASIN';
     $atts['post_status']    = 'any';
     $atts['paged']          = getKbAmzPaged();
-
+    
     if (isset($atts['attributeKey']) && isset($atts['attributeValue'])) {
         $atts['meta_query'] = array(
             'key' => $atts['attributeKey'],

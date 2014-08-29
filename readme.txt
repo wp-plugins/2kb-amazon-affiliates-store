@@ -36,6 +36,8 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+= 1.0.5 =
+Category fix in [kb_amz_list_products]
 = 1.0.4 =
 Some bugs got fixed. Thank you for your support.
 = 1.0.3 =
