@@ -91,6 +91,10 @@ class KbAmzTemplate
     
     public function initDefaultAdminScripts()
     {
+        if (is_admin() && (!isset($_GET['page']) || $_GET['page'] != 'kbAmz')) {
+            return;
+        }
+        
         wp_enqueue_style(
             'KbAmzAdminDefaultCss',
             getKbPluginUrl() . '/template/admin/css/default.css'
@@ -113,10 +117,6 @@ class KbAmzTemplate
     
     public function loadBootstrapScripts()
     {
-        if (is_admin() && (!isset($_GET['page']) || $_GET['page'] != 'kbAmz')) {
-            return;
-        }
-        
         wp_enqueue_script(
             'KbAmzBootstrapJs',
             getKbPluginUrl() . '/template/vendors/bootstrap/js/bootstrap.min.js',
