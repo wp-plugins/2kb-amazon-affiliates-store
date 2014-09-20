@@ -73,9 +73,10 @@ class KbAmazonStore
         'listProduct' => array(
             'code' => 'kb_amz_list_products',
             'params' => array(
+                'items_per_row' => '2,3,4,6',
                 'posts_per_page' => 'Number',
                 'pagination' => 'Yes/No',
-                'category' => 'ID/Name',
+                'category' => 'ID/Name, FUNCTION(), example: getKbAmzProductBottomCategory(), getKbAmzProductTopCategory(), the_category_ID(true)',
                 'post_status' => 'Always - any',
                 'title' => 'String',
                 'attributeKey' => '(See Product Attributes)',
@@ -95,6 +96,8 @@ class KbAmazonStore
     protected $options = null;
     
     protected $productsCount;
+    
+    protected $publishedProductsCount;
 
     public function __construct() {
         
@@ -901,6 +904,23 @@ HTML;
                FROM $wpdb->postmeta AS t
                JOIN $wpdb->posts AS p ON p.ID = t.post_id
                WHERE t.meta_key = 'KbAmzASIN'
+            ";
+            $result = $this->getSqlResult($sql);
+            $this->productsCount = isset($result[0]) ? $result[0]->count : 0;
+        }
+        
+        return $this->productsCount;
+    }
+    
+    public function getPublishedProductsCount()
+    {
+        if (null === $this->publishedProductsCount) {
+            global $wpdb;
+            $sql = "
+               SELECT COUNT(DISTINCT t.post_id) AS count
+               FROM $wpdb->postmeta AS t
+               JOIN $wpdb->posts AS p ON p.ID = t.post_id
+               WHERE t.meta_key = 'KbAmzASIN' AND p.post_status = 'publish'
             ";
             $result = $this->getSqlResult($sql);
             $this->productsCount = isset($result[0]) ? $result[0]->count : 0;

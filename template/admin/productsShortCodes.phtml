@@ -35,7 +35,7 @@
             <?php echo __('ShortCode Post Content. This content is inserted with every product.'); ?>
         </label>
         
-<?php wp_editor(getKbAmz()->getShortCodePostContent(), 'shortCodePostContent', array(
+<?php wp_editor(stripslashes(getKbAmz()->getShortCodePostContent()), 'shortCodePostContent', array(
 	'dfw' => true,
 	'drag_drop_upload' => true,
 	'tabfocus_elements' => 'insert-media-button,save-post',

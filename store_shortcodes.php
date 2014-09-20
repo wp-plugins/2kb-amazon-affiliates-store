@@ -290,7 +290,8 @@ function kb_amz_list_products($atts) {
         'attributeValue'    => null,
         'attributeCompare'  => '=',
         'title'             => null,
-        'pagination'        => 'Yes'
+        'pagination'        => 'Yes',
+        'items_per_row'     => null
     ), $atts);
     
     $shortCodes = getKbAmz()->getShortCodes();
@@ -298,14 +299,21 @@ function kb_amz_list_products($atts) {
     && !$shortCodes['listProduct']['active']) {
         return;
     }
+
+    if ($atts['items_per_row'] && !in_array(intval($atts['items_per_row']), array(2, 3, 4, 6))) {
+        $atts['items_per_row'] = null;
+    }
     
     $atts['pagination'] = kbAmzShortCodeBool($atts['pagination']);
     
-    $category = null;
-    if (!empty($atts['category'])) {
+    $category = kbAmzExtractShortCodeFunctionParam($atts['category']);
+    
+    if (!$category instanceof KbAmzErrorString && !$category && !empty($atts['category'])) {
         $category = is_numeric($atts['category'])
             ? $atts['category']
             : get_cat_ID($atts['category']);
+    } else if ($category instanceof KbAmzErrorString) {
+        echo $category;
     }
     
     $atts['cat']            = $category;
@@ -369,4 +377,62 @@ function filterKbAmzThumbnailGallery($html)
     }
     return getKbProductGalleryContent(array('size' => getKbAmz()->getOption('productListImageSize'), 'class' => 'kb-amz-thumb-replace'));
     
+}
+
+function kbAmzExtractShortCodeFunctionParam($str)
+{
+    if (is_numeric($str) || is_object($str)) {
+        return $str;
+    }
+    if (strpos($str, '(') !== false && strpos($str, ')') !== false) {
+        $parts = explode('(', trim(strip_tags($str)));
+        $function = $parts[0];
+        if (function_exists($function)) {
+            $params = explode(')', $parts[1]);
+            $params = explode(',', $params[0]);
+            $fixedParams = array();
+            foreach ($params as $param) {
+                if (strtolower($param) == 'true') {
+                    $fixedParams[] = true;
+                } else if(strtolower($param) == 'false') {
+                    $fixedParams[] = false;
+                } else {
+                    $fixedParams[] = $param;
+                }
+            }
+            $results = call_user_func_array($function, $fixedParams);
+            if (!is_array($results)) {
+                $results = array($results);
+            }
+            foreach ($results as $result) {
+                if (is_numeric($result)) {
+                    return $result;
+                } else if (is_object($result) && isset($result->ID)) {
+                    return $result->ID;
+                } else if (is_object($result) && isset($result->term_id)) {
+                    return $result->term_id;
+                } else if (is_object($result) && isset($result->cat_ID)) {
+                    return $result->cat_ID;
+                }
+                return null;
+            }
+        } else {
+            return new KbAmzErrorString('ShortCode given function: "' .$function . '"" is not a valid function.');
+        }
+    }
+}
+
+class KbAmzErrorString
+{
+    private $error;
+    
+    public function __construct($error)
+    {
+        $this->error = $error;
+    }
+    
+    public function __toString()
+    {
+        return '<div><strong style="color:red;">Error: '.$this->error.'</strong></div>';
+    }
 }

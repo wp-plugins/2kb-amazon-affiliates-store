@@ -327,3 +327,27 @@ function getKbAmzAjaxUrl()
 {
     return get_site_url() . '/wp-admin/admin-ajax.php';
 }
+
+
+function getKbAmzProductTopCategory()
+{
+    $cats = get_the_category();
+    if (isset($cats[0])) {
+        return $cats[0];
+    }
+}
+
+function getKbAmzProductBottomCategory()
+{
+    $cats = get_the_category();
+    foreach ($cats as $key => $cat) {
+        if ($cat->term_id == 1) {
+            unset($cats[$key]);
+            break;
+        }
+    }
+    reset($cats);
+    if (isset($cats[count($cats)-1])) {
+        return $cats[count($cats)-1];
+    }
+}

@@ -72,6 +72,7 @@
 
                     <?php
                     $count = getKbAmz()->getProductsCount();
+                    $publishedCount = getKbAmz()->getPublishedProductsCount();
                     $max = getKbAmz()->getOption('maxProductsCount');
                     ?>
 
@@ -101,7 +102,27 @@
                         <?php
                     }
                     ?>
-
+                    <?php if ($publishedCount == 0): ?>
+                        <div class="alert alert-danger">
+                            <span class="glyphicon glyphicon-check"></span>
+                            <?php
+                            $params = $_GET;
+                            $params['kbAction'] = 'productsVisibility';
+                            echo sprintf(
+                                __('You have 0 of %s published products. Recomended action <a href="?%s">publish</a>.'),
+                                $count,
+                                http_build_query($params)
+                            );
+                            ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="alert alert-success">
+                            <span class="glyphicon glyphicon-check"></span>
+                            <?php echo sprintf(__('You have %s of %s published products.'),
+                                $publishedCount,
+                                $count); ?>
+                        </div>
+                    <?php endif; ?>
                 <?php } else { ?>
                     <div class="alert alert-danger">
                         <span class="glyphicon glyphicon-fire"></span>

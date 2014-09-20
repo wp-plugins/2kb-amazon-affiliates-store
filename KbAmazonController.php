@@ -306,6 +306,7 @@ class KbAmzAdminController {
     {
         $data = array();
         if (!empty($_POST)) {
+            $_POST['shortCodePostContent'] = stripslashes($_POST['shortCodePostContent']);
             $action = $_POST['submit'];
             unset($_POST['submit']);
             if ($action == 'defaults') {

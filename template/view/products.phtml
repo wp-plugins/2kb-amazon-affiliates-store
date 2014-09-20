@@ -16,7 +16,7 @@ if (!empty($posts)) {
         }
         $ul = '<ul class="row kb-amz-products-list">';
         $i = 0;
-        $c = getKbAmz()->getOption('ListItemsPerRow', 6);
+        $c = $this->items_per_row ? $this->items_per_row : getKbAmz()->getOption('ListItemsPerRow', 6);
         echo $ul;
         foreach ($posts as $p): 
             if ($i == $c) {

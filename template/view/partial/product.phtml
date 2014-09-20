@@ -2,7 +2,7 @@
 
 $meta = getKbAmz()->getProductMeta($p->ID);
 $title = htmlentities(str_replace('"', '', get_the_title($p->ID)));
-$c = getKbAmz()->getOption('ListItemsPerRow', 6);
+$c = $this->items_per_row ? $this->items_per_row : getKbAmz()->getOption('ListItemsPerRow', 6);
 $lg = 2;
 $md = 2;
 $sm = 3;
