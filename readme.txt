@@ -2,7 +2,7 @@
 Tags: amazon, affiliate, associate, online store, selling products
 Requires at least: 4.0
 Tested up to: 4.0
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,7 +35,10 @@ This section describes how to install the plugin and get it working.
 == Screenshots ==
 
 == Changelog ==
-
+= 1.0.7 =
+Short Codes bug fixed - all shortcodes use '_' instead of '-'.
+Added option for featured content in [kb_amz_list_products featured="Yes" featured_content_length="150"]. Content is loaded from the_excerpt or the product description.
+Bug fixed when using [kb_amz_list_products] in product shortcode content. (product is excluded from the query).
 = 1.0.6 =
 Category accept functions in [kb_amz_list_products] and items_per_row added.
 Dashboard published products  message added.

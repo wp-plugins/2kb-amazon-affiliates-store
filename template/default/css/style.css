@@ -345,6 +345,23 @@ ul.kb-products-list > li{
     font-size: 0;
     line-height: 0;
 }
+
+.kb-amz-row-item-part.featured .kb-amz-item-list-img img{
+    margin: 0!important;
+    /*position: initial!important;*/
+}
+
+.kb-amz-row-item-part.featured .kb-amz-item-list-img a{
+    float: left;
+    width: 50%;
+    position: relative;
+    height: 100%;
+}
+.kb-amz-featured-content{
+    float: left;
+    width: 49%;
+    padding-left: 1%;
+}
 /*TB*/
 .row {
     margin-left: -15px;

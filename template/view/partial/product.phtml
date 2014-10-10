@@ -17,11 +17,15 @@ if ($c == 4) {
     $md = 4;
     $sm = 4;
     $xs = 4;
-}
-
+} else if ($c == 2) {
+    $lg = 6;
+    $md = 6;
+    $sm = 6;
+    $xs = 6;
+};
 ?>
 
-<li class="kb-amz-per-row-<?php echo $c; ?> col-lg-<?php echo $lg; ?> col-md-<?php echo $md; ?> col-sm-<?php echo $sm; ?> col-xs-<?php echo $xs; ?> kb-amz-row-item-part <?php echo getKbAmz()->getOption('productListImageSize'); ?>">
+<li class="kb-amz-per-row-<?php echo $c; ?> col-lg-<?php echo $lg; ?> col-md-<?php echo $md; ?> col-sm-<?php echo $sm; ?> col-xs-<?php echo $xs; ?> kb-amz-row-item-part <?php echo getKbAmz()->getOption('productListImageSize'); ?> <?php echo $this->featured ? 'featured' : 'not-featured'; ?>">
     <article id="post-<?php echo $p->ID; ?>" <?php post_class('kb-amz-product', $p->ID); ?>>
         <header>
             <div class="kb-amz-item-list-img animate <?php echo getKbAmz()->getOption('imageHoverSwitch') ? 'kb-amz-hover-switch-active' : 'kb-amz-hover-switch-not-active'; ?>">
@@ -34,6 +38,18 @@ if ($c == 4) {
                     echo $images->getSecond(getKbAmz()->getOption('productListImageSize'),null, array('class' => 'animate kb-amz-second'));
                     ?>
                 </a>
+                <?php if ($this->featured) : ?>
+                <div class="kb-amz-featured-content">
+                    <?php
+                    if (!empty($p->post_excerpt)) {
+                        echo $p->post_excerpt;
+                    } else {
+                        $content = getKbAmz()->getProductContent($p->ID);
+                        echo getKbAmzExcerptFromContent($content, $this->featured_content_length);
+                    }
+                    ?>
+                </div>
+                <?php endif; ?>
                 <?php echo getKbAmz()->getProductSticker($p->ID); ?>
             </div>
             <div class="kb-amz-item-list-content">

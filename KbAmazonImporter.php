@@ -542,7 +542,6 @@ class KbAmazonImporter
             }
         } 
         
-        
         $metaToInsert = $this->updateProductPostMeta($meta, $postId);
         
         $specialMeta = array();

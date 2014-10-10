@@ -24,6 +24,7 @@ if (!empty($posts)) {
                 echo $ul;
                 $i = 0;
             }
+            setup_postdata($p);
             include dirname(__FILE__) . '/partial/product.phtml';
             $i++;
         endforeach;

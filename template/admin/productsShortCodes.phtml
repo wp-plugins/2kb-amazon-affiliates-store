@@ -20,7 +20,7 @@
                             foreach ($code['params'] as $nameParamName => $avaialbe) {
                                 $params[] = $nameParamName . '="'.$avaialbe.'"';
                             }
-                            echo implode(', ', $params);
+                            echo implode(' ', $params);
                         ?>
                     </td>
                     <td>
@@ -48,7 +48,7 @@
     </div>
     <div class="form-group">
         <label class="control-label" for="updateForAllPosts">
-            <?php echo __('Update For All Existing Products.'); ?>
+            <?php echo __('Update For All Existing Products. Note that if some product is updated manualy, all the changes will be lost with option Yes.'); ?>
         </label>
         <select value="<?php echo getKbPostVar('updateForAllPosts', 0);?>" name="updateForAllPosts" class="form-control">
             <?php echo kbAmzSelect(array(1 => __('Yes'), 0 => __('No')), getKbPostVar('updateForAllPosts', 0)); ?>

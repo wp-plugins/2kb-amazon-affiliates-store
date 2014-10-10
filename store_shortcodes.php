@@ -101,10 +101,11 @@ add_shortcode( 'kb_amz_product_gallery', 'kb_amz_product_gallery_func' );
 
 // [kb_amz_product_content]
 function kb_amz_product_content_func($atts) {
+    
 	$atts = shortcode_atts( array(
-            'show-all-reviews' => 'Yes',
-            'show-title' => 'Yes',
-            'strip-tags' => 'No',
+            'show_all_reviews' => 'Yes',
+            'show_title' => 'Yes',
+            'strip_tags' => 'No',
             'id' => null
 	), $atts);
 
@@ -125,6 +126,7 @@ function kb_amz_product_content_func($atts) {
     </div>
 </div>
 HTML;
+        
         $postId = $atts['id'] ? $atts['id'] : get_the_ID();
         $meta = getKbAmz()->getProductMetaArray($postId);
         $tabs = '';
@@ -136,14 +138,14 @@ HTML;
             $headers = array();
             $contents = array();
             foreach ($reviews as $review) {
-                if (kbAmzShortCodeBool($atts['show-title'])) {
+                if (kbAmzShortCodeBool($atts['show_title'])) {
                     $headers[]  = $review['Source'];
                 }
                 
-                $contents[] = kbAmzShortCodeBool($atts['strip-tags'])
+                $contents[] = kbAmzShortCodeBool($atts['strip_tags'])
                             ? strip_tags($review['Content'])
                             : $review['Content'];
-                if (!kbAmzShortCodeBool($atts['show-all-reviews'])) {
+                if (!kbAmzShortCodeBool($atts['show_all_reviews'])) {
                     break;
                 }
             }
@@ -283,12 +285,14 @@ add_shortcode( 'kb_amz_checkout', 'kb_amz_checkout' );
 // [kb_amz_list_products]
 function kb_amz_list_products($atts) {
     $atts = shortcode_atts( array(
+        'featured'          => null,
+        'featured_content_length' => 300,
         'posts_per_page'    => get_option('posts_per_page', 10),
         'category'          => null,
         'post_status'       => 'any',
-        'attributeKey'      => null,
-        'attributeValue'    => null,
-        'attributeCompare'  => '=',
+        'attribute_key'      => null,
+        'attribute_value'    => null,
+        'attribute_compare'  => '=',
         'title'             => null,
         'pagination'        => 'Yes',
         'items_per_row'     => null
@@ -318,25 +322,43 @@ function kb_amz_list_products($atts) {
     
     $atts['cat']            = $category;
     $atts['post_type']      = 'post';
-    $atts['meta_key']       = 'KbAmzASIN';
+    //$atts['meta_key']       = 'KbAmzASIN';
     $atts['post_status']    = 'any';
     $atts['paged']          = getKbAmzPaged();
-    
-    if (isset($atts['attributeKey']) && isset($atts['attributeValue'])) {
-        $atts['meta_query'] = array(
-            'key' => $atts['attributeKey'],
-            'value' => $atts['attributeValue'],
-            'compare' => $atts['attributeCompare']
+    $atts['meta_query']     = array();
+    $atts['meta_query'][]   = array(
+        'key' => 'KbAmzASIN'
+    );
+        
+    if (null !== $atts['attribute_key'] && null !== $atts['attribute_value']) {
+        $atts['meta_query'][] = array(
+            'key' => $atts['attribute_key'],
+            'value' => $atts['attribute_value'],
+            'compare' => str_replace(array('&gt;', '&lt;'), array('>', '<'), $atts['attribute_compare'])
         );
     }
-    kbAmzIsMainQuery(true);    
+    
+    if (get_the_ID() && getKbAmz()->isPostProduct(get_the_ID())) {
+        $atts['post__not_in'] = array(get_the_ID());
+    }
+    
+    $currentPost = null;
+    if (get_the_ID()) {
+        global $post;
+        $currentPost = $post;
+    }
+    
+    kbAmzIsMainQuery(true);
     $posts = query_posts($atts);
     $atts['maxNumPages'] = $GLOBALS['wp_query']->max_num_pages;
     $atts['posts']       = $posts;
+    $atts['featured'] = kbAmzShortCodeBool($atts['featured']);
     $view = getKbAmzTemplate()->getProductsView($atts)->getContent();
     wp_reset_query();
     kbAmzIsMainQuery(false);
-    
+    if (get_the_ID()) {
+        setup_postdata($currentPost);
+    }
     return $view;
 }
 

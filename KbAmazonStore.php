@@ -42,10 +42,10 @@ class KbAmazonStore
         'content' => array(
             'code' => 'kb_amz_product_content',
             'params' => array(
-                'show-all-reviews' => 'Yes/No',
-                'show-title' => 'Yes/No',
-                'strip-tags' => 'No/Yes',
-                'replace' => 'No/Yes - replace the short code result directly in the post'
+                'show_all_reviews' => '<b>Yes</b>/No',
+                'show_title' => '<b>Yes</b>/No',
+                'strip_tags' => '<b>No</b>/Yes',
+                'replace' => '<b>No</b>/Yes - replace the short code result directly in the post'
             ),
             'active' => true,
         ),
@@ -73,15 +73,17 @@ class KbAmazonStore
         'listProduct' => array(
             'code' => 'kb_amz_list_products',
             'params' => array(
+                'featured' => '<b>No</b>/Yes',
+                'featured_content_length' => '<b>300</b> / any number',
                 'items_per_row' => '2,3,4,6',
                 'posts_per_page' => 'Number',
                 'pagination' => 'Yes/No',
                 'category' => 'ID/Name, FUNCTION(), example: getKbAmzProductBottomCategory(), getKbAmzProductTopCategory(), the_category_ID(true)',
                 'post_status' => 'Always - any',
                 'title' => 'String',
-                'attributeKey' => '(See Product Attributes)',
-                'attributeValue' => '(Explore Attributes Value)',
-                'attributeCompare' => "'=', '!=', '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN'"
+                'attribute_key' => '(See Product Attributes)',
+                'attribute_value' => '(Explore Attributes Value)',
+                'attribute_compare' => "'=', '!=', '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN'"
             ),
             'active' => true,
         )
@@ -589,6 +591,13 @@ HTML;
         if ($curr && $curr->term_id == $id) {
             return true;
         }
+    }
+    
+    public function getProductContent($id)
+    {
+        $meta = $this->getProductMeta($id);
+        return isset($meta['KbAmzEditorialReviews.EditorialReview.0.Content'])
+               ? $meta['KbAmzEditorialReviews.EditorialReview.0.Content'] : '';
     }
 
     public function getCartButtonHtml($id)

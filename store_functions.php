@@ -351,3 +351,22 @@ function getKbAmzProductBottomCategory()
         return $cats[count($cats)-1];
     }
 }
+
+function getKbAmzExcerptFromContent($postcontent, $length)
+{
+    $this_excerpt = strip_shortcodes( $postcontent );
+    $this_excerpt = strip_tags($this_excerpt);
+    $this_excerpt = substr($this_excerpt, 0, $length);
+    
+    $parts = preg_split('/([\s\n\r]+)/', $this_excerpt, null, PREG_SPLIT_DELIM_CAPTURE);
+    $parts_count = count($parts);
+
+    $length = 0;
+    $last_part = 0;
+    for (; $last_part < $parts_count; ++$last_part) {
+      $length += strlen($parts[$last_part]);
+      if ($length > $length) { break; }
+    }
+
+    return implode(array_slice($parts, 0, $last_part));
+}
