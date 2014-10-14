@@ -24,14 +24,16 @@ class KbAmazonImporter
     protected $importCategories = array();
     
     protected $amazonCategoryGroups = array(
-        'com'       => 'Worldwide',
-        'de'        => 'Germany',
-        'co.uk'     => 'United Kingdom',
-        'ca'        => 'Canada',
-        'co.jp'     => 'Japan',
-        'it'        => 'Italy',
+        'com'       => 'Worldwide', // ok
+        'de'        => 'Germany', // ok
+        'co.uk'     => 'United Kingdom', // ok
+        'ca'        => 'Canada', // ok
+        'co.jp'     => 'Japan', // ok
+        'it'        => 'Italy', // ok
         'cn'        => 'China',
-        'es'        => 'Spain'
+        'fr'        => 'France', //ok
+        'es'        => 'Spain', // ok
+        'in'        => 'India', // ok
     );
     
     protected $amazonCategories = array(
@@ -243,6 +245,17 @@ class KbAmazonImporter
             '595314' => 'Toys',
             '573400' => 'VHS',
             '328229011' => 'Watches',
+        ),
+        'in' => array(
+            '976389031' => 'Books',
+            '976416031' => 'DVD',
+            '976419031' => 'Electronics',
+            '976442031' => 'Home & Kitchen',
+            '1951048031' => 'Jewelry',
+            '976392031' => 'PCHardware',
+            '1350380031' => 'Toys',
+            '1350387031' => 'Watches'
+            
         )
     );
 

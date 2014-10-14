@@ -2,7 +2,7 @@
 Tags: amazon, affiliate, associate, online store, selling products
 Requires at least: 4.0
 Tested up to: 4.0
-Stable tag: 1.0.7
+Stable tag: 1.0.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Amazon Affiliate Store Plugin With Cart, Checkout, Custom Themes. Easy to manage
 
 Features
 
-*   Sell wide range of physical and digital products
+*   Sell wide range of physical and digital products in Worldwide, Germany, United Kingdom, Canada, Japan, Italy, China, France, Spain, India.
 *   Amazon Affiliate API integration with 90 days cookie duration
 *   Product as post
 *   Product attributes smart management system
@@ -35,6 +35,8 @@ This section describes how to install the plugin and get it working.
 == Screenshots ==
 
 == Changelog ==
+= 1.0.8 =
+India is added to the import categories list thanks to Mr.Parmar.
 = 1.0.7 =
 Short Codes bug fixed - all shortcodes use '_' instead of '-'.
 Added option for featured content in [kb_amz_list_products featured="Yes" featured_content_length="150"]. Content is loaded from the_excerpt or the product description.

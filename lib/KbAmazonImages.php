@@ -75,9 +75,9 @@ class KbAmazonImages
                     $attrs[] = $key . '="' . $val . '"';
                 }
                 
-                $attrs['alt'] = esc_attr($this->getPost()->post_title);
-                $attrs['data-image'] = $image->getImageSrc();
-                
+                $attrs[] = 'alt="'. htmlspecialchars($this->getPost()->post_title) .'"';
+                $attrs[] = 'data-image="' .$image->getImageSrc() .'"';
+       
                 return sprintf(
                     '<img src="%s" %s/>',
                     $image->getImageSrc(),
