@@ -2,7 +2,7 @@
 Tags: amazon, affiliate, associate, online store, selling products
 Requires at least: 4.0
 Tested up to: 4.0
-Stable tag: 1.0.8
+Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,6 +35,8 @@ This section describes how to install the plugin and get it working.
 == Screenshots ==
 
 == Changelog ==
+= 1.0.9 =
+kb_amz_list_products shortcode accept short code parameters with php code. Ex. [kb_amz_list_products attribute_value="<? date('Y-m-d', time() - 3600); ?>"].
 = 1.0.8 =
 India is added to the import categories list thanks to Mr.Parmar.
 = 1.0.7 =

@@ -284,7 +284,7 @@ add_shortcode( 'kb_amz_checkout', 'kb_amz_checkout' );
 
 // [kb_amz_list_products]
 function kb_amz_list_products($atts) {
-    $atts = shortcode_atts( array(
+    $atts = kbAmzShortCodeAtts( array(
         'featured'          => null,
         'featured_content_length' => 300,
         'posts_per_page'    => get_option('posts_per_page', 10),
@@ -296,7 +296,7 @@ function kb_amz_list_products($atts) {
         'title'             => null,
         'pagination'        => 'Yes',
         'items_per_row'     => null
-    ), $atts);
+    ), $atts, 'kb_amz_list_products');
     
     $shortCodes = getKbAmz()->getShortCodes();
     if (isset($shortCodes['listProduct']['active'])
@@ -329,12 +329,12 @@ function kb_amz_list_products($atts) {
     $atts['meta_query'][]   = array(
         'key' => 'KbAmzASIN'
     );
-        
-    if (null !== $atts['attribute_key'] && null !== $atts['attribute_value']) {
+    
+    if ($atts['attribute_key'] && $atts['attribute_value']) {
         $atts['meta_query'][] = array(
             'key' => $atts['attribute_key'],
             'value' => $atts['attribute_value'],
-            'compare' => str_replace(array('&gt;', '&lt;'), array('>', '<'), $atts['attribute_compare'])
+            'compare' => $atts['attribute_compare']
         );
     }
     
@@ -363,7 +363,6 @@ function kb_amz_list_products($atts) {
 }
 
 add_shortcode('kb_amz_list_products', 'kb_amz_list_products');
-
 
 
 function kbAmzShortCodeBool($str)
@@ -401,12 +400,36 @@ function filterKbAmzThumbnailGallery($html)
     
 }
 
+function kbAmzShortCodeAtts($pairs, $atts, $shortcode = '' ) {
+    $atts = (array)$atts;
+    foreach ($atts as $name => $val) {
+        $pairs[$name] = kbAmzExtractShortCodeFunctionParam($val);
+    }
+
+    if ($shortcode) {
+        $pairs = apply_filters( "shortcode_atts_{$shortcode}", $pairs, $pairs, $atts );
+    }
+    return $pairs;
+}
+
 function kbAmzExtractShortCodeFunctionParam($str)
 {
-    if (is_numeric($str) || is_object($str)) {
+    if (is_numeric($str) || is_object($str) || is_array($str)) {
         return $str;
     }
-    if (strpos($str, '(') !== false && strpos($str, ')') !== false) {
+    
+    $str = str_replace(array('&gt;', '&lt;'), array('>', '<'), $str);
+    
+    if (strpos($str, '<?') !== false || strpos($str, '<?php') !== false) {
+        $str = str_replace(array('<?', '<?php', '?>', 'return', "\n"), null, $str);
+        $str = "return " . $str . ";";
+        try {
+            $result = eval($str);
+            return kbAmzTestShortCodeValueResult($result);
+        } catch (Exception $e) {
+            return new KbAmzErrorString('Shortcode value error: ' . $e->getMessage());
+        }
+    } else if (strpos($str, '(') !== false && strpos($str, ')') !== false) {
         $parts = explode('(', trim(strip_tags($str)));
         $function = $parts[0];
         if (function_exists($function)) {
@@ -427,21 +450,29 @@ function kbAmzExtractShortCodeFunctionParam($str)
                 $results = array($results);
             }
             foreach ($results as $result) {
-                if (is_numeric($result)) {
-                    return $result;
-                } else if (is_object($result) && isset($result->ID)) {
-                    return $result->ID;
-                } else if (is_object($result) && isset($result->term_id)) {
-                    return $result->term_id;
-                } else if (is_object($result) && isset($result->cat_ID)) {
-                    return $result->cat_ID;
-                }
-                return null;
+                return kbAmzTestShortCodeValueResult($result);
             }
         } else {
             return new KbAmzErrorString('ShortCode given function: "' .$function . '"" is not a valid function.');
         }
     }
+    return $str;
+}
+
+function kbAmzTestShortCodeValueResult($result)
+{
+    if (is_numeric($result)) {
+        return $result;
+    } else if (is_string($result)) {
+        return $result;
+    } else if (is_object($result) && isset($result->ID)) {
+        return $result->ID;
+    } else if (is_object($result) && isset($result->term_id)) {
+        return $result->term_id;
+    } else if (is_object($result) && isset($result->cat_ID)) {
+        return $result->cat_ID;
+    }
+    return null;
 }
 
 class KbAmzErrorString

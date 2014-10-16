@@ -752,7 +752,7 @@ HTML;
         $data = array();
         foreach ($rows as $row) {
             if (in_array($row->meta_key, $attributes)) {
-                $data[$row->meta_key] = substr($row->meta_key, 5) . ' <span class="badge"><span class="kbbr">(</span>'.$row->count.'<span class="kbbr">)</span></span>';
+                $data[$row->meta_key] = $row->meta_key . ' <span class="badge"><span class="kbbr">(</span>'.$row->count.'<span class="kbbr">)</span></span>';
             }
         }
         if (isset($data['KbAmzSimilarProducts'])) {
