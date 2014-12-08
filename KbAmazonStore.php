@@ -540,11 +540,8 @@ HTML;
     
     public function isProductAvailable($id)
     {
-        $meta = $this->getProductMeta($id);
-        if (isset($meta['KbAmzOfferSummary.TotalNew'])
-        && $meta['KbAmzOfferSummary.TotalNew'] > 0) {
-            return true;
-        } else if (isset($meta['KbAmzOfferSummary.TotalUsed'])
+        
+        /*else if (isset($meta['KbAmzOfferSummary.TotalUsed'])
         && $meta['KbAmzOfferSummary.TotalUsed'] > 0) {
             return true;
         } else if (isset($meta['KbAmzOfferSummary.TotalCollectible'])
@@ -552,6 +549,12 @@ HTML;
             return true;
         } else if (isset($meta['KbAmzOfferSummary.TotalRefurbished'])
         && $meta['KbAmzOfferSummary.TotalRefurbished'] > 0) {
+            return true;
+        } */
+        
+        $meta = $this->getProductMeta($id);
+        if (isset($meta['KbAmzOfferSummary.TotalNew'])
+        && $meta['KbAmzOfferSummary.TotalNew'] > 0) {
             return true;
         } else {
             return $this->isProductFree($id);
