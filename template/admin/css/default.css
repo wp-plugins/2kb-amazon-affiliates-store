@@ -26,6 +26,7 @@
 .kb-amz-url-upload .import-image{
     height: 180px;
     overflow: hidden;
+    text-align: center;
 }
 .kb-amz-product-attributes #sortable2 input{
     display: none;

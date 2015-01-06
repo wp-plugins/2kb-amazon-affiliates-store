@@ -3,7 +3,7 @@ if (isset($_GET['q'])
 && !empty($_GET['q'])
 && isset($_GET['check'])
 && $_GET['check'] == getKbAmz()->getSecret()) {
-    
+    set_time_limit(90);
     require_once KbAmazonStorePluginPath . 'lib/phpQuery-onefile.php';
     
     $importer = new KbAmazonImporter;

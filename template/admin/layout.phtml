@@ -7,6 +7,10 @@
     <div id="kb-amz-header">
         <ul class="nav nav-tabs">
         <?php
+            $query = array(
+                'page' => $_GET['page'],
+                'kbAction' => $_GET['kbAction']
+            );
             $i = 0;
             foreach($this->actions as $action):
                 if (isset($action['pages'])) {
@@ -20,7 +24,7 @@
                         $subMenuStr .= sprintf(
                             '<li class="%s"><a href="?%s">%s</a></li>',
                             $subPageAction ? 'active' : '',
-                            http_build_query(array_merge($_GET, array('kbAction' => $page['action']))),
+                            http_build_query(array_merge($query, array('kbAction' => $page['action']))),
                             $page['label']
                         );
                     }
@@ -42,7 +46,7 @@
                     echo sprintf(
                         '<li class="%s"><a href="?%s">%s %s</a></li>',
                         $isActive ? 'active' : '',
-                        http_build_query(array_merge($_GET, array('kbAction' => $action['action']))),
+                        http_build_query(array_merge($query, array('kbAction' => $action['action']))),
                         (isset($action['icon']) ? '<span class="glyphicon '.$action['icon'].'"></span>' : ''),
                         $action['label']
                     );
@@ -74,3 +78,10 @@
         </div>
     </div>
 </div>
+<script>
+    (function ($, params) {
+        $.each(params, function (name, value) {
+            $('[name="'+name+'"]').val(value);
+        });
+    })(jQuery, <?php echo json_encode($_GET); ?>);
+</script>

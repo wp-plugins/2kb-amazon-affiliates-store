@@ -127,17 +127,20 @@ class KbAmzAdminController {
     {
         $data = array();
         $importer = new KbAmazonImporter;
-        if (isset($_POST['search']) && (!empty($_POST['category']) || !empty($_POST['categoryName']))) {
-            $category = !empty($_POST['categoryName'])
-                        ? $_POST['categoryName']
-                        : $importer->getAmazonCategory($_POST['category']);
+        if (isset($_GET['search']) && (!empty($_GET['category']) || !empty($_GET['categoryName']))) {
+            $category = !empty($_GET['categoryName'])
+                        ? $_GET['categoryName']
+                        : $importer->getAmazonCategory($_GET['category']);
             
             $resultSet = $importer->search(
-                $_POST['search'],
-                $category
+                $_GET['search'],
+                $category,
+                null,
+                (isset($_GET['kbpage']) ? $_GET['kbpage'] : null)
             );
   
             if ($resultSet->isValid()) {
+                $data['resultSet'] = $resultSet;
                 $data['items'] = $resultSet->getItems();
                 $data['addItemsTemplate'] = $this->getTemplatePath('importItemsWithGallery');
             } else {

@@ -1,4 +1,4 @@
-<form role="form" method="post">
+<form role="form" method="get">
     <div class="alert alert-success">Use Category from the select or write down your own. <a href="http://docs.aws.amazon.com/AWSECommerceService/latest/DG/BrowseNodeIDs.html" target="_blank">Check this link for amazon categories</a></div>
     <div class="row">
         <div class="col-xs-4">
@@ -12,7 +12,7 @@
         <div class="col-xs-4">
             <div class="form-group">
                 <label for="category" class="control-label">
-                    <?php echo __('Category'); ?>
+                    <?php echo __('Select Category'); ?>
                 </label>
                 <select name="category" class="form-control"  value="<?php echo getKbPostVar('category');?>">
                     <?php echo kbAmzSelect($this->categories, getKbPostVar('category'), null); ?>
@@ -22,7 +22,7 @@
         <div class="col-xs-4">
             <div class="form-group">
                 <label for="categoryName" class="control-label">
-                    <?php echo __('Category Name'); ?>
+                    <?php echo __('Or Write a Category Name'); ?>
                 </label>
                 <input type="text" name="categoryName" class="form-control" value="<?php echo getKbPostVar('categoryName');?>" />
             </div>
@@ -31,7 +31,27 @@
     <div class="form-group">
         <button type="submit" class="btn btn-primary" name="submit" value="load"><?php echo __('Search'); ?></button>
     </div>
+    <?php echo kbAmzHiddenInput(); ?>
 </form>
+
+<?php
+if ($this->resultSet) {
+    echo '<div class="form-group">';
+    echo sprintf(
+        '<span class="label label-default">%s %s %s %s %s</span>',
+        $this->resultSet->getTotalResults(),
+        __('Items'),
+        __('in'),
+        $this->resultSet->getTotalPages(),
+        __('Pages')
+    );
+    echo sprintf(
+        '&nbsp;<span class="label label-info">%s</span>',
+        __('Amazon is allowing to browse up to 10 pages of results.')
+    );
+    echo '</div>';
+}
+?>
 
 <?php
 if ($this->addItemsTemplate) {

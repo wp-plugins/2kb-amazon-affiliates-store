@@ -34,6 +34,16 @@ class KbAmazonItems
         }
     }
     
+    public function getTotalResults()
+    {
+        return isset($this->result['Items']['TotalResults']) ? $this->result['Items']['TotalResults'] : 0;
+    }
+    
+    public function getTotalPages()
+    {
+        return isset($this->result['Items']['TotalPages']) ? $this->result['Items']['TotalPages'] : 0;
+    }
+    
     public function getItems()
     {
         return $this->items;

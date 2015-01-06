@@ -4,7 +4,7 @@
     </div>
     <div class="row kb-amz-url-upload" id="kb-amz-categories-products">
         <?php foreach ($this->items as $item): ?>
-        <label class="col-sm-3 col-md-2">
+        <label class="col-sm-2 col-md-2">
             <div class="thumbnail">
                 <div class="import-image">
                     <img src="<?php echo is_array($item) ? $item['src'] : $item->getImageThumbSrc();?>">
@@ -19,6 +19,13 @@
         </label>
         <?php endforeach; ?>
     </div>
+    
+    <?php
+    if ($this->resultSet && $this->resultSet->getTotalResults() > 10) {
+        $number = $this->resultSet->getTotalResults();
+        echo kbAmzBootstrapPagination($number, 10);
+    }
+    ?>
     
     <div class="row">
         <div class="col-xs-12">

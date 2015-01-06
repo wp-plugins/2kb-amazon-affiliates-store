@@ -370,3 +370,92 @@ function getKbAmzExcerptFromContent($postcontent, $length)
 
     return implode(array_slice($parts, 0, $last_part));
 }
+
+function kbAmzBootstrapPagination($count, $perPage)
+{
+    $query = $_GET;
+
+    $curPage = isset($_GET['kbpage']) ? $_GET['kbpage'] : 1;
+    $data = array();
+    if($count){
+        $pages = ceil($count / $perPage);
+        if($pages > 1){
+
+            $page = $curPage == 1 ? 1 : $curPage - 1;
+            $query['kbpage'] = $page;
+            $data[] = \sprintf(
+                '<li%s><a href="?%s">%s</a></li>' . PHP_EOL,
+                $curPage == 1 ? ' class="disabled"' : '',
+                http_build_query($query),
+                '&laquo;'
+            );
+            $query['kbpage'] = 1;
+            $data[] = \sprintf(
+                '<li%s><a href="?%s">%s</a></li>' . PHP_EOL,
+                $curPage == 1 ? ' class="disabled first"' : ' class="first"',
+                http_build_query($query),
+                __('First')
+            );
+
+            for($i = 1; $i <= $pages; $i++) {
+                $canAdd = false;
+                if ($i >= $curPage - 5 && $i <= $curPage + 5) {
+                    $canAdd = true;
+                }
+
+                if (!$canAdd) {
+                    continue;
+                }
+                
+                $query['kbpage'] = $i;
+                $data[] = \sprintf(
+                    '<li%s><a href="?%s">%s</a></li>' . PHP_EOL,
+                    $i == $curPage ? ' class="active"' : '',
+                     http_build_query($query),
+                    $i
+                );  
+
+
+            }
+            
+            $query['kbpage'] = $pages;
+            $data[] = \sprintf(
+                '<li%s><a href="?%s">%s</a></li>' . PHP_EOL,
+                $curPage == $pages ? ' class="disabled last"' : ' class="last"',
+                http_build_query($query),
+                __('Last')
+            );
+
+            $page = $curPage == $pages ? $pages : $curPage + 1;
+            $query['kbpage'] = $page;
+            $data[] = \sprintf(
+                '<li%s><a href="?%s">%s</a></li>' . PHP_EOL,
+                $curPage == $pages ? ' class="disabled"' : '',
+                http_build_query($query),
+                '&raquo;'
+            );
+        }
+    }
+    
+    if (!empty($data)) {
+        return \sprintf(
+            '<ul class="pagination">%s</ul>' . PHP_EOL,
+            join('', $data)
+        ); 
+    }
+}
+
+function kbAmzHiddenInput()
+{
+    if (!empty($_GET)) {
+        $data = array();
+        foreach ($_GET as $name => $val) {
+            $data[] = sprintf(
+                '<input type="hidden" name="%s" value="%s"/>',
+                $name,
+                $val
+            );
+        }
+        return implode(PHP_EOL, $data);
+    }
+}

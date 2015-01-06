@@ -368,13 +368,14 @@ class KbAmazonImporter
      * @param type $nodeId
      * @return \KbAmazonItems
      */
-    public function search($search, $category, $nodeId = null)
+    public function search($search, $category, $nodeId = null, $page = null)
     {
         $result = getKbAmazonApi()
                   ->responseGroup('Large')
-                  ->optionalParameters(array('MerchantId' => 'All'))
+                  ->optionalParameters(array('MerchantId' => 'All', 'ItemPage' => $page))
                   ->category($category)
                   ->search($search, $nodeId);
+        
         $this->countAmazonRequest();
         return new KbAmazonItems($result, true);
     }
@@ -849,6 +850,7 @@ class KbAmazonImporter
     
     public function getUrlItems($url)
     {
+        set_time_limit(90);
         $asins = $this->getUrlAsins($url);
         $items = array();
         foreach ($asins as $asin) {
