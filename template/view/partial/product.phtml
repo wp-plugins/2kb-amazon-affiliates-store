@@ -25,7 +25,7 @@ if ($c == 4) {
 };
 ?>
 
-<li class="kb-amz-per-row-<?php echo $c; ?> col-lg-<?php echo $lg; ?> col-md-<?php echo $md; ?> col-sm-<?php echo $sm; ?> col-xs-<?php echo $xs; ?> kb-amz-row-item-part <?php echo getKbAmz()->getOption('productListImageSize'); ?> <?php echo $this->featured ? 'featured' : 'not-featured'; ?>">
+<li class="kb-amz-per-row-<?php echo $c; ?> col-lg-<?php echo $lg; ?> col-md-<?php echo $md; ?> col-sm-<?php echo $sm; ?> col-xs-<?php echo $xs; ?> kb-amz-row-item-part <?php echo 'kb-amz-' . getKbAmz()->getOption('productListImageSize'); ?> <?php echo $this->featured ? 'featured' : 'not-featured'; ?>">
     <article id="post-<?php echo $p->ID; ?>" <?php post_class('kb-amz-product', $p->ID); ?>>
         <header>
             <div class="kb-amz-item-list-img animate <?php echo getKbAmz()->getOption('imageHoverSwitch') ? 'kb-amz-hover-switch-active' : 'kb-amz-hover-switch-not-active'; ?>">

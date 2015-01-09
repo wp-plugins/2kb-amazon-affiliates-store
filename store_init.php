@@ -170,3 +170,18 @@ function kbAmzRemoveCategoryDeleteMarker($desc) {
     return str_replace($markUp, '', $desc);
 }
 add_filter( 'category_description', 'kbAmzRemoveCategoryDeleteMarker' );
+
+/**
+ * External Url Option fix
+ */
+add_filter('wp_get_attachment_url', 'kbAmzFixImageExternalUrl');
+function kbAmzFixImageExternalUrl($url) {
+    if (strpos($url, 'images-amazon.com') !== false
+    || strpos($url, 'amazon.com') !== false) {
+        $parts = explode('/http', $url);
+        if (isset($parts[1])) {
+            return 'http' . $parts[1];
+        }
+    }
+    return $url;
+}

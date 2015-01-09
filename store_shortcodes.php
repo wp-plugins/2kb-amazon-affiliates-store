@@ -324,7 +324,7 @@ function kb_amz_list_products($atts) {
     $atts['post_type']      = 'post';
     //$atts['meta_key']       = 'KbAmzASIN';
     $atts['post_status']    = 'any';
-    $atts['paged']          = getKbAmzPaged();
+    $atts['paged']          = $atts['pagination'] ? getKbAmzPaged() : null;
     $atts['meta_query']     = array();
     $atts['meta_query'][]   = array(
         'key' => 'KbAmzASIN'
@@ -363,6 +363,39 @@ function kb_amz_list_products($atts) {
 }
 
 add_shortcode('kb_amz_list_products', 'kb_amz_list_products');
+
+
+// [kb_amz_product_reviews]
+function kb_amz_product_reviews_func($atts) {
+    $atts = shortcode_atts( array(
+        'ID' => null,
+        'title' => null,
+        'title_tag' => 'h3',
+        'width' => '100%',
+        'height' => '300px'
+    ), $atts);
+
+    $shortCodes = getKbAmz()->getShortCodes();
+    if (isset($shortCodes['reviews']['active'])
+    && !$shortCodes['reviews']['active']) {
+        return;
+    }
+    $meta = getKbAmz()->getProductMeta(($atts['ID'] ? $atts['ID'] : get_the_ID()));
+    if (isset($meta['KbAmzCustomerReviews.HasReviews'])
+    && $meta['KbAmzCustomerReviews.HasReviews']
+    && isset($meta['KbAmzCustomerReviews.IFrameURL'])
+    && $meta['KbAmzCustomerReviews.IFrameURL']) {
+        return sprintf(
+            '<div class="kb-amz-iframe-reviews">%s<iframe src="%s" style="width:%s;height:%s;border:none;padding:0;margin:0;"/>%s</iframe></div>',
+            ($atts['title'] ? '<' . $atts['title_tag'] . '>' . $atts['title'] . '</' . $atts['title_tag'] . '>' : ''),
+            $meta['KbAmzCustomerReviews.IFrameURL'],
+            $atts['width'],
+            $atts['height'],
+            __('Your browser does not support Iframes.')
+        );
+    }
+}
+add_shortcode( 'kb_amz_product_reviews', 'kb_amz_product_reviews_func' );
 
 
 function kbAmzShortCodeBool($str)

@@ -86,7 +86,19 @@ class KbAmazonStore
                 'attribute_compare' => "'=', '!=', '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN'"
             ),
             'active' => true,
-        )
+        ),
+        'reviews' => array(
+            'code' => 'kb_amz_product_reviews',
+            'params' => array(
+                'Version'  => '<b>Beta* Use to Test and Feedback Only</b>',
+                'ID' => 'post ID, leave empty for current post',
+                'title' => '<b>Emtpy</b> / String',
+                'title_tag' => '<b>h3</b> / Any html tag',
+                'width' => '<b>100%</b> / any valid css value',
+                'height' => '<b>300px</b> / any valid css value',
+            ),
+            'active' => false,
+        ) 
     );
 
     /**
@@ -380,6 +392,7 @@ class KbAmazonStore
 %s
 %s
 %s
+%s
 HTML;
 
         return sprintf(
@@ -388,6 +401,7 @@ HTML;
             getKbAmz()->getShortCode('attributes'),
             getKbAmz()->getShortCode('actions'),
             getKbAmz()->getShortCode('content', array('replace' => 'Yes')),
+            getKbAmz()->getShortCode('reviews'),
             getKbAmz()->getShortCode('similar')
         );
     }

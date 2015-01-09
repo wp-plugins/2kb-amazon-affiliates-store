@@ -35,6 +35,12 @@ This section describes how to install the plugin and get it working.
 == Screenshots ==
 
 == Changelog ==
+= 1.1.1 =
+Amazon Iframe Reviews added. You can test and provide feedback to complete this functionality.
+Fixed bug when using product images directly from Amazon and not displaying outside the product page. Thanks to alamandeh for reporting it.
+Fixed bug when pagination is disabled for one listing on multiple product listings.
+Fixed admin import search form same parameters after submit bug.
+Fixed bug for custom themes when having thumbnail size (class) on the listing page.
 = 1.1.0 =
 Import timeout increased from default 30sec. to 90 sec.
 Added pagination on the search page.
