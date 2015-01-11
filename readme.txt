@@ -35,6 +35,9 @@ This section describes how to install the plugin and get it working.
 == Screenshots ==
 
 == Changelog ==
+= 1.1.2 =
+Listing price add when 'Show the original price of the product.' options is enabled.
+Disabled store widgets filters on product post page.
 = 1.1.1 =
 Amazon Iframe Reviews added. You can test and provide feedback to complete this functionality.
 Fixed bug when using product images directly from Amazon and not displaying outside the product page. Thanks to alamandeh for reporting it.

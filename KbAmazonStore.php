@@ -673,11 +673,16 @@ HTML;
             return '<span class="kb-amz-out-of-stock">'.__('Out of stock').'</span>';
         }
         $meta = $this->getProductMeta($id);
-        
         $price = $meta['KbAmzPriceAmountFormatted'];
         $lowest = isset($meta['KbAmzOfferSummary.LowestNewPrice.FormattedPrice'])
                 ? $meta['KbAmzOfferSummary.LowestNewPrice.FormattedPrice'] : 0;
-
+        
+        $listPrice = 0;
+        if (isset($meta['KbAmzItemAttributes.ListPrice.FormattedPrice'])
+        && !empty($meta['KbAmzItemAttributes.ListPrice.FormattedPrice'])) {
+            $listPrice = $meta['KbAmzItemAttributes.ListPrice.FormattedPrice'];
+        }
+        
         if (getKbAmz()->getOption('enableSalePrice', 1)
         && $lowest && $lowest != $price) {
             return sprintf(
@@ -686,10 +691,21 @@ HTML;
                 $lowest
             );
         } else if ($price) {
-            return sprintf(
-                '<ins>%s</ins>',
-                $price
-            );
+            
+            if (getKbAmz()->getOption('enableSalePrice', 1)
+            && $listPrice
+            && $listPrice != $price) {
+                return sprintf(
+                    '<del>%s</del><ins>%s</ins>',
+                    $listPrice,
+                    $price
+                );
+            } else {
+                return sprintf(
+                    '<ins>%s</ins>',
+                    $price
+                );
+            }
         } else {
             return sprintf(
                 '<ins>%s</ins>',

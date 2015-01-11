@@ -124,8 +124,12 @@ class KbAmzWidget extends WP_Widget
         if (isset($instance['categoryAndPageOnly']) && $instance['categoryAndPageOnly']) {
             return true;
         }
-
-        if ((is_single() || is_page()) && !hasKbPostShortCode('listProduct')) {
+        
+        if ((is_single() || is_page())) {
+            if (hasKbPostShortCode('listProduct')
+            && !getKbAmz()->isPostProduct(get_the_ID())) {
+                return true;
+            }
             return false;
         }
         
