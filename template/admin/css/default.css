@@ -64,10 +64,10 @@ float: right;
 .kb-amz-select-width select{
     width: 100%;
 }
-#kb-amz-version ul, #kb-amz-version li{
+#kb-amz-version ul, #kb-amz-version li, .infoAction #kb-amz-content li{
     list-style-type: disc;
 }
-#kb-amz-version ul{
+#kb-amz-version ul, .infoAction #kb-amz-content ul{
     padding-left: 15px;
 }
 #kb-amz-footer .credit{
@@ -77,4 +77,7 @@ float: right;
 .homepage .label{
     display: inline-block;
     margin-bottom: 5px;
+}
+.info-items a{
+    display: block;
 }

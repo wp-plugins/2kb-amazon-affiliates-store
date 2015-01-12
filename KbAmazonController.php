@@ -489,8 +489,15 @@ class KbAmzAdminController {
         $data['postData'] = json_encode(array('action' => 'premiumAction'));
         return new KbView($data);
     }
+    
+    public function infoAction()
+    {
+        $data = array();
+        
+        return new KbView($data);
+    }
 
-    protected function getActions() {
+        protected function getActions() {
         return array(
             array(
                 'action' => 'home',
@@ -546,11 +553,11 @@ class KbAmzAdminController {
                 'icon' => 'glyphicon-question-sign',
                 'label' => __('Support')
             ),
-//            array(
-//                'action' => 'info',
-//                'icon' => 'glyphicon-info-sign',
-//                'label' => __('Info & FAQ')
-//            ),
+            array(
+                'action' => 'info',
+                'icon' => 'glyphicon glyphicon-folder-open',
+                'label' => __('Docs & FAQ')
+            ),
             array(
                 'action' => 'version',
                 'label' => 'v'.KbAmazonVersion

@@ -91,15 +91,15 @@ class KbAmzTemplate
     
     public function initDefaultAdminScripts()
     {
-        if (is_admin() && (!isset($_GET['page']) || $_GET['page'] != 'kbAmz')) {
-            return;
-        }
-        
         wp_enqueue_style(
             'KbAmzAdminDefaultCss',
             getKbPluginUrl() . '/template/admin/css/default.css'
         );
-
+        
+        if (is_admin() && (!isset($_GET['page']) || $_GET['page'] != 'kbAmz')) {
+            return;
+        }
+        
         wp_enqueue_script(
             'KbAmzAdminJqueryUI',
             getKbPluginUrl() . '/template/admin/js/jquery-ui-1.10.4.custom.min.js',

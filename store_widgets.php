@@ -39,7 +39,7 @@ class KbAmzWidget extends WP_Widget
         <?php if (!isset($instance['disableMeta']) || !$instance['disableMeta']) :?>
         <p>
             <label for="<?php echo $this->get_field_id('meta_key'); ?>"><?php _e('Meta Key:'); ?></label> 
-            <select id="<?php echo $this->get_field_id('meta_key'); ?>" name="<?php echo $this->get_field_name('meta_key'); ?>" type="text" value="<?php echo esc_attr($metaKey); ?>" style="max-width: 100%;">
+            <select id="<?php echo $this->get_field_id('meta_key'); ?>" name="<?php echo $this->get_field_name('meta_key'); ?>" type="text" value="<?php echo esc_attr($metaKey); ?>" style="width: 100%;">
                 <?php foreach (getKbAmz()->getAttributes() as $name => $type) : ?>
                 <option value="<?php echo $name; ?>"<?php echo $metaKey == $name ? 'selected="selected"' : ''?>><?php echo $type; ?></option>
                 <?php endforeach; ?>

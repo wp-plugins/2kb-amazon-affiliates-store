@@ -1,0 +1,158 @@
+<div class="info-items">
+    <a href="#premium">Premium</a>
+    <a href="#products-attributes">Products Attributes</a>
+    <a href="#products-explore-attributes">Products Explore Attributes</a>
+    <a href="#products-exclude-attributes">Products Exclude Attributes</a>
+    <a href="#products-short-codes">Products Short Codes</a>
+    <a href="#widgets">Widgets</a>
+    <a href="#import">Import</a>
+    <a href="#settings-general">General Settings</a>
+    
+</div>
+
+<div>
+    <a id="premium"></a>
+    <br/>
+    <h4>Premium <a href="?page=kbAmz&kbAction=premium"><span class="glyphicon glyphicon-link"></span></a></h4>
+    <div>
+        Disclaimer! Premium menu will not not add any new and magical functionality to the 2kb Amazon Affiliate Store plugin, however premium themes can and will.
+        <br/>
+        <b>If you like this plugin and want to see more, consider supporting us by purchasing items from the <a href="?page=kbAmz&kbAction=premium">Premium Menu</a>. Thank you!</b>
+    </div>
+</div>
+
+<div>
+    <a id="products-attributes"></a>
+    <br/>
+    <h4>Products -> Attributes <a href="?page=kbAmz&kbAction=productsAttributes"><span class="glyphicon glyphicon-link"></span></a></h4>
+    <div>
+        In this menu, the user can select which attributes and labes that will be displayed using [kb_amz_product_attributes] short code. Non existing attributes will not be displayed. Green label is mandatory attribute.
+        <img src="<?php echo getKbPluginUrl(); ?>/template/admin/img/info/attributes.jpg" />
+    </div>
+</div>
+
+<div>
+    <a id="products-explore-attributes"></a>
+    <br/>
+    <h4>Products -> Explore Attributes <a href="?page=kbAmz&kbAction=productsExplodeAttributes"><span class="glyphicon glyphicon-link"></span></a></h4>
+    <div>
+        Here are displayed all the attributes  will all their values. This is very important for Store customization.
+    </div>
+</div>
+
+<div>
+    <a id="products-exclude-attributes"></a>
+    <br/>
+    <h4>Products -> Exclude Attributes <a href="?page=kbAmz&kbAction=productsExcludeAttributes"><span class="glyphicon glyphicon-link"></span></a></h4>
+    <div>
+        Adding more products will use database space, which can be saved with removing attributes that are not used by the system. Removing attributes is not recommended because future plugin functionality may rely on them. Red labels can not be excluded.
+    </div>
+</div>
+
+<div>
+    <a id="products-short-codes"></a>
+    <br/>
+    <h4>Products -> Short Codes <a href="?page=kbAmz&kbAction=productsShortCodes"><span class="glyphicon glyphicon-link"></span></a></h4>
+    <div>
+        Short Codes can be globally disabled, so that products (posts) content is not changed. Use enable checkbox to do that.
+        <br/><br/>
+        [kb_amz_product_gallery] - do the same as [option Replace Thumbnail With Gallery], used in custom themes giving flexibility.
+        <br/>
+        [kb_amz_product_attributes] - see <a href="#products-attributes">Products -> Attributes</a>
+        <br/>
+        [kb_amz_product_content]
+        <ul style="list-style-type: disc;">
+            <li>show_all_reviews="<b>Yes</b>/No" in addition to the product description, amazon can provide 3rd party reviews as text.</li>
+            <li>show_title="<b>Yes</b>/No"</li>
+            <li>strip_tags="<b>No</b>/Yes" - removes all formatting on the description and reviews.</li>
+            <li>replace="<b>No</b>/Yes - this option will replace the short code directly in the product(post) content and it will be removed. This option will allow 3rd party plugins work the description content that amazon provides.</li>
+        </ul>
+        [kb_amz_product_similar] - show Amazon similar products if any. [option Load Similar Items Strategy] should be enabled to use this shortcode and similar products must be downloaded.
+        <br/>
+        [kb_amz_product_actions] - Checkout action(url) for now. More to come.
+        <br/>
+        [kb_amz_checkout] - this shortcode allows checkout cart to be displayed anywhere on the store. By default, page with name Checkout will be created.
+        <br/>
+        [kb_amz_list_products] - this shortcode is the power of listing in your hands.
+        <br/>
+        A couple of thing you need to know in order to do cool things with this shortcode:
+        <ul style="list-style-type: disc;">
+            <li>Any not array arguments that accepts <a href="http://codex.wordpress.org/Template_Tags/get_posts" target="_blank">get_posts</a> will be accepted. For example: posts_per_page, category, category_name, orderby, meta_key, meta_value... got the point?</li>
+            <li>Any valid function that return scalar data. Check <a href="http://php.net/manual/en/function.is-scalar.php" target="_blank">is_scalar</a> For example: <code>[kb_amz_list_products category="getKbAmzProductBottomCategory()"]</code></li>
+            <li>Any php code resulting scalar value. For example <code>[kb_amz_list_products category_name="<? echo 'Page ' . rand(1, 3); ?>"]</code>. Note that you can use html special characters for '&gt;' and '&lt;'</li>
+        </ul>
+        Example for listing new Books.
+        <br/>
+        <code>
+            [kb_amz_list_products attribute_key="KbAmzItemAttributes.PublicationDate" attribute_value="<? date('Y-m-d',  strtotime('-3month')) ?>" attribute_compare=">="]
+        </code>
+        <br/>
+        [kb_amz_product_reviews] - Amazon Iframe Reviews, in beta for now. Use for tests only.
+        <br/>
+        <br/>
+        Short Code Post Content is used for global edit on all products(posts) on your store.
+    </div>
+</div>
+
+<div>
+    <a id="widgets"></a>
+    <br/>
+    <h4>Widgets <a href="?page=kbAmz&kbAction=widgets"><span class="glyphicon glyphicon-link"></span></a></h4>
+    <div>
+        Primary widgets function is to create filters for products listings. You can create almost any filter you see on Amazon.com
+        <br/>
+        <b>Note 1</b> - Filtering widgets will be disabled for products (posts) pages by default and this can not be changed.
+        <br/>
+        All widgets can be enabled only for specific page or/and category. This can help you create filters for Books and Clothes on the same store without data collision.
+        <br/><br/>
+        <b>Examples:</b><br><br>
+        Price Slider - Use Kb Shop Slider Widget + Meta Key KbAmzPriceAmount<br>
+        <img src="<?php echo getKbPluginUrl(); ?>/template/admin/img/info/price-slider.jpg" />
+        <br/><br/>
+        Best Sellers - Use Kb Shop Slider Widget + Meta Key KbAmzSalesRank<br>
+        <img src="<?php echo getKbPluginUrl(); ?>/template/admin/img/info/best-sellers-slider.jpg" />
+        <br/><br/>
+        Attributes and Categories Count<br/>
+        <img src="<?php echo getKbPluginUrl(); ?>/template/admin/img/info/binding-attributes-count.jpg" />
+    </div>
+</div>
+
+<div>
+    <a id="import"></a>
+    <br/>
+    <h4>Import</h4>
+    <div>
+        Any Questions here?
+    </div>
+</div>
+
+<div>
+    <a id="settings-general"></a>
+    <br/>
+    <h4>Settings -> General <a href="?page=kbAmz&kbAction=settingsGeneral"><span class="glyphicon glyphicon-link"></span></a></h4>
+    <div>
+        [option Number of items per row] - used for columns layout - 6, 4 and 3 columns. Can be overridden by shortcode value.
+        <br/>
+        [option Show the original price of the product] - Shows listing price and the new lower price. <img src="<?php echo getKbPluginUrl(); ?>/template/admin/img/info/price-discount.jpg" />
+        <br/>
+        [option List Products Image Sizes] - Image size reference to wp images sizes.
+        <br/>
+        [option Replace Thumbnail With Gallery] - replace the product(post) thumbnail with gallery that contains all the images.
+        <br/>
+        [option Download images from Amazon] - This option will allow you to skip the image downloading, but still act like the images in downloaded. Very cool option.
+        <br/>
+        [option Switch images on hover in the listing]
+        <br/>
+        <img src="<?php echo getKbPluginUrl(); ?>/template/admin/img/info/images-hover.jpg" />
+        <br/>
+        [option Max Number of Images to Download] - Lower Number = Faster 
+        <br/>
+        [option Import Free Items] - (Price = 0 for example Kindle Books)
+        <br/>
+        [option Load Similar Items Strategy] - Every product has similar items that Amazon provides. Must be enabled to use [kb_amz_product_similar]
+        <br/>
+        [option ENABLE Products import for comma separated Amazon category names] - If you want to mass import products for example Books, add Books to the field and products that dont have Books category will not be imported.
+        [option DISABLE Products import for comma separated Amazon category names] - As the above in reverse.
+        [option Cron] - Keep your products up to date.
+    </div>
+</div>

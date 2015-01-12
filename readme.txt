@@ -1,8 +1,8 @@
 === Plugin Name ===
 Tags: amazon, affiliate, associate, online store, selling products
 Requires at least: 4.0
-Tested up to: 4.0
-Stable tag: 1.1.0
+Tested up to: 4.1
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,6 +35,11 @@ This section describes how to install the plugin and get it working.
 == Screenshots ==
 
 == Changelog ==
+= 1.1.3 =
+Fixed bug for creating multiple checkout pages.
+Fixed bug with listing price option. Now showing listing price and discounted price.
+Admin widgets css update.
+Documentation added.
 = 1.1.2 =
 Listing price add when 'Show the original price of the product.' options is enabled.
 Disabled store widgets filters on product post page.

@@ -183,6 +183,7 @@ ul.kb-products-list > li{
     max-width: 100%;
     overflow: hidden;
     max-height: 100%;
+    width: 100%;
 }
 .kb-amz-item-list-content{
     z-index: 5010;
@@ -208,7 +209,7 @@ ul.kb-products-list > li{
     margin: 0.1em 0;
 }
 .kb-amz-item-price del{
-    font-size:0.60em;
+    font-size:0.70em;
     opacity: 0.50;
     text-decoration: line-through;
 }

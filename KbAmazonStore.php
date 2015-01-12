@@ -195,6 +195,13 @@ class KbAmazonStore
 
     public function getCheckoutPage()
     {
+        $pageIdOption = $this->getOption('CheckoutPage');
+        if ($pageIdOption) {
+            $page = get_page($pageIdOption);
+            if ($page) {
+                return $page;
+            }
+        }
         $args = array(
             'meta_key' => 'KbAmzCheckoutPage',
             'meta_value' => '1',
@@ -212,6 +219,10 @@ class KbAmazonStore
                 'post_content' => $this->getShortCode('checkout')
             ));
             add_post_meta($pageId, 'KbAmzCheckoutPage', '1');
+            $this->setOption('CheckoutPage', $pageId);
+        }
+        if (!$pageIdOption) {
+            $this->setOption('CheckoutPage', $page->ID);
         }
         return $page;
     }
@@ -686,7 +697,7 @@ HTML;
         if (getKbAmz()->getOption('enableSalePrice', 1)
         && $lowest && $lowest != $price) {
             return sprintf(
-                '<del>%s</del><ins>%s</ins>',
+                '<del>%s</del>&nbsp;<ins>%s</ins>',
                 $price,
                 $lowest
             );
@@ -696,7 +707,7 @@ HTML;
             && $listPrice
             && $listPrice != $price) {
                 return sprintf(
-                    '<del>%s</del><ins>%s</ins>',
+                    '<del>%s</del>&nbsp;<ins>%s</ins>',
                     $listPrice,
                     $price
                 );
