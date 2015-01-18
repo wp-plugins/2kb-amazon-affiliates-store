@@ -295,7 +295,8 @@ function kb_amz_list_products($atts) {
         'attribute_compare'  => '=',
         'title'             => null,
         'pagination'        => 'Yes',
-        'items_per_row'     => null
+        'items_per_row'     => null,
+        'post_status'       => 'publish'
     ), $atts, 'kb_amz_list_products');
     
     $shortCodes = getKbAmz()->getShortCodes();
@@ -323,7 +324,7 @@ function kb_amz_list_products($atts) {
     $atts['cat']            = $category;
     $atts['post_type']      = 'post';
     //$atts['meta_key']       = 'KbAmzASIN';
-    $atts['post_status']    = 'any';
+    //$atts['post_status']    = 'publish';
     $atts['paged']          = $atts['pagination'] ? getKbAmzPaged() : null;
     $atts['meta_query']     = array();
     $atts['meta_query'][]   = array(

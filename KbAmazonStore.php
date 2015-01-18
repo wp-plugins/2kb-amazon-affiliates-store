@@ -83,7 +83,8 @@ class KbAmazonStore
                 'title' => 'String',
                 'attribute_key' => '(See Product Attributes)',
                 'attribute_value' => '(Explore Attributes Value)',
-                'attribute_compare' => "'=', '!=', '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN'"
+                'attribute_compare' => "'=', '!=', '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN'",
+                'post_status' => '<b>publish</b> / any'
             ),
             'active' => true,
         ),
