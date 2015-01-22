@@ -1,6 +1,6 @@
 <form role="form" method="post">
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-6 col-xs-6">
             <div class="form-group">
                 <label for="ListItemsPerRow" class="control-label">
                     <?php echo __('Number of items per row.'); ?>
@@ -10,9 +10,7 @@
                 </select>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-6 col-xs-6">
             <div class="form-group">
                 <label for="enableSalePrice" class="control-label">
                     <?php echo __('Show the original price of the product.'); ?>
@@ -21,11 +19,11 @@
                     <?php echo kbAmzSelect(array(1 => __('Yes'), 0 => __('No')), getKbPostVar('enableSalePrice', getKbAmz()->getOption('enableSalePrice'))); ?>
                 </select>
             </div>
-        </div>
+        </div>  
     </div>
     
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-6 col-xs-6">
             <div class="form-group">
                 <label for="productListImageSize" class="control-label">
                     <?php echo __('List Products Image Sizes.'); ?>
@@ -35,10 +33,7 @@
                 </select>
             </div>
         </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-6 col-xs-6">
             <div class="form-group">
                 <label for="replaceThumbnailWithGallery" class="control-label">
                     <?php echo __('Replace Thumbnail With Gallery.'); ?>
@@ -51,7 +46,7 @@
     </div>
     
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-6 col-xs-6">
             <div class="form-group">
                 <label for="replaceThumbnailWithGallery" class="control-label">
                     <?php echo __('Download images from Amazon.'); ?>
@@ -61,10 +56,7 @@
                 </select>
             </div>
         </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-6 col-xs-6">
             <div class="form-group">
                 <label for="imageHoverSwitch" class="control-label">
                     <?php echo __('Switch images on hover in the listing.'); ?>
@@ -77,7 +69,7 @@
     </div>
     
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-6 col-xs-6">
             <div class="form-group">
                 <label for="numberImagesToDownload" class="control-label">
                     <?php echo __('Max Number of Images to Download. Lower Number = Faster'); ?>
@@ -85,10 +77,7 @@
                 <input value="<?php echo getKbPostVar('numberImagesToDownload', getKbAmz()->getOption('numberImagesToDownload'));?>" name="numberImagesToDownload" class="form-control"/>
             </div>
         </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-6 col-xs-6">
             <div class="form-group">
                 <label for="canImportFreeItems" class="control-label">
                     <?php echo __('Import Free Items (Price = 0 for example Kindle Books)'); ?>
@@ -101,7 +90,7 @@
     </div>
     
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-6 col-xs-6">
             <div class="form-group">
                 <label for="loadSimilarItems" class="control-label">
                     <?php echo __('Load Similar Items Strategy. Increases product import time.'); ?>
@@ -115,6 +104,26 @@
                     );
                     ?>
                     <?php echo kbAmzSelect($values, getKbPostVar('loadSimilarItems', getKbAmz()->getOption('loadSimilarItems'))); ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-6">
+            <div class="form-group">
+                <label for="deleteProductOnNoQuantity" class="control-label">
+                    <?php echo __('Delete Product(post) on no quantity.'); ?>
+                </label>
+                <select value="<?php echo getKbPostVar('deleteProductOnNoQuantity', getKbAmz()->getOption('deleteProductOnNoQuantity'));?>" name="deleteProductOnNoQuantity" class="form-control">
+                    <?php echo kbAmzSelect(array(1 => __('Yes'), 0 => __('No')), getKbPostVar('deleteProductOnNoQuantity', getKbAmz()->getOption('deleteProductOnNoQuantity'))); ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-6">
+            <div class="form-group">
+                <label for="sendStatsData" class="control-label">
+                    <?php echo __('Participate The Plugin Experience Program'); ?>
+                </label>
+                <select value="<?php echo getKbPostVar('sendStatsData', getKbAmz()->getOption('sendStatsData'));?>" name="sendStatsData" class="form-control">
+                    <?php echo kbAmzSelect(array(0 => __('No'), 1 => __('Yes')), getKbPostVar('sendStatsData', getKbAmz()->getOption('sendStatsData'))); ?>
                 </select>
             </div>
         </div>
@@ -140,7 +149,7 @@
     </div>
     
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-6 col-xs-6">
             <div class="form-group">
                 <label for="isCronEnabled" class="control-label">
                     <?php echo __('Is Cron Enabled.'); ?>
@@ -205,19 +214,19 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-4 col-xs-4">
             <?php echo kbAmzAdminMessage(__('Cron Insert / Update Url: ') . '<b>'. kbGetUrlWithParams(array('BASE_URL' => get_site_url(), 'kbAction' => 'KbAmzCronAction', 'secret' => getKbAmz()->getSecret()), false) . '</b>'); ?>
         </div> 
-        <div class="col-xs-12">
+        <div class="col-md-4 col-xs-4">
             <?php echo kbAmzAdminMessage(__('Cron Insert Products Url: ') . '<b>'. kbGetUrlWithParams(array('BASE_URL' => get_site_url(), 'kbAction' => 'KbAmzCronImportProductsAction', 'secret' => getKbAmz()->getSecret()), false) . '</b>'); ?>
         </div>
-        <div class="col-xs-12">
+        <div class="col-md-4 col-xs-4">
             <?php echo kbAmzAdminMessage(__('Cron Update Products Url: ') . '<b>'. kbGetUrlWithParams(array('BASE_URL' => get_site_url(), 'kbAction' => 'KbAmzCronUpdateProductsAction', 'secret' => getKbAmz()->getSecret()), false) . '</b>'); ?>
         </div> 
     </div>
     
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-md-6 col-xs-6">
             <div class="form-group">
                 <button type="submit" class="btn btn-primary" name="update" value="load"><?php echo __('Update'); ?></button>
             </div> 

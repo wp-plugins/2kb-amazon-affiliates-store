@@ -342,7 +342,6 @@ class KbAmazonImporter
                       ->responseGroup($responseGroup)
                       ->optionalParameters(array('MerchantId' => 'All'))
                       ->lookup($asin);
-            
             /**
              * STATS
              */
@@ -437,6 +436,7 @@ class KbAmazonImporter
             $this->priceToMeta($meta);
             $this->updateProductPostMeta($meta, $postId);
             wp_update_post(array('ID' => $postId, 'post_modified' => date('Y-m-d H:i:s')));
+            $this->checkAvailableAction($postId);
         }
     }
 
@@ -602,18 +602,25 @@ class KbAmazonImporter
             }
         }
         
-        // update status
-        if (!getKbAmz()->isProductAvailable($postId)) {
-            wp_update_post(array('ID' => $postId, 'post_status' => 'pending'));
-        }
-        
         $this->updateProductContent($postId);
-
+        
+        $this->checkAvailableAction($postId);
         return array(
             'post_id' => $postId,
             'updated' => (bool) $postExists,
             'error' => null
         );
+    }
+    
+    public function checkAvailableAction($postId)
+    {
+        // update status
+        if (!getKbAmz()->isProductAvailable($postId)) {
+            wp_update_post(array('ID' => $postId, 'post_status' => 'pending'));
+            if (getKbAmz()->getOption('deleteProductOnNoQuantity')) {
+                getKbAmz()->clearProduct($postId);
+            }
+        }
     }
     
     /**

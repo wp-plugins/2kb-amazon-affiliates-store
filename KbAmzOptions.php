@@ -22,6 +22,9 @@ function getKbAmzDefaultOptions()
        'maxProductsCount' => 250,
        'productsLimitReached' => false,
        'imageHoverSwitch' => 0,
-       'defaultPostStatus' => 'pending'
+       'defaultPostStatus' => 'pending',
+       'deleteProductOnNoQuantity' => false,
+       'sendStatsData' => false,
+       'showStatsDataJoinModal' => true,
    );
 }

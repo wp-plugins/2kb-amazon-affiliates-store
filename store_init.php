@@ -185,3 +185,20 @@ function kbAmzFixImageExternalUrl($url) {
     }
     return $url;
 }
+
+
+/**
+ * Serialize session
+ */
+add_action('shutdown', 'kbAmzSerializeSession', 99999);
+
+function kbAmzSerializeSession()
+{
+    if (isset($_SESSION['2kb-amazon-affiliates-store']['cache'])
+    && is_array($_SESSION['2kb-amazon-affiliates-store']['cache'])) {
+        $_SESSION['2kb-amazon-affiliates-store']['cache']
+        = serialize($_SESSION['2kb-amazon-affiliates-store']['cache']);
+    } else {
+        $_SESSION['2kb-amazon-affiliates-store']['cache'] = [];
+    }
+}

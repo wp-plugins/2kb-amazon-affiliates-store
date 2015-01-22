@@ -75,6 +75,24 @@ class KbAmzAdminController {
         $view->bodyClass = $action;
         echo $view;
     }
+    
+    public function improveAction()
+    {
+        if (isset($_GET['improvePluginExperience'])) {
+            getKbAmz()->setOption(
+                'sendStatsData',
+                boolval($_GET['improvePluginExperience'])
+            );
+            getKbAmz()->setOption(
+                'showStatsDataJoinModal',
+                '0'
+            );
+            unset($_GET['improvePluginExperience']);
+        }
+        
+        $view = new KbView(array());
+        return $view;
+    }
 
     public function importByAsinAction() {
         $data = array();
@@ -416,9 +434,18 @@ class KbAmzAdminController {
             getKbAmz()->clearAllProducts();
             getKbAmz()->setOption('ProductsToDownload', array());
             $this->messages[] = array(__('All products are deleted and cron queue is cleared.'), 'alert-success');
+        } else if (isset($_POST['clearAllProductsNoQuantity'])) {
+            $productsNoQuantity = getKbAmz()->getProductsWithNoQuantity();
+            foreach ($productsNoQuantity as $row) {
+                getKbAmz()->clearProduct($row->ID);
+            }
+            $this->messages[] = array(__('Products with no quantity are deleted.'), 'alert-success');
         } else {
             $this->messages[] = array(__('Full post data delete may be slow. Expect to delete about 1000-2000 products (depending on the images settings) per request.'), 'alert-success');
         }
+        $productsNoQuantity = getKbAmz()->getProductsWithNoQuantity();
+        $data['productsNoQuantityCount'] = count($productsNoQuantity);
+        
         $view = new KbView($data);
         return $view;
     }

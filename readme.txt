@@ -2,7 +2,7 @@
 Tags: amazon, affiliate, associate, online store, selling products
 Requires at least: 4.0
 Tested up to: 4.1
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,6 +35,12 @@ This section describes how to install the plugin and get it working.
 == Screenshots ==
 
 == Changelog ==
+= 1.1.5 =
+New Option - delete product(post) on quantity = 0
+New Action - Delete All Products That Have post_status = pending And KbAmzOfferSummary.TotalNew <= 0'
+Added Default Product Image in the listings.
+Added Popover on checkout button: if product is not sellable with the affiliate program, direct product link will be provided.
+Added Plugin Experience Program (Optional)
 = 1.1.4 =
 Fixed bug when listing products with no quantity left. kb_amz_list_products now lists only products (posts) with post_status = publish be default, which can be changed.
 = 1.1.3 =

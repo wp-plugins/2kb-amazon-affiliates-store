@@ -109,7 +109,7 @@
                             $params = $_GET;
                             $params['kbAction'] = 'productsVisibility';
                             echo sprintf(
-                                __('You have 0 of %s published products. Recomended action <a href="?%s">publish</a>.'),
+                                __('You have 0 of %s published products. Recommended action <a href="?%s">publish</a>.'),
                                 $count,
                                 http_build_query($params)
                             );
@@ -183,3 +183,43 @@
         </div>
     </div>
 </div>
+
+<?php if (getKbAmz()->getOption('showStatsDataJoinModal')) : ?>
+<div class="modal fade" id="stats">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><?php echo __('Plugin Experience'); ?></h4>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 1.2em;">
+                    <?php echo __('Do you want to participate in <b>Improving Plugin Experience Program</b> by Sending Us Data?'); ?>
+                    <br/>
+                    <?php echo __('You can turn this option off at any time from the setting menu.'); ?>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <?php
+                $_GET['improvePluginExperience'] = 1;
+                unset($_GET['kbAction']);
+                $_GET['kbAction'] = 'improve';
+                ?>
+                <a href="?<?php echo http_build_query($_GET); ?>" class="btn btn-primary">Yes</a>
+                <?php
+                $_GET['improvePluginExperience'] = 0;
+                ?>
+                <a href="?<?php echo http_build_query($_GET); ?>" class="btn btn-default">No</a>
+                <?php
+                unset($_GET['improvePluginExperience']);
+                ?>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+    (function ($) {
+        $('#stats').modal('show');
+    })(jQuery);
+</script>
+<?php endif; ?>

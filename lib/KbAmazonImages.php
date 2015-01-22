@@ -84,6 +84,12 @@ class KbAmazonImages
                     implode(' ', $attrs)
                 );
             }
+        } else if ($index == 0) {
+            return sprintf(
+                '<img src="%s" alt=""/>',
+                getKbPluginUrl('template/images/default.jpg'),
+                __('No Image')
+            );
         }
     }
 }

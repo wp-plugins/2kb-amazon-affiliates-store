@@ -197,9 +197,10 @@ class KbAmazonStore
     public function getCheckoutPage()
     {
         $pageIdOption = $this->getOption('CheckoutPage');
+       
         if ($pageIdOption) {
             $page = get_page($pageIdOption);
-            if ($page) {
+            if ($page && is_object($page) && $page->post_status == 'publish') {
                 return $page;
             }
         }
@@ -321,6 +322,7 @@ class KbAmazonStore
                 $result = $value;
             }
         }
+        
         if ($result === null) {
             $defaults = getKbAmzDefaultOptions();
             $result = isset($defaults[$name]) && $default === ''
@@ -949,6 +951,21 @@ HTML;
         $wpdb->query($sql);
     }
     
+    public function getProductsWithNoQuantity()
+    {
+        global $wpdb;
+        
+        $sql = "
+           SELECT t.ID
+           FROM $wpdb->posts AS t
+           JOIN $wpdb->postmeta AS t1 ON t.ID = t1.post_id AND t1.meta_key = 'KbAmzOfferSummary.TotalNew'
+           WHERE t.post_status ='pending' AND t1.meta_value <= 0
+           ORDER BY t.post_modified ASC
+        ";
+        
+        return $this->getSqlResult($sql);
+    }
+
     public function getProductsCount($addUp = null)
     {
         if (null === $this->productsCount) {
@@ -1030,7 +1047,7 @@ HTML;
         return isset($rows[0]) ? $rows[0] : null;
     }
 
-    function clearAllProducts()
+    public function clearAllProducts()
     {
         set_time_limit(360);
         global $wpdb;
@@ -1043,11 +1060,17 @@ HTML;
         
         $result = $this->getSqlResult($sql);
         foreach ($result as $row) {
-            wp_delete_post($row->post_id, true);
-            wp_delete_attachment($row->post_id, true);
+            $this->clearProduct($row->post_id);
         }
     }
     
+    public function clearProduct($postId)
+    {
+        wp_delete_post($postId, true);
+        wp_delete_attachment($postId, true);
+    }
+
+
     public function getProductsAsinsToUpdate()
     {
         global $wpdb;
@@ -1103,12 +1126,33 @@ HTML;
 
     public function getCache($key)
     {
-        return wp_cache_get(sha1($key));
+        if (isset($_SESSION['2kb-amazon-affiliates-store']['cache'])) {
+            if (!is_array($_SESSION['2kb-amazon-affiliates-store']['cache'])) {
+                $_SESSION['2kb-amazon-affiliates-store']['cache']
+                = unserialize($_SESSION['2kb-amazon-affiliates-store']['cache']);
+            }
+            if (isset($_SESSION['2kb-amazon-affiliates-store']['cache'][$key])) {
+                return $_SESSION['2kb-amazon-affiliates-store']['cache'][$key];
+            }
+        }
+        
+        $key = sha1($key);
+        return wp_cache_get($key);
     }
     
     public function setCache($key, $data)
     {
-        wp_cache_set(sha1($key), empty($data) ? null : $data);
+        $key = sha1($key);
+        $data = empty($data) ? null : $data;
+        
+        if (isset($_SESSION['2kb-amazon-affiliates-store']['cache'])) {
+            if (!is_array($_SESSION['2kb-amazon-affiliates-store']['cache'])) {
+                $_SESSION['2kb-amazon-affiliates-store']['cache']
+                = unserialize($_SESSION['2kb-amazon-affiliates-store']['cache']);
+            }
+             $_SESSION['2kb-amazon-affiliates-store']['cache'][$key] = $data;
+        }
+        wp_cache_set($key, $data);
     }
     
     public function removeFromAjaxCart()
@@ -1170,7 +1214,6 @@ HTML;
                     'Quantity' => 1,
                     'ASIN' => $meta['KbAmzASIN']
                 );
-
                 $cart = getKbAmazonApi()->responseGroup('Cart')->cartThem($params);
                 $cart = isset($cart['Cart']) ? $cart['Cart'] : $cart;
                 if (isset($cart['Request']['Errors'])) {
@@ -1178,6 +1221,20 @@ HTML;
                         ? $cart['Request']['Errors']['Error']['Message']
                         : 'Unable to add this product to the cart. Please contact the shop administrator.';
                     $this->addProductForDownload($meta['KbAmzASIN']);
+                    $response['title'] = __('Info');
+                    $info = '';
+                    if (isset($meta['KbAmzDetailPageURL'])) {
+                        $info .= sprintf(
+                            '<br/><b><a href="%s" target="_blank">%s</a></b>',
+                            $meta['KbAmzDetailPageURL'],
+                            __('Checkout on Amazon')
+                        );
+                    }
+                    $response['content'] = sprintf(
+                        '<small>%s</small>%s',
+                        $response['msg'],
+                        $info
+                    );
                 } else {
                     $_SESSION['KbAmzCart'] = $cart;
                     $response['success'] = true;
