@@ -199,6 +199,6 @@ function kbAmzSerializeSession()
         $_SESSION['2kb-amazon-affiliates-store']['cache']
         = serialize($_SESSION['2kb-amazon-affiliates-store']['cache']);
     } else {
-        $_SESSION['2kb-amazon-affiliates-store']['cache'] = [];
+        $_SESSION['2kb-amazon-affiliates-store']['cache'] = array();
     }
 }
