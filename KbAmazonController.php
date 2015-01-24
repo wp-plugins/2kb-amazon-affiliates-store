@@ -81,7 +81,7 @@ class KbAmzAdminController {
         if (isset($_GET['improvePluginExperience'])) {
             getKbAmz()->setOption(
                 'sendStatsData',
-                boolval($_GET['improvePluginExperience'])
+                $_GET['improvePluginExperience']
             );
             getKbAmz()->setOption(
                 'showStatsDataJoinModal',
