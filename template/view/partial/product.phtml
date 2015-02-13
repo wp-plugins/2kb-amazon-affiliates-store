@@ -5,18 +5,18 @@ $title = htmlentities(str_replace('"', '', get_the_title($p->ID)));
 $c = $this->items_per_row ? $this->items_per_row : getKbAmz()->getOption('ListItemsPerRow', 6);
 $lg = 2;
 $md = 2;
-$sm = 3;
-$xs = 4;
+$sm = 6;
+$xs = 6;
 if ($c == 4) {
     $lg = 3;
     $md = 3;
-    $sm = 3;
-    $xs = 3;
+    $sm = 6;
+    $xs = 6;
 } else if($c == 3) {
     $lg = 4;
     $md = 4;
-    $sm = 4;
-    $xs = 4;
+    $sm = 6;
+    $xs = 6;
 } else if ($c == 2) {
     $lg = 6;
     $md = 6;
