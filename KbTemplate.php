@@ -96,7 +96,7 @@ class KbAmzTemplate
             getKbPluginUrl() . '/template/admin/css/default.css'
         );
         
-        if (is_admin() && (!isset($_GET['page']) || $_GET['page'] != 'kbAmz')) {
+        if (is_admin() && (!isset($_GET['page']) || strpos($_GET['page'], 'kbAmz') === false)) {
             return;
         }
         

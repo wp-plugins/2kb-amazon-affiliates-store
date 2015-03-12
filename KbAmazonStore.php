@@ -20,6 +20,8 @@ class KbAmazonStore
     const PRICE_ATTRIBUTE = 'KbAmzFormattedPrice';
     const SUPPORT_EMAIL = 'support@2kblater.com';
 
+    public static $container = array();
+    
     protected $secret = 'INLINE';
     
     protected $productMeta = array();
@@ -114,10 +116,28 @@ class KbAmazonStore
     
     protected $publishedProductsCount;
 
+    protected $isCronRunning = false;
+
     public function __construct() {
         
     }
     
+    /**
+     * 
+     * @param type $bool
+     * @return \KbAmazonStore
+     */
+    public function setIsCronRunnig($bool)
+    {
+        $this->isCronRunning = $bool;
+        return $this;
+    }
+    
+    public function isCronRunning()
+    {
+        return $this->isCronRunning;
+    }
+
     public function getExceptions()
     {
         $errors = get_option('KbAmzExceptions', '');
@@ -420,9 +440,9 @@ HTML;
         );
     }
 
-    public function getProductMeta($id)
+    public function getProductMeta($id, $refresh = false)
     {
-        if (!isset($this->productMeta[$id])) {
+        if (!isset($this->productMeta[$id]) || $refresh) {
             $meta = get_post_meta($id);
             $meta = $meta ? $meta : array();
             foreach ($meta as $key => $val) {
@@ -445,7 +465,7 @@ HTML;
         $posts = getKbAmz()->getSimilarProducts($id);
         $data = array();
         $data['posts'] = $posts;
-        return new KbView($data, 'similar-products');
+        return new KbView($data, KbAmazonStorePluginPath . 'template/view/similar-products');
     }
 
     public function getProductMetaArray($id)

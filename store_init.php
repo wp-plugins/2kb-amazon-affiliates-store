@@ -5,7 +5,7 @@
  * Menus
  */
 
-add_action('admin_menu','kb_amz_admin_menu');
+add_action('admin_menu','kb_amz_admin_menu', 100);
 function kb_amz_admin_menu()
 {
     add_menu_page(
@@ -38,30 +38,34 @@ function kbAmzDownloadProductsCronFunction($execute = false)
         getKbAmz()->setOption('LastCronRun', date('Y-m-d H:i:s') . ' ' . __('Cron Disabled From Settings.'));
         return;
     }
+    getKbAmz()->setIsCronRunnig(true);
+    $importer = new KbAmazonImporter;
+    $importer->setApiRequestSleep(getKbAmz()->getOption('amazonApiRequestDelay'));
     
-     $importer = new KbAmazonImporter;
-     $products = getKbAmz()->getOption('ProductsToDownload', array());
-     $numberToProcess = (int) getKbAmz()->getOption('downloadProductsCronNumberToProcess', KbAmazonImporter::CRON_NUMBER_OF_PRODUCTS_TO_PROCESS);
-     $i = 0;
+    $products = getKbAmz()->getOption('ProductsToDownload', array());
+    $numberToProcess = (int) getKbAmz()->getOption('downloadProductsCronNumberToProcess', KbAmazonImporter::CRON_NUMBER_OF_PRODUCTS_TO_PROCESS);
+    $i = 0;
 
-     foreach ($products as $key => $asin) {
+    foreach ($products as $key => $asin) {
         if ($i >= $numberToProcess) {
             break;
         }
-         try {
-            $result = $importer->import($asin);
-            if (empty($result[0]['error'])) {
-            } else {
-                getKbAmz()->addException('Cron Import Product (AMZ Item)', $result[0]['error']);
-            }
-            unset($products[$key]);
-            getKbAmz()->setOption('ProductsToDownload', $products);
-            $i++;
-        } catch (Exception $e) {
-            getKbAmz()->addException('Cron Import Product', $e->getMessage());
-        }
-     }
+        try {
+           $result = $importer->import($asin);
+           if (empty($result[0]['error'])) {
+           } else {
+               getKbAmz()->addException('Cron Import Product (AMZ Item)', $result[0]['error']);
+           }
+           unset($products[$key]);
+           getKbAmz()->setOption('ProductsToDownload', $products);
+          
+       } catch (Exception $e) {
+           getKbAmz()->addException('Cron Import Product', $e->getMessage());
+       }
+        $i++;
+    }
     getKbAmz()->setOption('LastCronRun', date('Y-m-d H:i:s'));
+    getKbAmz()->setIsCronRunnig(false);
 }
 
 if (!wp_next_scheduled('kbAmzProductsUpdateCron') ) {
@@ -79,7 +83,7 @@ function kbAmzkbAmzProductsUpdateCronFunction($execute = false)
         getKbAmz()->setOption('LastCronRun', date('Y-m-d H:i:s') . ' ' . __('Cron Disabled From Settings.'));
         return;
     }
-    
+    getKbAmz()->setIsCronRunnig(true);
     $numberOfProductsToUpdate = getKbAmz()->getOption(
         'updateProductsPriceCronNumberToProcess',
         KbAmazonImporter::CRON_NUMBER_OF_PRODUCTS_PRICE_TO_UPDATE
@@ -87,6 +91,8 @@ function kbAmzkbAmzProductsUpdateCronFunction($execute = false)
     
     $asins = getKbAmz()->getProductsAsinsToUpdate();
     $importer = new KbAmazonImporter;
+    $importer->setApiRequestSleep(getKbAmz()->getOption('amazonApiRequestDelay'));
+    
     $i = 0;
     foreach ($asins as $key => $asin) {
         if ($i >= $numberOfProductsToUpdate) {
@@ -94,11 +100,13 @@ function kbAmzkbAmzProductsUpdateCronFunction($execute = false)
         }
         try {
             $importer->updatePrice($asin);
-            $i++;
         } catch (Exception $e) {
             getKbAmz()->addException('Cron Update Product', $e->getMessage());
         }
+        $i++;
     }
+    getKbAmz()->setIsCronRunnig(false);
+    getKbAmz()->setOption('LastCronRun', date('Y-m-d H:i:s'));
 }
 
 if (isset($_GET['kbAction'])

@@ -8,7 +8,7 @@
  */
 function getKbAmzDefaultOptions()
 {
-   return array(
+   $options = array(
        'enableSalePrice' => 1,
        'productListImageSize' => 1,
        'replaceThumbnailWithGallery' => 0,
@@ -26,5 +26,12 @@ function getKbAmzDefaultOptions()
        'deleteProductOnNoQuantity' => false,
        'sendStatsData' => false,
        'showStatsDataJoinModal' => true,
+       'amazonApiRequestDelay' => 5,
    );
+   
+   $filtered = apply_filters('getKbAmzDefaultOptions', $options);
+   if (empty($filtered)) {
+       $filtered = $options;
+   }
+   return $filtered;
 }

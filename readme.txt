@@ -35,6 +35,15 @@ This section describes how to install the plugin and get it working.
 == Screenshots ==
 
 == Changelog ==
+= 1.2.0 =
+Usability changes:
+Delay between requests option added to reduce Amazon API warnings
+Last cron run label on dashboard added
+
+Programming changes:
+Many hooks added
+Default no item image accepts attributes
+Similar Products warning fixed
 = 1.1.8 =
 Bug fix - Mobile layout for listing
 = 1.1.6, 1.1.7 =

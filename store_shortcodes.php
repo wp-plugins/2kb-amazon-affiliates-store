@@ -4,7 +4,7 @@
 // [kb_amz_product_attributes]
 function kb_amz_product_attributes_func($atts) {
 	$atts = shortcode_atts( array(
-            
+            'post_id' => get_the_ID()
 	), $atts);
         
         $shortCodes = getKbAmz()->getShortCodes();
@@ -26,7 +26,7 @@ HTML;
 HTML;
         
         
-        $meta = getKbAmz()->getProductMeta(get_the_ID());
+        $meta = getKbAmz()->getProductMeta($atts['post_id']);
         $attributes = getKbAmz()->getShortCodeAttributes();
         $markup = '';
         foreach ($attributes as $attr => $label) {

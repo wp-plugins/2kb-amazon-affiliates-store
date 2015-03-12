@@ -85,10 +85,15 @@ class KbAmazonImages
                 );
             }
         } else if ($index == 0) {
+            $attrs = array();
+            foreach ($attr as $key => $val) {
+                $attrs[] = $key . '="' . $val . '"';
+            }
             return sprintf(
-                '<img src="%s" alt=""/>',
+                '<img src="%s" alt="%s" %s/>',
                 getKbPluginUrl('template/images/default.jpg'),
-                __('No Image')
+                __('No Image'),
+                implode(' ', $attrs)
             );
         }
     }

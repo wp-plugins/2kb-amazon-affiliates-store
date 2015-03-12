@@ -118,10 +118,15 @@ class KbAmazonItem {
     {
         $arr = array();
         if (isset($this->item['SimilarProducts']['SimilarProduct'])) {
-            foreach ($this->item['SimilarProducts']['SimilarProduct'] as $similar) {
-                $arr[] = $similar['ASIN'];
-            } 
+            if (isset($this->item['SimilarProducts']['SimilarProduct'][0])) {
+                foreach ($this->item['SimilarProducts']['SimilarProduct'] as $similar) {
+                    $arr[] = $similar['ASIN'];
+                }
+            } else if ($this->item['SimilarProducts']['SimilarProduct']['ASIN']) {
+                $arr[] = $this->item['SimilarProducts']['SimilarProduct']['ASIN'];
+            }
         }
+        
         return $arr;
     }
 

@@ -86,6 +86,29 @@
     })(jQuery, <?php echo json_encode($_GET); ?>);
 </script>
 
+<script>
+    (function($, url) {
+        $(function(){
+            $('body').on('click', '[data-option]', function () {
+                $.ajax({
+                    type: "POST",
+                    url : url,
+                    data: {
+                        'action' : 'kbAmzSetOption',
+                        'option' : $(this).attr('data-option'),
+                        'option-value' : $(this).attr('data-option-value'),
+                    }
+                }).done(function(data) {
+                    
+                }).error(function(){
+                    alert('Unable to connect to the server. Please try again.');
+                });
+            });
+        });
+    })(jQuery, '<?php echo getKbAmzAjaxUrl(); ?>');
+</script>
+
+
 <?php if (getKbAmz()->getOption('sendStatsData')): ?>
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

@@ -26,6 +26,7 @@ class KbAmzAdminController {
     {
         add_action('wp_ajax_kbAmzPremiumAction', array($this, 'premiumAction'));
         add_action('wp_ajax_kbAmzPremiumActivateAction', array($this, 'premiumActivate'));
+        add_action('wp_ajax_kbAmzSetOption', array($this, 'kbAmzSetOption'));
     }
     
     public function premiumActivate()
@@ -69,7 +70,7 @@ class KbAmzAdminController {
         } else {
             $view = new KbView(array(), $this->getTemplatePath('index'));
         }
-        $view->setLayout($this->getTemplatePath('layout'));
+        $view->setLayout(KbAmazonStorePluginPath . '/template/admin/layout');
         $view->actions = $this->getActions();
         $view->messages = $this->messages;
         $view->bodyClass = $action;
@@ -491,7 +492,7 @@ class KbAmzAdminController {
             }
         } else {
             $this->messages[] = array(
-                sprintf(__('You cant contact us at <b>%s</b> using your Support Id(%s).'), KbAmazonStore::SUPPORT_EMAIL, getKbAmz()->getStoreId()),
+                sprintf(__('You can contact us at <b>%s</b> using your Support Id(%s).'), KbAmazonStore::SUPPORT_EMAIL, getKbAmz()->getStoreId()),
                 'alert-success'
             );
         }
@@ -523,8 +524,18 @@ class KbAmzAdminController {
         
         return new KbView($data);
     }
+    
+    public function kbAmzSetOption()
+    {
+        if (!empty($_POST) && isset($_POST['option'])) {
+            getKbAmz()->setOption(
+                $_POST['option'],
+                (isset($_POST['option-value']) ? $_POST['option-value'] : true)
+            );
+        }
+    }
 
-        protected function getActions() {
+    protected function getActions() {
         return array(
             array(
                 'action' => 'home',

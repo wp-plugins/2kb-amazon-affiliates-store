@@ -15,6 +15,9 @@ class KbAmazonImporter
     const CRON_NUMBER_OF_PRODUCTS_PRICE_TO_UPDATE = 50;
     const SECONDS_BEFORE_UPDATE = 86400;
     
+    protected $lastApiRequestTime;
+    protected $apiRequestSleep;
+    
     protected $requiredParams = array(
         // AMZ ARRAY WP ATTR
         'ASIN' => 'ASIN'
@@ -264,6 +267,17 @@ class KbAmazonImporter
         
     }
     
+    /**
+     * 
+     * @param type $sleep
+     * @return \KbAmazonImporter
+     */
+    public function setApiRequestSleep($sleep)
+    {
+        $this->apiRequestSleep = (int) $sleep;
+        return $this;
+    }
+
     public function getAmazonCategoryGroups()
     {
         return $this->amazonCategoryGroups;
@@ -299,6 +313,7 @@ class KbAmazonImporter
      */
     public function setImportCategories($arr)
     {
+        $arr = apply_filters('KbAmazonImporter::setImportCategories', $arr);
         $this->importCategories = !empty($arr) ? $arr : array();
         return $this;
     }
@@ -336,6 +351,16 @@ class KbAmazonImporter
     {
         $key = $this->getCacheItemKey($asin);
         if (!$data = getKbAmz()->getCache($key)) {
+            $sleep = $this->apiRequestSleep;
+            if ($sleep) {
+                if (!$this->lastApiRequestTime) {
+                    $this->lastApiRequestTime = time();
+                } else if ($this->lastApiRequestTime + $sleep > time()) {
+                    sleep($this->lastApiRequestTime + $sleep - time());
+                }
+                $this->lastApiRequestTime = time();
+            }
+            
             $this->countAmazonRequest();
             $time = microtime(true);
             $result = getKbAmazonApi()
@@ -357,7 +382,7 @@ class KbAmazonImporter
             $data = new KbAmazonItem($result);
             self::cacheItem($data);
         }
-        return $data;
+        return apply_filters('KbAmazonImporter::find', $data);
     }
     
     /**
@@ -437,6 +462,8 @@ class KbAmazonImporter
             $this->updateProductPostMeta($meta, $postId);
             wp_update_post(array('ID' => $postId, 'post_modified' => date('Y-m-d H:i:s')));
             $this->checkAvailableAction($postId);
+            
+            do_action('KbAmazonImporter::saveProduct', $postId, $item);
         }
     }
 
@@ -485,6 +512,10 @@ class KbAmazonImporter
     protected function saveProduct(KbAmazonItem $item, $isSimilar = false)
     {
         $postExists = $this->itemExists($item);
+        do_action(
+            'KbAmazonImporter::preSaveProduct',
+            array('postId' => $postExists, 'item' => $item)
+        );
         $meta = $item->getFlattenArray();
         $meta['SimilarProducts'] = $item->getSimilarProducts();
         $this->priceToMeta($meta);
@@ -525,7 +556,8 @@ class KbAmazonImporter
                 'menu_order' 	=> 0,
                 'post_author' 	=> isset($admin->ID) ? $admin->ID : 1
             ); 
-            $postId = wp_insert_post($postArgs);
+           
+            $postId = wp_insert_post($postArgs);  
             do_action('wp_insert_post', 'wp_insert_post');
             update_post_meta($postId, 'KbAmzASIN', $item->getAsin());
             getKbAmz()->addProductCount(1);
@@ -605,6 +637,9 @@ class KbAmazonImporter
         $this->updateProductContent($postId);
         
         $this->checkAvailableAction($postId);
+        
+        do_action('KbAmazonImporter::saveProduct', $postId, $item);
+        
         return array(
             'post_id' => $postId,
             'updated' => (bool) $postExists,
@@ -910,6 +945,11 @@ class KbAmazonImporter
             return round($num, 2);
         }
         return 0;
+    }
+    
+    public static function formattedNumberToDecial($str)
+    {
+        return preg_replace("/[^0-9,.]/", "", $str);
     }
 }
 

@@ -81,3 +81,12 @@ float: right;
 .info-items a{
     display: block;
 }
+.loading, .loading *{
+    cursor: progress!important;
+}
+.alert{
+    padding: 5px 10px!important;
+}
+#kb-amz-admin label{
+    width: 100%;
+}

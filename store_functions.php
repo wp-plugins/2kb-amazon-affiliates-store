@@ -135,6 +135,8 @@ function kbAmzFilterAttributes(&$attributes)
     foreach ($excluded as $attr) {
         unset($attributes[$attr]);
     }
+    
+    $attributes = apply_filters('kbAmzFilterAttributes', $attributes);
 }
 
 function getKbCronFirstInterval()
