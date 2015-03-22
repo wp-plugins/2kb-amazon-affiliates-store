@@ -601,6 +601,15 @@ HTML;
         } */
         
         $meta = $this->getProductMeta($id);
+        
+        if ($this->isProductDigital($id)) {
+            return true;
+        }
+//        
+//        if ($this->hasProductVariants($meta)) {
+//            return true;
+//        }
+        
         if (isset($meta['KbAmzOfferSummary.TotalNew'])
         && $meta['KbAmzOfferSummary.TotalNew'] > 0) {
             return true;
@@ -700,52 +709,83 @@ HTML;
        }
        return false;
     }
-            
+    
+    /**
+     * 
+     * @param type $mixed
+     * @return boolean
+     */
+    public function isProductDigital($mixed)
+    {
+        $meta = is_array($mixed) ? $mixed : $this->getProductMeta($mixed);
+        if (isset($meta['KbAmzItemAttributes.Binding'])
+        && $meta['KbAmzItemAttributes.Binding'] == 'Kindle Edition') {
+            return true;
+        }
+        return false;
+    }
+    
     function getProductPriceHtml($id)
     {
         if (!$this->isProductAvailable($id)) {
-            return '<span class="kb-amz-out-of-stock">'.__('Out of stock').'</span>';
-        }
-        $meta = $this->getProductMeta($id);
-        $price = $meta['KbAmzPriceAmountFormatted'];
-        $lowest = isset($meta['KbAmzOfferSummary.LowestNewPrice.FormattedPrice'])
-                ? $meta['KbAmzOfferSummary.LowestNewPrice.FormattedPrice'] : 0;
-        
-        $listPrice = 0;
-        if (isset($meta['KbAmzItemAttributes.ListPrice.FormattedPrice'])
-        && !empty($meta['KbAmzItemAttributes.ListPrice.FormattedPrice'])) {
-            $listPrice = $meta['KbAmzItemAttributes.ListPrice.FormattedPrice'];
-        }
-        
-        if (getKbAmz()->getOption('enableSalePrice', 1)
-        && $lowest && $lowest != $price) {
-            return sprintf(
-                '<del>%s</del>&nbsp;<ins>%s</ins>',
-                $price,
-                $lowest
-            );
-        } else if ($price) {
-            
-            if (getKbAmz()->getOption('enableSalePrice', 1)
-            && $listPrice
-            && $listPrice != $price) {
-                return sprintf(
-                    '<del>%s</del>&nbsp;<ins>%s</ins>',
-                    $listPrice,
-                    $price
-                );
-            } else {
-                return sprintf(
-                    '<ins>%s</ins>',
-                    $price
-                );
-            }
+            $price = '<span class="kb-amz-out-of-stock">'.__('Out of stock').'</span>';
         } else {
-            return sprintf(
-                '<ins>%s</ins>',
-                __('Free')
-            ); 
+            $meta = $this->getProductMeta($id);
+            $price = $meta['KbAmzPriceAmountFormatted'];
+            // @TODO
+            $lowest = false;isset($meta['KbAmzOfferSummary.LowestNewPrice.FormattedPrice'])
+                    ? $meta['KbAmzOfferSummary.LowestNewPrice.FormattedPrice'] : 0;
+
+            $listPrice = 0;
+            if (isset($meta['KbAmzItemAttributes.ListPrice.FormattedPrice'])
+            && !empty($meta['KbAmzItemAttributes.ListPrice.FormattedPrice'])) {
+                $listPrice = $meta['KbAmzItemAttributes.ListPrice.FormattedPrice'];
+            }
+
+            if (getKbAmz()->getOption('enableSalePrice', 1)
+            && $lowest && $lowest != $price) {
+                $price = sprintf(
+                    '<del>%s</del>&nbsp;<ins>%s</ins>',
+                    $price,
+                    $lowest
+                );
+            } else if ($price) {
+
+                if (getKbAmz()->getOption('enableSalePrice', 1)
+                && $listPrice
+                && $listPrice != $price) {
+                    $price = sprintf(
+                        '<del>%s</del>&nbsp;<ins>%s</ins>',
+                        $listPrice,
+                        $price
+                    );
+                } else {
+                    $price = sprintf(
+                        '<ins>%s</ins>',
+                        $price
+                    );
+                }
+            } else {
+                if ($this->isProductDigital($id)) {
+                    $price = sprintf(
+                        '<ins>%s, <small><a href="%s" target="_blank">%s</a></small></ins>',
+                        __('Digital'),
+                        $meta['KbAmzDetailPageURL'],
+                        __('check for price on Amazon')
+                    );
+                } else {
+                    $price = sprintf(
+                        '<ins>%s</ins>',
+                        __('Free')
+                    );
+                }
+            }
         }
+        $std = new stdClass;
+        $std->price     = $price;
+        $std->postId    = $id;
+        apply_filters('KbAmazonStore::getProductPriceHtml', $std);
+        return $std->price;
     }
     
     function getProductSticker($id)
@@ -790,11 +830,19 @@ HTML;
     
     public function isProductFree($mixed, $extract = false)
     {
+        if ($this->isProductDigital($mixed)) {
+            return false;
+        }
         $meta = is_array($mixed) ? $mixed : $this->getProductMeta($mixed);
         if ($extract) {
-            return empty($meta['KbAmzPriceAmount']);
+            $result = empty($meta['KbAmzPriceAmount']);
+        } else {
+            $result = isset($meta['KbAmzFreeProduct']) && $meta['KbAmzFreeProduct'] == 'yes';
         }
-        return isset($meta['KbAmzFreeProduct']) && $meta['KbAmzFreeProduct'] == 'yes';
+        if ($result && $meta['KbAmzItemAttributes.Binding'] == 'Kindle Edition') {
+            return false;
+        }
+        return $result;
     }
 
     public function getAttributes()

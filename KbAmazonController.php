@@ -508,7 +508,7 @@ class KbAmzAdminController {
         $data['isAjax'] = isset($_POST['action']);
         if ($data['isAjax']) {
             $api = new KbAmzApi(getKbAmz()->getStoreId());
-            $result = $api->getProducts();
+            $result = $api->getProductsListHtml();
             $data['premium'] = isset($result->content) ? $result->content : '';
             $view =  new KbView($data, $this->getTemplatePath('premium'));
             echo $view;

@@ -35,6 +35,11 @@ This section describes how to install the plugin and get it working.
 == Screenshots ==
 
 == Changelog ==
+= 1.2.1 =
+Added support for Digital products.
+Products number synchronization with 2kblater.com server
+Disabled revisions for products
+Preparations for v2.0 Stay Put!
 = 1.2.0 =
 Usability changes:
 Delay between requests option added to reduce Amazon API warnings

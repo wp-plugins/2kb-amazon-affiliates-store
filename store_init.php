@@ -210,3 +210,24 @@ function kbAmzSerializeSession()
         $_SESSION['2kb-amazon-affiliates-store']['cache'] = array();
     }
 }
+
+/**
+ * Plugin recheck
+ */
+register_activation_hook(KbAmazonStorePluginPath . '/plugin.php', 'kbAmzStorePluginActivated');
+function kbAmzStorePluginActivated()
+{
+    $api = new KbAmzApi(getKbAmz()->getStoreId());
+    $result = $api->getProductsCount();
+    getKbAmz()->setOption('maxProductsCount', $result);
+}
+
+add_filter( 'wp_revisions_to_keep', 'kbAmzProductRevisions', 99999, 2 );
+function kbAmzProductRevisions($num, $post)
+{
+    if (getKbAmz()->isPostProduct($post->ID)) {
+        return 0;
+    } else {
+        return $num;
+    }
+}

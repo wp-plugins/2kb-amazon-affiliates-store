@@ -12,7 +12,13 @@ class KbAmzApi
         $this->apiKey = $apiKey;
     }
 
-    public function getProducts()
+    public function getProductsCount()
+    {
+        $data =  $this->getRequest('getProductsCount');
+        return (int) (isset($data->count) ? $data->count : 250);
+    }
+    
+    public function getProductsListHtml()
     {
         return $this->getRequest('getProductsListHtml');
     }
