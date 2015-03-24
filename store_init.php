@@ -40,7 +40,7 @@ function kbAmzDownloadProductsCronFunction($execute = false)
     }
     getKbAmz()->setIsCronRunnig(true);
     $importer = new KbAmazonImporter;
-    $importer->setApiRequestSleep(getKbAmz()->getOption('amazonApiRequestDelay'));
+    // $importer->setApiRequestSleep(getKbAmz()->getOption('amazonApiRequestDelay'));
     
     $products = getKbAmz()->getOption('ProductsToDownload', array());
     $numberToProcess = (int) getKbAmz()->getOption('downloadProductsCronNumberToProcess', KbAmazonImporter::CRON_NUMBER_OF_PRODUCTS_TO_PROCESS);
@@ -83,28 +83,27 @@ function kbAmzkbAmzProductsUpdateCronFunction($execute = false)
         getKbAmz()->setOption('LastCronRun', date('Y-m-d H:i:s') . ' ' . __('Cron Disabled From Settings.'));
         return;
     }
+    
     getKbAmz()->setIsCronRunnig(true);
     $numberOfProductsToUpdate = getKbAmz()->getOption(
         'updateProductsPriceCronNumberToProcess',
         KbAmazonImporter::CRON_NUMBER_OF_PRODUCTS_PRICE_TO_UPDATE
     );
     
-    $asins = getKbAmz()->getProductsAsinsToUpdate();
     $importer = new KbAmazonImporter;
-    $importer->setApiRequestSleep(getKbAmz()->getOption('amazonApiRequestDelay'));
     
-    $i = 0;
-    foreach ($asins as $key => $asin) {
-        if ($i >= $numberOfProductsToUpdate) {
+    for ($i = 0; $i <= $numberOfProductsToUpdate; $i++) {
+        $asins = getKbAmz()->getProductsAsinsToUpdate(1);
+        if (empty($asins)) {
             break;
         }
         try {
-            $importer->updatePrice($asin);
+            $importer->updatePrice($asins[key($asins)]);
         } catch (Exception $e) {
             getKbAmz()->addException('Cron Update Product', $e->getMessage());
         }
-        $i++;
     }
+    
     getKbAmz()->setIsCronRunnig(false);
     getKbAmz()->setOption('LastCronRun', date('Y-m-d H:i:s'));
 }
@@ -119,7 +118,8 @@ if (isset($_GET['kbAction'])
     {
         kbAmzDownloadProductsCronFunction(true);
         kbAmzkbAmzProductsUpdateCronFunction(true);
-        wp_die('Kb Amz Cron Done. ' . date('Y-m-d H:i:s'));
+        http_response_code(200);
+        die('Kb Amz Cron Done. ' . date('Y-m-d H:i:s'));
     }
 }
 
@@ -132,7 +132,8 @@ if (isset($_GET['kbAction'])
     function kbAmzTriggerManualInsertCronJobs()
     {
         kbAmzDownloadProductsCronFunction(true);
-        wp_die('Kb Amz Insert Cron Done. ' . date('Y-m-d H:i:s'));
+        http_response_code(200);
+        die('Kb Amz Insert Cron Done. ' . date('Y-m-d H:i:s'));
     }
 }
 
@@ -145,7 +146,8 @@ if (isset($_GET['kbAction'])
     function kbAmzTriggerManualUpdateCronJobs()
     {
         kbAmzkbAmzProductsUpdateCronFunction(true);
-        wp_die('Kb Amz Update Cron Done. ' . date('Y-m-d H:i:s'));
+        http_response_code(200);
+        die('Kb Amz Update Cron Done. ' . date('Y-m-d H:i:s'));
     }
 }
 

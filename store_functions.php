@@ -30,7 +30,8 @@ function getKbAdminUser() {
 
 function getKbPluginUrl($append = null)
 {
-    return get_site_url() . '/wp-content/plugins/' . KbAmazonStoreFolderName . ($append ? '/' : '') . $append;
+    return plugins_url($append, __FILE__ );// . ($append ? '/' : '') . $append;
+    // return get_site_url() . '/wp-content/plugins/' . KbAmazonStoreFolderName . ($append ? '/' : '') . $append;
 }
 
 function getKbPostVar($name, $default = null)
@@ -327,9 +328,9 @@ function getKbAmzCurrentPost()
 
 function getKbAmzAjaxUrl()
 {
-    return get_site_url() . '/wp-admin/admin-ajax.php';
+    return admin_url('admin-ajax.php');
+    //return get_site_url() . '/wp-admin/admin-ajax.php';
 }
-
 
 function getKbAmzProductTopCategory()
 {
@@ -460,4 +461,25 @@ function kbAmzHiddenInput()
         }
         return implode(PHP_EOL, $data);
     }
+}
+function kbAmzSortOrder($a, $b)
+{
+    return $a['order'] - $b['order'];
+}
+
+function kbAmzGetArrayFromFlatten($array, $hasKey)
+{
+    $output = array();
+    foreach ($array as $key => $val) {
+        if (substr($key, 0, strlen($hasKey)) == $hasKey) {
+            $loc = &$output;
+            foreach(explode('.', $key) as $step)
+            {
+              $loc = &$loc[$step];
+            }
+            $loc = $val;
+        }
+    }
+    
+    return $output;
 }

@@ -19,13 +19,19 @@ class KbAmazonStore
 {
     const PRICE_ATTRIBUTE = 'KbAmzFormattedPrice';
     const SUPPORT_EMAIL = 'support@2kblater.com';
-
+    const AMAZON_SIZE_CHART = '%s/gp/product/ajax-handlers/apparel-sizing-chart.html/ref=dp_sizechart?ie=UTF8&asin=%s&isUDP=1';
+    
     public static $container = array();
     
     protected $secret = 'INLINE';
     
     protected $productMeta = array();
-
+    
+    protected $unserializeMetaKeys = array(
+        'KbAmzSimilarProducts',
+        'KbAmzImages',
+    );
+    
     protected $shortCodes = array(
         'gallery' => array(
             'code' => 'kb_amz_product_gallery',
@@ -93,7 +99,7 @@ class KbAmazonStore
         'reviews' => array(
             'code' => 'kb_amz_product_reviews',
             'params' => array(
-                'Version'  => '<b>Beta* Use to Test and Feedback Only</b>',
+                // 'Version'  => '<b>Beta* Use to Test and Feedback Only</b>',
                 'ID' => 'post ID, leave empty for current post',
                 'title' => '<b>Emtpy</b> / String',
                 'title_tag' => '<b>h3</b> / Any html tag',
@@ -113,6 +119,7 @@ class KbAmazonStore
     protected $options = null;
     
     protected $productsCount;
+    protected $productVariantsCount;
     
     protected $publishedProductsCount;
 
@@ -439,9 +446,26 @@ HTML;
             getKbAmz()->getShortCode('similar')
         );
     }
+    
+    /**
+     * 
+     * @param type $key
+     * @return \KbAmazonStore
+     */
+    public function setUnserializeMetaKey($key)
+    {
+        if (!in_array($key, $this->unserializeMetaKeys)) {
+            $this->unserializeMetaKeys[] = $key;
+        }
+        return $this;
+    }
 
     public function getProductMeta($id, $refresh = false)
     {
+        if (!$id) {
+            return array();
+        }
+        
         if (!isset($this->productMeta[$id]) || $refresh) {
             $meta = get_post_meta($id);
             $meta = $meta ? $meta : array();
@@ -451,8 +475,15 @@ HTML;
                 }
             }
             
-            if (isset($meta['KbAmzSimilarProducts'])) {
-                $meta['KbAmzSimilarProducts'] = unserialize($meta['KbAmzSimilarProducts']);
+            foreach ($this->unserializeMetaKeys as $key) {
+                if (isset($meta[$key])) {
+                    $meta[$key] = @unserialize($meta[$key]);
+                }
+            }
+            
+            if (isset($meta['KbAmzVariationAttributes.VariationAttribute.0.Name'])) {
+                $KbAmzVariationAttributes = kbAmzGetArrayFromFlatten($meta, 'KbAmzVariationAttributes');
+                $meta['KbAmzVariationAttributes'] = $KbAmzVariationAttributes['KbAmzVariationAttributes'];
             }
             
             $this->productMeta[$id] = $meta;
@@ -504,8 +535,24 @@ HTML;
               'order' => 'asc'
              );
              $images = get_posts($args);
-             reset($images);
-             wp_reset_query();
+              wp_reset_query();
+             $filter = array();
+             foreach ($images as $key => $image) {
+                 $filter[$image->ID] = $image;
+             }
+             
+             $meta = $this->getProductMeta($id);
+             if (isset($meta['KbAmzImages'])
+             && !empty($meta['KbAmzImages'])) {
+                 foreach ($meta['KbAmzImages'] as $imageId) {
+                     if (!isset($filter[$imageId])) {
+                         $filter[$imageId] = get_post($imageId);
+                     }
+                 }
+             }
+             $images = array_merge(array(), $filter);
+             unset($filter);
+             $i = 0;
              foreach ($images as $key => $img) {
                  $meta = get_post_meta($img->ID);
                   foreach ($meta as $k => $val) {
@@ -517,15 +564,35 @@ HTML;
                       $meta['_wp_attachment_metadata'] = unserialize($meta['_wp_attachment_metadata']);
                   }
                  $img->amzMeta = $meta;
-                 $images[$key] = new KbAmazonImage($img);
+                 $images[$i++] = new KbAmazonImage($img);
              }
-
+             
             $cache[$id] = new KbAmazonImages($images, $id);
         }
         return $cache[$id];
     }
     
-    
+    public function getProductDate($id, $toTime = false)
+    {
+        $meta = $this->getProductMeta($id);
+        if (isset($meta['KbAmzItemAttributes.ReleaseDate'])) {
+            $date = $meta['KbAmzItemAttributes.ReleaseDate'];
+        } else if (isset($meta['KbAmzItemAttributes.PublicationDate'])) {
+            $date = $meta['KbAmzItemAttributes.PublicationDate'];
+        } else {
+            $post = get_post($id);
+            if ($post) {
+                $date = $post->post_date;
+            } else {
+                $date = date("Y-m-d H:i", time());
+            }
+        }
+        if ($toTime) {
+            return strtotime($date);
+        }
+        return $date;
+    }
+
     public function getSimilarProducts($id)
     {
         $meta = $this->getProductMeta($id);
@@ -586,6 +653,19 @@ HTML;
         return $posts;
     }
     
+    public function getAttachmentForUrl($url)
+    {
+        global $wpdb;
+        $sql = "
+           SELECT m.post_id
+           FROM $wpdb->posts AS t
+           JOIN $wpdb->postmeta AS m
+           WHERE m.meta_key = 'KbAmzAttachmentASIN' AND t.post_type = 'attachment' AND t.post_content = '$url'
+        ";
+        $result = $this->getSqlResult($sql);
+        return !empty($result) && isset($result[0]->post_id) ? $result[0]->post_id : null;
+    }
+    
     public function isProductAvailable($id)
     {
         
@@ -605,10 +685,10 @@ HTML;
         if ($this->isProductDigital($id)) {
             return true;
         }
-//        
-//        if ($this->hasProductVariants($meta)) {
-//            return true;
-//        }
+        
+        if ($this->hasProductVariants($meta)) {
+            return true;
+        }
         
         if (isset($meta['KbAmzOfferSummary.TotalNew'])
         && $meta['KbAmzOfferSummary.TotalNew'] > 0) {
@@ -664,9 +744,23 @@ HTML;
     {
         $id = $id ? $id : get_the_ID();
 
+        if ($this->isProductDigital($id)) {
+            $meta = $this->getProductMeta($id);
+            return sprintf(
+                '<a href="%s" title="%s" ref="nofollow" target="_blank"><button class="kb-add-to-cart button kb-cart-action animate not-available">
+                    <span class="glyphicon glyphicon-shopping-cart"></span>
+                    <span class="button-text">%s</span>
+                 </button></a>',
+                $meta['KbAmzDetailPageURL'],
+                __("Add To Cart"),
+                __('Add to cart')
+            );
+        }
+        
         if (getKbAmz()->inCart($id)) {
             return getKbAmz()->getCheckoutButtonHtml();
         }
+        
         return sprintf(
             '<button title="%s" class="kb-add-to-cart button kb-cart-action not-loading animate%s" data-url="%s/wp-admin/admin-ajax.php" data-id="%s">
                 <span class="glyphicon glyphicon-shopping-cart"></span>
@@ -709,24 +803,16 @@ HTML;
        }
        return false;
     }
-    
-    /**
-     * 
-     * @param type $mixed
-     * @return boolean
-     */
-    public function isProductDigital($mixed)
-    {
-        $meta = is_array($mixed) ? $mixed : $this->getProductMeta($mixed);
-        if (isset($meta['KbAmzItemAttributes.Binding'])
-        && $meta['KbAmzItemAttributes.Binding'] == 'Kindle Edition') {
-            return true;
-        }
-        return false;
-    }
-    
+            
     function getProductPriceHtml($id)
     {
+        if ($this->hasProductVariants($id)) {
+            $variant = $this->getProductFirstVariant($id);
+            if ($variant) {
+                return $this->getProductPriceHtml($variant->ID);
+            }
+        }
+        
         if (!$this->isProductAvailable($id)) {
             $price = '<span class="kb-amz-out-of-stock">'.__('Out of stock').'</span>';
         } else {
@@ -768,7 +854,7 @@ HTML;
             } else {
                 if ($this->isProductDigital($id)) {
                     $price = sprintf(
-                        '<ins>%s, <small><a href="%s" target="_blank">%s</a></small></ins>',
+                        '<ins>%s <small class="kb-amz-digital-price-link"><a href="%s" target="_blank">%s</a></small></ins>',
                         __('Digital'),
                         $meta['KbAmzDetailPageURL'],
                         __('check for price on Amazon')
@@ -828,6 +914,21 @@ HTML;
         return $meta['KbAmzOnSaleProduct'] == 'yes';
     }
     
+    /**
+     * 
+     * @param type $mixed
+     * @return boolean
+     */
+    public function isProductDigital($mixed)
+    {
+        $meta = is_array($mixed) ? $mixed : $this->getProductMeta($mixed);
+        if (isset($meta['KbAmzItemAttributes.Binding'])
+        && $meta['KbAmzItemAttributes.Binding'] == 'Kindle Edition') {
+            return true;
+        }
+        return false;
+    }
+
     public function isProductFree($mixed, $extract = false)
     {
         if ($this->isProductDigital($mixed)) {
@@ -1034,7 +1135,7 @@ HTML;
         return $this->getSqlResult($sql);
     }
 
-    public function getProductsCount($addUp = null)
+    public function getProductsCount()
     {
         if (null === $this->productsCount) {
             global $wpdb;
@@ -1051,6 +1152,22 @@ HTML;
         return $this->productsCount;
     }
     
+    public function getProductVariantsCount()
+    {
+        if (null === $this->productVariantsCount) {
+            global $wpdb;
+            $sql = "
+               SELECT COUNT(DISTINCT t.post_id) AS count
+               FROM $wpdb->postmeta AS t
+               JOIN $wpdb->posts AS p ON p.ID = t.post_id
+               WHERE t.meta_key = 'KbAmzASIN' AND p.post_parent > 0
+            ";
+            $result = $this->getSqlResult($sql);
+            $this->productVariantsCount = isset($result[0]) ? $result[0]->count : 0;
+        }
+        
+        return $this->productVariantsCount;
+    }    
     public function getPublishedProductsCount()
     {
         if (null === $this->publishedProductsCount) {
@@ -1099,8 +1216,92 @@ HTML;
         return false;
     }
 
+    /**
+     * VARIANTS
+     */
+    public function hasProductVariants($mixed)
+    {
+        $meta = is_array($mixed) ? $mixed : $this->getProductMeta($mixed);
+        return isset($meta['KbAmzVariations']['Items'])
+               && !empty($meta['KbAmzVariations']['Items']);
+    }  
+    
+    public function getProductFirstVariant($id)
+    {
+        $variants = $this->getProductVariants($id, array(), 1);
+        return isset($variants[0]) ? $variants[0] : array();
+    }
+    
+    public function getProductVariantLabel($id)
+    {
+        $meta = $this->getProductMeta($id);
+        if (isset($meta['KbAmzVariationAttributes']['VariationAttribute'])) {
+            $label = array();
+            foreach ($meta['KbAmzVariationAttributes']['VariationAttribute'] as $v) {
+                $label[] = $v['Value'];
+            }
+            return implode(' ', $label);
+        } else if (isset($meta['KbAmzVersions'])
+        && isset($meta['KbAmzItemAttributes.Binding'])) {
+            return $meta['KbAmzItemAttributes.Binding'];
+        }
+        
+    }
 
-
+    public function getProductVariants($id, $meta = array(), $count = 0)
+    {
+        static $cache;
+        
+        if (isset($cache[$id])) {
+            return $cache[$id];
+        }
+        
+        if (!$this->hasProductVariants($id)) {
+            return array();
+        }
+        
+        $meta = empty($meta) ? $this->getProductMeta($id) : $meta;
+        
+        $variants = array();
+        if (isset($meta['KbAmzVariations']['Items'])
+        && !empty($meta['KbAmzVariations']['Items'])) {
+            foreach ($meta['KbAmzVariations']['Items'] as $item) {
+                $post = $this->getProductByAsin($item['ASIN']);
+                if ($post) {
+                    $variants[] = $post;
+                    if ($count && count($variants) >= $count) {
+                        break;
+                    }
+                }
+            }
+        }
+        if (!$count) {
+            $cache[$id] = $variants;
+        } else {
+            return $variants;
+        }
+        return $cache[$id];
+    }
+    
+    public function getProductSizeChartUrl($id)
+    {
+        $meta   = $this->getProductMeta($id);
+        $url    = $meta['KbAmzDetailPageURL'];
+        $parts  = parse_url($url);
+        
+        return sprintf(
+            self::AMAZON_SIZE_CHART,
+            $parts['scheme'] . '://' . $parts['host'],
+            $meta['KbAmzASIN']
+        );
+    }
+    
+    /**
+     * 
+     * @global type $wpdb
+     * @param type $metaId
+     * @return type
+     */
     public function getMetaDataById($metaId)
     {
         global $wpdb;
@@ -1132,27 +1333,45 @@ HTML;
         }
     }
     
+    /**
+     * Deletes post and post variants
+     * @param type $postId
+     */
     public function clearProduct($postId)
     {
+        $args = array(
+            'post_parent' => $postId,
+            'post_type'   => 'any', 
+            'posts_per_page' => -1,
+            'post_status' => 'any'
+        );
+        
+        $children = get_children($args);
+        if (!empty($children)) {
+            foreach ($children as $child) {
+                $this->clearProduct($child->ID);
+            }
+        }
         wp_delete_post($postId, true);
         wp_delete_attachment($postId, true);
     }
 
 
-    public function getProductsAsinsToUpdate()
+    public function getProductsAsinsToUpdate($limit = null)
     {
         global $wpdb;
         $add = getKbAmz()->getOption('uproductsUpdateOlderThanHours', KbAmazonImporter::SECONDS_BEFORE_UPDATE);
-        $time = time() - $add;
-        
+        $time = time();// - $add;
+        $sqlLimit = $limit === null ? '' : ' LIMIT ' . intval($limit);
         $sql = "
            SELECT t1.meta_value AS asin
            FROM $wpdb->posts AS t
            JOIN $wpdb->postmeta AS t1 ON t.ID = t1.post_id AND t1.meta_key = 'KbAmzASIN'
            WHERE t.post_modified < '".date('Y-m-d H:i:s', $time)."'
            ORDER BY t.post_modified ASC
+           $sqlLimit
         ";
-        //echo $sql;die;
+        
         $result = $this->getSqlResult($sql);
 
         $asins = array();

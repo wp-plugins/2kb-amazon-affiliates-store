@@ -1,20 +1,13 @@
-<form role="form" method="post">
+<form role="form" method="post" class="import-products">
     <div class="kb-amz-checkbox-toggle">
         <div data-target="#kb-amz-categories-products" class="btn btn-default"><?php echo __('Toggle Checkbox'); ?></div>
     </div>
-    <div class="row kb-amz-url-upload" id="kb-amz-categories-products">
-        <?php foreach ($this->items as $item): ?>
-        <label class="col-sm-2 col-md-2">
+    <div class="row kb-amz-url-upload kb-amz-same-child-height" id="kb-amz-categories-products">
+        <?php foreach ($this->items as $item): $this->item = $item; ?>
+        <label class="col-sm-3 col-md-2<?php echo $this->areLoaded ? ' loaded' : '';?>">
             <div class="thumbnail">
-                <div class="import-image">
-                    <img src="<?php echo is_array($item) ? $item['src'] : $item->getImageThumbSrc();?>">
-                </div>
-                <div class="caption">
-                    <div class="import-title">
-                         <a><?php echo is_array($item) ? $item['asin'] : htmlspecialchars($item->getTitle());?></a>
-                    </div>
-                    <input type="checkbox" name="asin[]" value="<?php echo is_array($item) ? $item['asin'] : $item->getAsin();?>" checked="checked"/>
-                </div>
+                <?php include 'kbAmzLoadItemPreview.phtml';?>
+                <input type="checkbox" name="asin[]" value="<?php echo is_array($item) ? $item['asin'] : $item->getAsin();?>" checked="checked"/>
             </div>
         </label>
         <?php endforeach; ?>
@@ -40,5 +33,166 @@
         </div>
     </div>
     <br/>
-    <button type="submit" class="btn btn-primary" name="import" value="import"><?php echo __('Import'); ?></button>
+    <?php if ($this->useAjax) : ?>
+        <button id="submit-ajax" type="button" class="btn btn-primary" name="import" value="import"><?php echo __('Import'); ?></button>
+    <?php else: ?>
+        <button id="submit" type="submit" class="btn btn-primary" name="import" value="import"><?php echo __('Import'); ?></button>
+    <?php endif; ?>
+    
 </form>
+
+<?php if ($this->useAjax) : ?>
+<div id="bottom-controlls" style="display: none;">
+    <div class="progress" id="ajax-items-loader">
+        <div style="width: 0%" aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" role="progressbar" class="progress-bar progress-bar-striped active">
+            <span><span id="items-done">0</span> of <?php echo count($this->items); ?></span>
+            ,
+            <span><span id="items-percent">0</span>% Complete</span>
+        </div>
+    </div>
+</div>
+
+
+<script>
+(function ($, url) {
+    $(function () {
+        var size        = $('#kb-amz-categories-products label').size();
+        var done        = 0;
+        var $bar        = $('#bottom-controlls');
+        var $loader     = $('#ajax-items-loader');
+        
+        function loadItems()
+        {
+            $bar.show();
+            var $item = $('#kb-amz-categories-products label').not('.loaded').first();
+            var asin = $item.find('[name]').attr('value');
+            if ($item.length === 0) {
+                $loader.find('.progress-bar').removeClass('active');
+                alert('All items are loaded. Proceed to Import.');
+                return;
+            }
+            if ($('body').hasClass('iddle')) {
+                $(window).scrollTop($item.offset().top - 50);
+            }
+            
+            $.ajax({
+                type: "POST",
+                url : url,
+                dataType : 'json',
+                data: {
+                    'action' : 'kbAmzLoadItemPreview',
+                    'asin'   :  asin
+                }
+            }).done(function(data) {
+                if (data && data['html']) {
+                    var $p = $item.find('.kb-amz-preview');
+                    $p.before(data['html']);
+                    $p.remove();
+                }
+            }).error(function(){
+                // alert('Unable to connect to the server. Please try again.');
+            }).always(function () {
+                if ($item.hasClass('loaded')) {
+                    return;
+                }
+                done++;
+                $('#items-done').html(done);
+                var percent = ((done / size) * 100).toFixed(2);
+                if (percent > 100) {
+                    percent = 100;
+                    $loader.find('.progress-bar').removeClass('active');
+                }
+                $('#items-percent').html(percent);
+                $loader.find('.progress-bar').width(percent + '%');
+                $item.addClass('loaded');
+                loadItems();
+            });
+        }
+        
+        if ($('#kb-amz-categories-products label').not('.loaded').size()) {
+            loadItems();
+        }
+        
+        $('body').addClass('iddle');
+        $(window).onDelay('mousemove', 10000, function(e) {
+            $('body').addClass('iddle');
+        });
+        $(window).on('mousemove', function(e) {
+            $('body').removeClass('iddle');
+        });
+        
+        function importItems()
+        {
+            $bar.show();
+            var $item = $('#kb-amz-categories-products label.loaded').not('.import-done').first();
+            var asin = $item.find('[name]').attr('value');
+            if ($item.length === 0) {
+                alert('Import Ready.');
+                return;
+            }
+            
+            if ($('body').hasClass('iddle')) {
+                $(window).scrollTop($item.offset().top - 50);
+            }
+            
+            $.ajax({
+                type: "POST",
+                url : url,
+                dataType : 'json',
+                data: {
+                    'action' : 'kbAmzImportItem',
+                    'asin'   :  asin
+                }
+            }).done(function(data) {
+                if (data && data['html']) {
+                    var $p = $item.find('.kb-amz-preview');
+                    $p.before(data['html']);
+                    $p.remove();
+                }
+                if (data && data['result'] && !data['result']['error']) {
+                    $item.addClass('success');
+                } else {
+                    $item.addClass('danger');
+                }
+            }).error(function(){
+                $item.addClass('danger');
+            }).always(function () {
+                $item.addClass('import-done');
+                done++;
+                $('#items-done').html(done);
+                var percent = ((done / size) * 100).toFixed(2);
+                if (percent > 100) {
+                    percent = 100;
+                    $loader.find('.progress-bar').removeClass('active');
+                }
+                $('#items-percent').html(percent);
+                $loader.find('.progress-bar').width(percent + '%');
+                importItems();
+            });
+        }
+        
+        $('#submit-ajax').click(function () {
+            $('#kb-amz-categories-products label').addClass('loaded');
+            $loader.find('.progress-bar').width(0);
+            setTimeout(function () {
+                $loader.find('.progress-bar').removeClass('active progress-bar-striped').addClass('progress-bar-success');
+            }, 500);
+            done = 0;
+            var $items = $('#kb-amz-categories-products label.loaded')
+            $items.removeClass('import-done success danger');
+            $items.each(function () {
+                var $c = $(this).find('[name]');
+                if (!$c.is(':checked')) {
+                    $(this).addClass('import-done');
+                    done++;
+                }
+            });
+            importItems();
+        });
+    });
+})(jQuery, '<?php echo getKbAmzAjaxUrl(); ?>');
+</script>
+<style type="text/css">
+    #kb-amz-content
+</style>
+<?php endif; ?>

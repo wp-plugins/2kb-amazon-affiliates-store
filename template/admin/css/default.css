@@ -12,6 +12,7 @@
     min-height: 300px;
     background: white;
     color: black;
+    position: relative;
 }
 .kb-amz-url-upload .caption a{
     line-height: 1.1;
@@ -86,7 +87,34 @@ float: right;
 }
 .alert{
     padding: 5px 10px!important;
+    margin-bottom: 10px!important;
 }
-#kb-amz-admin label{
+/*#kb-amz-admin label{
     width: 100%;
+}
+#kb-amz-admin form.import-products label{
+    width: inherit;
+}*/
+#bottom-controlls{
+    bottom: 0;
+    max-width: 100%;
+    width: 50%;
+    position: fixed;
+    right: 0;
+    /*width: 600px;*/
+    z-index: 1000;
+    padding: 5px;
+    background: none repeat scroll 0 0 rgba(200, 200, 200, 0.8);
+}
+.progress{
+    margin-bottom: 0!important;
+}
+#kb-amz-categories-products .loaded .thumbnail{
+    border-color: #31708f;
+}
+#kb-amz-categories-products .success .thumbnail{
+    border-color: #3c763d;
+}
+#kb-amz-categories-products .danger .thumbnail{
+    border-color: #a94442;
 }

@@ -1,5 +1,12 @@
+<?php if (!getKbAmz()->getOption('KbAmzV2VariantsMessageSeen')) : ?>
+    <div class="alert alert-warning" role="alert">
+        <button aria-label="Close" data-dismiss="alert" class="close" type="button" data-option="KbAmzV2VariantsMessageSeen" data-option-value="1"><span aria-hidden="true">×</span></button>
+        <span class="label label-success">NEW</span>
+        (Beta Testing) Product Variants and Versions are added. Take a look before you activate them!
+        <b><a href="?<?php echo http_build_query(array_merge($_GET, array('kbAction' => 'info')))?>#variants">Check the docs</a></b>
+    </div>
+<?php endif; ?>
 <div class="row homepage">
-
     <div class="col-sm-3">
         <img src="<?php echo getKbPluginUrl(); ?>/template/admin/img/2kb-amazon-affiliate-product-logo.png" />
     </div>
@@ -189,12 +196,38 @@
                 ?>
             </div>
             
+            <?php if (!getKbAmz()->getOption('allowVariants') && getKbAmz()->getProductVariantsCount()) :?>
+            <div class="col-sm-6">
+                <div class="alert alert-warning">
+                    <?php echo sprintf(__('You have %s product varants but disallowed importing them.'),getKbAmz()->getProductVariantsCount()); ?>
+                    <a href="?<?php echo http_build_query(array_merge($_GET, array('kbAction' => 'settingsGeneral'))); ?>"><?php echo __('Check your settings.');?></a>
+                </div>
+            </div>
+            <?php endif;?>
+            
+            
 <!--            <div class="col-sm-12">
                 <div role="alert" class="alert alert-info">
                     <strong>Heads up!</strong> This alert needs your attention, but it's not super important.
                 </div>
             </div>-->
         </div>
+        <?php
+        $tips = array();
+        if (getKbAmz()->getOption('downloadImages')) {
+            $tips[] = 'Did you know that you can skip downloading amazon images on your disk? Go to <a href="?'.http_build_query(array_merge($_GET, array('kbAction' => 'settingsGeneral'))).'">General Settings</a> and set No to Download images from Amazon.';
+        }
+        
+        $tips[] = 'Did you know that you can check the values of all product attributes from <a href="?'.http_build_query(array_merge($_GET, array('kbAction' => 'productsExplodeAttributes'))).'">Explore Attributes</a>.';
+        $tips[] = 'Every variant is inserted as new post (the same as none variable products). Product with 3 Sizes and 8 Colors will result in inserting 25 posts.(1st the main product and 3x8 Variants)';
+        $tips[] = 'From where to get ASIN. <a href="?'.http_build_query(array_merge($_GET, array('kbAction' => 'info'))).'#get-asin">Click here to find</a>.';
+        
+        if (!empty($tips)) {
+            $tip = $tips[rand(0, count($tips) - 1)];
+            echo '<div class="alert alert-info" role="alert"><span aria-hidden="true" class="glyphicon glyphicon-heart-empty"></span> '.$tip.'</div>';
+        }
+        ?>
+        
     </div>
 </div>
 
@@ -237,3 +270,5 @@
     })(jQuery);
 </script>
 <?php endif; ?>
+
+

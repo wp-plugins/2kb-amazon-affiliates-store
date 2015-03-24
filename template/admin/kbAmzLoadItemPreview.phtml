@@ -1,0 +1,11 @@
+<div class="kb-amz-preview">
+    <div class="import-image">
+        <img src="<?php echo $this->item->getImageThumbSrc();?>">
+    </div>
+    <div class="caption">
+        <div class="import-title">
+            <a><?php echo htmlspecialchars($this->item->getTitle());?></a><br/>
+            <span><?php echo $this->item->getAsin();?></span>
+        </div>
+    </div>
+</div>

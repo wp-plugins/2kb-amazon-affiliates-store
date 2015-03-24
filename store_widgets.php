@@ -473,7 +473,7 @@ class kbAmazonShopAttributeCount extends KbAmzWidget
                     $classes[] = 'empty';
                 }
                 echo sprintf(
-                    '<li class="cat-item kb-store-attribute %s"><a href="%s" title="%s">%s <span class="kb-store-attribute-count">(%s)</span></a></li>',
+                    '<li class="cat-item kb-store-attribute %s"><a href="%s" title="%s" ref="nofollow">%s <span class="kb-store-attribute-count">(%s)</span></a></li>',
                     implode(' ', $classes),
                     kbGetUrlWithParams(array($key => $item->meta_id)),
                     $item->meta_value,

@@ -2,7 +2,7 @@
     <?php echo kbAmzHiddenInput(); ?>
     <div class="alert alert-success">Use Category from the select or write down your own. <a href="http://docs.aws.amazon.com/AWSECommerceService/latest/DG/BrowseNodeIDs.html" target="_blank">Check this link for amazon categories</a></div>
     <div class="row">
-        <div class="col-xs-4">
+        <div class="col-xs-3">
             <div class="form-group">
                 <label for="search" class="control-label">
                     <?php echo __('Search Word'); ?>
@@ -10,7 +10,7 @@
                 <input value="<?php echo getKbPostVar('search');?>" type="text" name="search" class="form-control" placeholder="<?php echo __('e.g. iphone'); ?>">
             </div>
         </div>
-        <div class="col-xs-4">
+        <div class="col-xs-3">
             <div class="form-group">
                 <label for="category" class="control-label">
                     <?php echo __('Select Category'); ?>
@@ -20,7 +20,7 @@
                 </select>
             </div>
         </div>
-        <div class="col-xs-4">
+        <div class="col-xs-3">
             <div class="form-group">
                 <label for="categoryName" class="control-label">
                     <?php echo __('Or Write a Category Name'); ?>
@@ -28,6 +28,17 @@
                 <input type="text" name="categoryName" class="form-control" value="<?php echo getKbPostVar('categoryName');?>" />
             </div>
         </div>
+<!--        <div class="col-xs-3">
+            <div class="form-group">
+                <label for="category" class="control-label">
+                    <?php echo __('Limit'); ?>
+                </label>
+                <select name="category" class="form-control"  value="<?php echo getKbPostVar('category');?>">
+                    <?php echo kbAmzSelect(array(10 => 10, 20 => 20, 30 => 30), getKbPostVar('category'), null); ?>
+                </select>
+            </div>
+        </div>-->
+        
     </div>
     <div class="form-group">
         <button type="submit" class="btn btn-primary" name="submit" value="load"><?php echo __('Search'); ?></button>

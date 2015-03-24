@@ -65,9 +65,13 @@ function getKbProductGalleryContent($atts)
     %s
 </div>
 HTML;
-        
         $images = getKbAmz()->getProductImages(get_the_ID());
-        $imagesHtml = $images->getImagesHtmlSkipFirst($atts['size']);
+        if (count ($images) > 1) {
+            $imagesHtml = $images->getImagesHtml($atts['size']);
+        } else {
+            $imagesHtml = $images->getImagesHtmlSkipFirst($atts['size']);
+        }
+        
         $thumb = $images->getFirst($atts['size']);
         if (empty($thumb)) {
             return;
@@ -161,10 +165,10 @@ HTML;
 add_shortcode( 'kb_amz_product_content', 'kb_amz_product_content_func' );
 
 
-// [kb_amz_product_content]
+// [kb_amz_product_actions]
 function kb_amz_product_actions_func($atts) {
     $atts = shortcode_atts( array(
-
+        'postId' => get_the_ID()
     ), $atts);
 
     $shortCodes = getKbAmz()->getShortCodes();
@@ -172,15 +176,38 @@ function kb_amz_product_actions_func($atts) {
     && !$shortCodes['actions']['active']) {
         return;
     }
-
-    $addToCart = getKbAmz()->getCartButtonHtml(get_the_ID());
+    
+    $actions = array();
+    $actions[] = array(
+        'html'  => getKbAmz()->getCartButtonHtml($atts['postId']),
+        'order' => 100
+    );
+    $std = new stdClass;
+    $std->actions = $actions;
+    $std->postId  = $atts['postId'];
+    $std->post    = get_post($atts['postId']);
+    $std->atts    = $atts;
+    
+    apply_filters('kb_amz_product_add_actions', $std);
+    
+    $actions = $std->actions;
+    usort($actions, 'kbAmzSortOrder');
+    
+    $html = array();
+    foreach ($actions as $action) {
+        $html[] = $action['html'];
+    }
+    
+    if (empty($html)) {
+        $html[] = getKbAmz()->getCartButtonHtml($atts['postId']);
+    }
+    
     return sprintf(
         '<div class="kb-product-actions">%s</div>',
-        $addToCart
+        implode(PHP_EOL . '<br class="kb-product-actions-break"/>', $html)
     );
 }
 add_shortcode( 'kb_amz_product_actions', 'kb_amz_product_actions_func' );
-
 
 // [kb_amz_product_similar]
 function kb_amz_product_similar_func($atts) {
@@ -350,6 +377,19 @@ function kb_amz_list_products($atts) {
     }
     
     kbAmzIsMainQuery(true);
+    
+    $std = new stdClass;
+    $std->queryAttributes = $atts;
+    $std->atts            = $atts;
+    
+    apply_filters('kb_amz_list_products_query_attributes', $std);
+    
+    if ($std instanceof stdClass
+    && isset($std->queryAttributes)
+    && !empty($std->queryAttributes)) {
+        $atts = $std->queryAttributes;
+    }
+    
     $posts = query_posts($atts);
     $atts['maxNumPages'] = $GLOBALS['wp_query']->max_num_pages;
     $atts['posts']       = $posts;

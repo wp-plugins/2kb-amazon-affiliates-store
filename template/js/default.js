@@ -142,6 +142,57 @@
             $contents.hide();
             $contents.eq(index).show();
         });
+        
+        /**
+         * Same height
+         */
+        $('.kb-amz-same-child-height').each(function () {
+            var maxHeight = 0;
+            var $els = $(this).children();
+            $els.each(function () {
+               var h = $(this).height();
+               if (h > maxHeight) {
+                   maxHeight = h;
+               }
+            });
+            $els.height(maxHeight);
+        });
+        
+        $('.kb-amz-actions-see-all-formats').click(function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            if (!$this.attr('data-text-original')) {
+                $this.attr('data-text-original', $this.html());
+            }
+            var $e    = $this.parent().find('.kb-amz-actions-all-formats');
+            
+            $this.toggleClass('active');
+            if ($this.hasClass('active')) {
+                $this.html($this.attr('data-text'));
+                $e.show();
+            } else {
+                $this.html($this.attr('data-text-original'));
+                $e.hide();
+            }
+            return false;
+        });
+        
+        $('.kb-amz-format-type').click(function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            var $e    = $this.next('table');
+            
+            $this.toggleClass('active');
+            if ($this.hasClass('active')) {
+                $e.parent().find('table').hide();
+                $e.show();
+            } else {
+                $e.parent().find('table').hide();
+            }
+            return false;
+        });
+        
+        
     });
 })(jQuery);
 

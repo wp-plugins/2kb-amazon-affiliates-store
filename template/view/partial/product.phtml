@@ -51,6 +51,14 @@ if ($c == 4) {
                 </div>
                 <?php endif; ?>
                 <?php echo getKbAmz()->getProductSticker($p->ID); ?>
+                <?php
+                if ($variantLabel = getKbAmz()->getProductVariantLabel($p->ID)) {
+                    echo sprintf(
+                        '<span class="kb-amz-item-list-variant-label">%s</span>',
+                        $variantLabel
+                    );
+                }
+                ?>
             </div>
             <div class="kb-amz-item-list-content">
                 <div class="kb-amz-item-list-title">

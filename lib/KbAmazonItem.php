@@ -16,18 +16,37 @@ class KbAmazonItem {
         'MediumImage',
         'LargeImage',
         'ImageSets',
-        'Offers',
+        //'Offers',
         'BrowseNodes',
         'SimilarProducts',
-        // 'EditorialReviews'
+        // 'EditorialReviews',
+        'Variations',
+        'AlternateVersions',
     );
+    
+    protected $isSimilar;
+    
+    protected $postParent = 0;
 
-    public function __construct($result)
+    public function __construct($result, $isSimilar = false)
     {
-        $this->item = isset($result['Items']['Item']) ? $result['Items']['Item'] : array();
-        $this->result = $result;
+        if (isset($result['Items']['Item']['AlternateVersions'])) {
+            if (!isset($result['Items']['Item']['AlternateVersions']['AlternateVersion'][0])) {
+                $result['Items']['Item']['AlternateVersions']['AlternateVersion']
+                = array($result['Items']['Item']['AlternateVersions']['AlternateVersion']);
+            }
+        }
+        
+        $this->item         = isset($result['Items']['Item']) ? $result['Items']['Item'] : array();
+        $this->result       = $result;
+        $this->isSimilar    = $isSimilar;
     }
     
+    public function getItem()
+    {
+        return $this->item;
+    }
+
     public function isValid()
     {
         if (isset($this->result['src'])) {
@@ -60,6 +79,16 @@ class KbAmazonItem {
         return isset($this->result['asin']) ? $this->result['asin'] : $this->item['ASIN'];
     }
     
+    public function getParentAsin()
+    {
+        return isset($this->item['ParentASIN']) ? $this->item['ParentASIN'] : null;
+    }
+
+    public function setAsin($asin)
+    {
+        $this->result['asin'] = $asin;
+    }
+
     public function getTitle()
     {
         return isset($this->result['asin'])
@@ -153,6 +182,31 @@ class KbAmazonItem {
         }
         $images = $this->getImages();
         return isset($images[0]) ? $images[0] : null;
+    }
+    
+    /**
+     * 
+     * @return type
+     */
+    public function getResult()
+    {
+        return $this->result;
+    }
+    
+    /**
+     * 
+     * @param type $id
+     * @return \KbAmazonItem
+     */
+    public function setPostParent($id)
+    {
+        $this->postParent = (int) $id;
+        return $this;
+    }
+    
+    public function getPostParent()
+    {
+        return $this->postParent;
     }
 }
 

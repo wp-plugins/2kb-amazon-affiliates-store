@@ -2,7 +2,7 @@
 Tags: amazon, affiliate, associate, online store, selling products
 Requires at least: 4.0
 Tested up to: 4.1
-Stable tag: 1.1.8
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,6 +12,7 @@ Amazon Affiliate Store Plugin With Cart, Checkout, Custom Themes. Easy to manage
 
 Features
 
+*   Product Variants and Versions
 *   Sell wide range of physical and digital products in Worldwide, Germany, United Kingdom, Canada, Japan, Italy, China, France, Spain, India.
 *   Amazon Affiliate API integration with 90 days cookie duration
 *   Product as post
@@ -35,11 +36,12 @@ This section describes how to install the plugin and get it working.
 == Screenshots ==
 
 == Changelog ==
-= 1.2.1 =
-Added support for Digital products.
-Products number synchronization with 2kblater.com server
-Disabled revisions for products
-Preparations for v2.0 Stay Put!
+= 2.0.0 BETA =
+Product Variants Added
+Product Versions Added
+Import Products Improvement
+Optimizations
+Some bug fixes
 = 1.2.0 =
 Usability changes:
 Delay between requests option added to reduce Amazon API warnings

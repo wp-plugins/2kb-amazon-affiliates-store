@@ -25,6 +25,7 @@ if (isset($_GET['q'])
             if ($img) {
                 foreach ($img as $im) {
                    $src = pq($im)->attr('src');
+                   break;
                 }
             }
         }

@@ -127,6 +127,33 @@
                 </select>
             </div>
         </div>
+        <div class="col-md-6 col-xs-6">
+            <div class="row">
+                <div class="col-md-6 col-xs-6">
+                    <div class="form-group">
+                        <label for="allowVariants" class="control-label">
+                            <?php echo __('Allow Importing Variantions'); ?>
+                            <span class="label label-success">NEW</span>
+                            <a href="?<?php echo http_build_query(array_merge($_GET, array('kbAction' => 'info')))?>#variants" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-question-sign"></span></a>
+                        </label>
+                        <select value="<?php echo getKbPostVar('allowVariants', getKbAmz()->getOption('allowVariants'));?>" name="allowVariants" class="form-control">
+                            <?php echo kbAmzSelect(array(0 => __('No'), 1 => __('Yes')), getKbPostVar('allowVariants', getKbAmz()->getOption('allowVariants'))); ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xs-6">
+                    <div class="form-group">
+                        <label for="showVariantsInListing" class="control-label">
+                            <?php echo __('Show Variants in Listings'); ?>
+                            <span class="label label-success">NEW</span>
+                        </label>
+                        <select value="<?php echo getKbPostVar('showVariantsInListing', getKbAmz()->getOption('showVariantsInListing'));?>" name="showVariantsInListing" class="form-control">
+                            <?php echo kbAmzSelect(array(1 => __('Yes'), 0 => __('No')), getKbPostVar('showVariantsInListing', getKbAmz()->getOption('showVariantsInListing'))); ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <div class="row">

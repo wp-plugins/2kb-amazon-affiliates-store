@@ -1,4 +1,5 @@
 <div class="info-items">
+    <a href="#get-asin">From where to get ASIN</a>
     <a href="#premium">Premium</a>
     <a href="#products-attributes">Products Attributes</a>
     <a href="#products-explore-attributes">Products Explore Attributes</a>
@@ -7,7 +8,7 @@
     <a href="#widgets">Widgets</a>
     <a href="#import">Import</a>
     <a href="#settings-general">General Settings</a>
-    
+    <a href="#variants">Product Variations</a>
 </div>
 
 <br/><br/>
@@ -19,7 +20,14 @@
     <br/><br/>
 </div>
 
-
+<div>
+    <a id="get-asin"></a>
+    <br/>
+    <h4>From where to get ASIN</h4>
+    <div>
+        <img src="<?php echo getKbPluginUrl(); ?>/template/admin/img/info/where-to-get-asin.jpg" />
+    </div>
+</div>
 
 <div>
     <a id="premium"></a>
@@ -169,3 +177,26 @@
         [option Cron] - Keep your products up to date.
     </div>
 </div>
+
+<div>
+    <a id="variants"></a>
+    <br/>
+    <h4>Product Variations</h4>
+    <div>
+        What to consider before using variants?<br/>
+        1. Every variant is inserted as new post (the same as none variable products)<br/>
+        2. Product with 3 Sizes and 8 Colors will result in inserting 25 posts.(1st the main product and 3x8 Variants)<br/>
+        3. Currently the plugin supports 2 varables: Size and Color. More to come.<br/><br/>
+        How to list products without variants?<br/>
+        1. Go to <a href="?page=kbAmz&kbAction=settingsGeneral">General Settings</a> and set `Show Variants in Listings` to Yes<br/>
+        2. Use [kb_amz_list_products] on any page/post
+        <br/><br/>
+        <h3>Product Variants</h3>
+        <img src="<?php echo getKbPluginUrl(); ?>/template/admin/img/info/variant-example.jpg" />
+        <br/><br/>
+        <h3>Product Versions</h3>
+        <img src="<?php echo getKbPluginUrl(); ?>/template/admin/img/info/product-versions-example.jpg" /> 
+    </div>
+</div>
+
+

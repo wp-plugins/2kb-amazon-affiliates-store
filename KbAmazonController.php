@@ -27,8 +27,42 @@ class KbAmzAdminController {
         add_action('wp_ajax_kbAmzPremiumAction', array($this, 'premiumAction'));
         add_action('wp_ajax_kbAmzPremiumActivateAction', array($this, 'premiumActivate'));
         add_action('wp_ajax_kbAmzSetOption', array($this, 'kbAmzSetOption'));
+        add_action('wp_ajax_kbAmzLoadItemPreview', array($this, 'kbAmzLoadItemPreviewAction'));
+        add_action('wp_ajax_kbAmzImportItem', array($this, 'kbAmzImportItemAjaxAction'));
     }
     
+    function kbAmzImportItemAjaxAction()
+    {
+        $asin     = $_POST['asin'];
+        $importer = new KbAmazonImporter;
+        $item     = $importer->find($asin);
+        $result   = $importer->saveProduct($item);
+        $view = new KbView(array('item' => $item), $this->getTemplatePath('kbAmzLoadItemPreview'));
+        echo json_encode(
+            array(
+                'html'      => $item->isValid() ?  $view->getContent() : null,
+                'result'    => $result
+            )
+        );
+        exit;
+    }
+    
+    public function kbAmzLoadItemPreviewAction()
+    {
+        $asin     = $_POST['asin'];
+        $importer = new KbAmazonImporter;
+        $item     = $importer->find($asin);
+        
+        $view = new KbView(array('item' => $item), $this->getTemplatePath('kbAmzLoadItemPreview'));
+        
+        echo json_encode(
+            array(
+                'html' => $item->isValid() ?  $view->getContent() : null
+            )
+        );
+        exit;
+    }
+
     public function premiumActivate()
     {
         $data = array();
@@ -124,12 +158,14 @@ class KbAmzAdminController {
     }
 
     public function importByUrlAction() {
-        $this->messages[] = array(__("Large amount of items will require more time to load."), 'alert-warning');
+        $this->messages[] = array(__("Large amount of items will require more time to load. To import variants, they must be allowed from the General Settings"), 'alert-warning');
+        $this->messages[] = array(__("You can proceed to Import at the bottom, without waiting for all items to load."), 'alert-info');
         $data = array();
         if (isset($_POST['url']) && !empty($_POST['url']) && isset($_POST['load'])) {
             $data['url'] = $_POST['url'];
             $importer = new KbAmazonImporter;
-            $items = $importer->getUrlItems($data['url']);
+            // $items = $importer->getUrlItems($data['url']);
+            $items = $importer->getUrlAsinItems($data['url']);
             if (!empty($items)) {
                 $data['items'] = $items;
                 $data['addItemsTemplate'] = $this->getTemplatePath('importItemsWithGallery');
@@ -139,6 +175,7 @@ class KbAmzAdminController {
         }
         $this->importItemsWithGallery();
         $view = new KbView($data);
+        $view->useAjax = true;
         return $view;
     }
 
@@ -174,6 +211,8 @@ class KbAmzAdminController {
         }
         $this->importItemsWithGallery();
         $view = new KbView($data);
+        $view->useAjax = true;
+        $view->areLoaded = true;
         return $view;
     }
 
@@ -225,20 +264,27 @@ class KbAmzAdminController {
         }
     }
 
-    public function settingsAmazonApiAction() {
+    public function settingsAmazonApiAction()
+    {
         $data = array();
         if (isset($_POST['amazon']) && !empty($_POST['amazon'])) {
-            try {
-                getKbAmz()->setOption('amazon', $_POST['amazon']);
-                $amazonApi = getKbAmazonApi();
-                $amazonApi->category('Phone');
-                $result = $amazonApi->search('iphone');
-                $this->messages[] = array(__('Credentials Updated'), 'alert-success');
-            } catch (Exception $e) {
-                getKbAmz()->setOption('amazon', array());
-                $this->messages[] = array(sprintf(__('Invalid Credentials: %s'), $e->getMessage()), 'alert-danger');
-                getKbAmz()->addException('Amazon API', sprintf(__('Invalid Credentials: %s'), $e->getMessage()));
-            }
+            getKbAmz()->setOptions(
+                array(
+                    'amazonApiRequestDelay' => $_POST['amazonApiRequestDelay'],
+                    'amazon'                => $_POST['amazon']
+                )
+            );
+//            try {
+//                getKbAmz()->setOption('amazon', $_POST['amazon']);
+//                $amazonApi = getKbAmazonApi();
+//                $amazonApi->category('Phone');
+//                $result = $amazonApi->search('iphone');
+//                $this->messages[] = array(__('Credentials Updated'), 'alert-success');
+//            } catch (Exception $e) {
+//                getKbAmz()->setOption('amazon', array());
+//                $this->messages[] = array(sprintf(__('Invalid Credentials: %s'), $e->getMessage()), 'alert-danger');
+//                getKbAmz()->addException('Amazon API', sprintf(__('Invalid Credentials: %s'), $e->getMessage()));
+//            }
         }
         $importer = new KbAmazonImporter;
         $data['groups'] = $importer->getAmazonCategoryGroups();
@@ -571,7 +617,7 @@ class KbAmzAdminController {
                 'pages' => array(
                     array('action' => 'importByAsin', 'label' => __('By ASIN')),
                     array('action' => 'importBySearch', 'label' => __('By Search')),
-                    array('action' => 'importByUrl', 'label' => __('By Url (beta)')),
+                    array('action' => 'importByUrl', 'label' => __('By Url')),
                     array('action' => 'importCronPending', 'label' => __('Cron Pending'))
                 )
             ),
