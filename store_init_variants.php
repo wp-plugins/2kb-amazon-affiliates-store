@@ -152,9 +152,9 @@ function kbAmzVariantsProductSave($std)
         if (!isset($item['ASIN'])) {
             continue;
         }
-        $variations['Items'][] = [
+        $variations['Items'][] = array(
             'ASIN' => $item['ASIN']
-        ];
+        );
         
         $variantItem = $importer->find($item['ASIN']);
         if (!$variantItem->isValid()) {
