@@ -233,3 +233,80 @@ function kbAmzProductRevisions($num, $post)
         return $num;
     }
 }
+
+add_action('restrict_manage_posts', 'kbAmzPostsPageFiltersSelect');
+function kbAmzPostsPageFiltersSelect()
+{
+    $type = 'post';
+    if (isset($_GET['post_type'])) {
+        $type = $_GET['post_type'];
+    }
+    
+    if ('post' == $type){
+        $values = array(
+            false => __('Don`t Show Amz Products'),
+            true  => __('Show Amz Products'),
+        );
+        $filter = isset($_GET['kbAmzShowProductsFilter'])
+                ? $_GET['kbAmzShowProductsFilter']
+                : getKbAmz()->getOption('showProductsInAdminPosts');
+        ?>
+        <select name="kbAmzShowProductsFilter" style="color:<?php echo !$filter ? '#d54e21!important;' : 'green!important;'?>" onchange="this.style = ''">
+        <?php
+            foreach ($values as $value => $label) {
+                printf
+                    (
+                        '<option value="%s"%s style="color:%s!important;">%s</option>',
+                        $value,
+                        $value == $filter? ' selected="selected"':'',
+                        (!$value ? '#d54e21' : 'black'),
+                        $label
+                    );
+                }
+        ?>
+        </select>
+        <?php
+    }
+}
+
+
+add_filter('parse_query', 'kbAmzPostsPageFilters');
+function kbAmzPostsPageFilters($query)
+{
+    global $pagenow;
+    $type = 'post';
+    if (isset($_GET['post_type'])) {
+        $type = $_GET['post_type'];
+    }
+    
+    if (!is_admin() || $type != 'post' || $pagenow != 'edit.php') {
+        return $query;
+    }
+   
+
+    if (!isset($query->query_vars['meta_query'])
+    || !is_array($query->meta_query)) {
+        $query->query_vars['meta_query'] = array();
+    }
+    
+    if (isset($_GET['kbAmzShowProductsFilter'])) {
+        getKbAmz()->setOption('showProductsInAdminPosts', boolval($_GET['kbAmzShowProductsFilter']));
+    }
+    
+    if ((isset($_GET['kbAmzShowProductsFilter']) && $_GET['kbAmzShowProductsFilter'])
+    || getKbAmz()->getOption('showProductsInAdminPosts')) {
+        $query->query_vars['meta_query'][] = array(
+            'key'       => 'KbAmzASIN',
+            'compare'   => 'EXISTS',
+            //'value'     => ''
+        );
+    } else {
+        $query->query_vars['meta_query'][] = array(
+            'key'       => 'KbAmzASIN',
+            'compare'   => 'NOT EXISTS',
+            //'value'     => ''
+        );
+    }
+    
+    return $query;
+}

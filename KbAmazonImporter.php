@@ -450,9 +450,7 @@ class KbAmazonImporter
                           ->responseGroup(implode(',', $responseGroup))
                           ->optionalParameters(array('MerchantId' => 'All'))
                           ->lookup($asin);
-//                echo '<pre>';
-//                print_r($result);
-//                die;
+                
             } catch (Exception $e) {
                 if ($sleep) {
                     sleep($sleep);

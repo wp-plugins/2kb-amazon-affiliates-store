@@ -118,3 +118,43 @@ float: right;
 #kb-amz-categories-products .danger .thumbnail{
     border-color: #a94442;
 }
+#kb-amz-admin input[type="checkbox"] {
+    margin-top: 0;
+}
+.icons-actions a
+{
+    display: inline-block;
+    padding: 20px;
+    border: 1px solid #aeaeae;
+    text-align: center;
+    text-decoration: none!important;
+    color: black!important;
+    font-weight: bold;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+.icons-actions a span
+{
+    margin-bottom: 10px;
+}
+#kb-amz-admin label{
+    max-width: 100%;
+    min-width: 300px;
+}
+
+.bs-callout {
+    border-color: #eee;
+    border-image: none;
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 1px 1px 1px 5px;
+    margin: 0 0 10px 0;
+    padding: 5px 10px;
+}
+.bs-callout-info {
+    border-left-color: #1b809e;
+}
+.bs-callout-info h4 {
+    color: #1b809e;
+}

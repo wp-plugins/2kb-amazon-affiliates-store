@@ -59,10 +59,20 @@
 
     <div id="kb-amz-content">
         <br/>
-        <?php 
+        <?php
         if (!empty($this->messages)) {
             foreach ($this->messages as $m) {
                 echo kbAmzAdminMessage($m[0], $m[1]);
+            }
+        }
+        if (isset($_GET['messages']) && is_array($_GET['messages'])) {
+            foreach ($_GET['messages'] as $type => $messages) {
+                if (!is_array($messages)) {
+                    $messages = array($messages);
+                }
+                foreach ($messages as $message) {
+                    echo kbAmzAdminMessage($message, $type);
+                }
             }
         }
         ?>

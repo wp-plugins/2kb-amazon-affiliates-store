@@ -117,17 +117,7 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-6 col-xs-6">
-            <div class="form-group">
-                <label for="sendStatsData" class="control-label">
-                    <?php echo __('Participate The Plugin Experience Program'); ?>
-                </label>
-                <select value="<?php echo getKbPostVar('sendStatsData', getKbAmz()->getOption('sendStatsData'));?>" name="sendStatsData" class="form-control">
-                    <?php echo kbAmzSelect(array(0 => __('No'), 1 => __('Yes')), getKbPostVar('sendStatsData', getKbAmz()->getOption('sendStatsData'))); ?>
-                </select>
-            </div>
-        </div>
-        <div class="col-md-6 col-xs-6">
+        <div class="col-md-12 col-xs-12">
             <div class="row">
                 <div class="col-md-6 col-xs-6">
                     <div class="form-group">
@@ -141,7 +131,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-6 col-xs-6">
+                <div class="col-md-3 col-xs-3">
                     <div class="form-group">
                         <label for="showVariantsInListing" class="control-label">
                             <?php echo __('Show Variants in Listings'); ?>
@@ -152,6 +142,37 @@
                         </select>
                     </div>
                 </div>
+                <div class="col-md-3 col-xs-3">
+                    <div class="form-group">
+                        <label for="maxVersionsNumberOnImport" class="control-label">
+                            <?php echo __('Max Versions to Import on Product Create'); ?>
+                            <span class="label label-success">NEW</span>
+                        </label>
+                        <select value="<?php echo getKbPostVar('maxVersionsNumberOnImport', getKbAmz()->getOption('maxVersionsNumberOnImport'));?>" name="maxVersionsNumberOnImport" class="form-control">
+                            <?php echo kbAmzSelect(array(5 => 5, 10 => 10, 15 => 15, 20 => 20), getKbPostVar('maxVersionsNumberOnImport', getKbAmz()->getOption('maxVersionsNumberOnImport'))); ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-6">
+            <div class="form-group">
+                <label for="cacheTtl" class="control-label">
+                    <?php echo __('Cache Expire in Seconds. 0 for disabled.'); ?>
+                </label>
+                <select value="<?php echo getKbPostVar('cacheTtl', getKbAmz()->getOption('cacheTtl'));?>" name="cacheTtl" class="form-control">
+                    <?php echo kbAmzSelect(array(0 => 0, 600 => 600, 1800 => 1800, 3600 => 3600), getKbPostVar('cacheTtl', getKbAmz()->getOption('cacheTtl'))); ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-6">
+            <div class="form-group">
+                <label for="sendStatsData" class="control-label">
+                    <?php echo __('Participate The Plugin Experience Program'); ?>
+                </label>
+                <select value="<?php echo getKbPostVar('sendStatsData', getKbAmz()->getOption('sendStatsData'));?>" name="sendStatsData" class="form-control">
+                    <?php echo kbAmzSelect(array(0 => __('No'), 1 => __('Yes')), getKbPostVar('sendStatsData', getKbAmz()->getOption('sendStatsData'))); ?>
+                </select>
             </div>
         </div>
     </div>

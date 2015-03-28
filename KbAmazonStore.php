@@ -1424,7 +1424,7 @@ HTML;
         }
         
         $key = sha1($key);
-        return wp_cache_get($key);
+        return wp_cache_get($key, 'kb-amz-' . KbAmazonDropShipManagerNumber);
     }
     
     public function setCache($key, $data)
@@ -1439,7 +1439,7 @@ HTML;
             }
              $_SESSION['2kb-amazon-affiliates-store']['cache'][$key] = $data;
         }
-        wp_cache_set($key, $data);
+        wp_cache_set($key, $data, 'kb-amz-' . KbAmazonDropShipManagerNumber, $this->getOption('cacheTtl'));
     }
     
     public function removeFromAjaxCart()

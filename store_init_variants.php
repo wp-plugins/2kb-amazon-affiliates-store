@@ -85,6 +85,9 @@ function kbAmzVariantsProductpreSaveAlternateVersions($std)
     $meta             = array();
     $meta['Versions'] = $versions;
     
+    $toDownload = array();
+    $num        = getKbAmz()->getOption('maxVersionsNumberOnImport');
+    $i          = 0;
     foreach ($versions as $version) {
         if (!isset($version['ASIN'])) {
             continue;
@@ -93,6 +96,11 @@ function kbAmzVariantsProductpreSaveAlternateVersions($std)
         if (getKbAmz()->getProductByAsin($asin)) {
             continue;
         }
+        
+        if (++$i > $num) {
+            $toDownload[] = $asin;
+        }
+        
         $versionItem = $importer->find($asin);
         if (!$versionItem->isValid()) {
             continue;
@@ -115,6 +123,14 @@ function kbAmzVariantsProductpreSaveAlternateVersions($std)
     }
     
     $importer->updateProductPostMeta($meta, $postId);
+    
+    if (!empty($toDownload)) {
+        $similarProducts = kbMergeUnique(getKbAmz()->getOption('ProductsToDownload', array()), $toDownload);
+        getKbAmz()->setOption(
+            'ProductsToDownload',
+            $similarProducts
+        );
+    }
     
     return $std;
 }
@@ -152,6 +168,10 @@ function kbAmzVariantsProductSave($std)
         if (!isset($item['ASIN'])) {
             continue;
         }
+//        NOT WORKING
+//        $cacheItem = new KbAmazonItem(array('Items' => array('Item' => $item)));
+//        $importer::cacheItem($cacheItem);
+        
         $variations['Items'][] = array(
             'ASIN' => $item['ASIN']
         );
@@ -510,8 +530,8 @@ function kbAmzProductVersionsActions($std)
                 $part1 .= sprintf(
                     '<a href="#" class="kb-amz-actions-see-all-formats%s" data-text="%s" data-text-original="%s">%s</a>',
                     ($hasActiveInAll ? ' active' : ''),
-                    ($hasActiveInAll ? $textActive : $text),
-                    ($hasActiveInAll ? $text : $textActive),
+                    $textActive,
+                    $text,
                     ($hasActiveInAll ? $textActive : $text)
                 );
                 $part1 .= '<div class="kb-amz-actions-all-formats"'.($hasActiveInAll ? ' style="display:block;"' : '').'>';

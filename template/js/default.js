@@ -161,11 +161,7 @@
         $('.kb-amz-actions-see-all-formats').click(function (e) {
             e.preventDefault();
             var $this = $(this);
-            if (!$this.attr('data-text-original')) {
-                $this.attr('data-text-original', $this.html());
-            }
             var $e    = $this.parent().find('.kb-amz-actions-all-formats');
-            
             $this.toggleClass('active');
             if ($this.hasClass('active')) {
                 $this.html($this.attr('data-text'));

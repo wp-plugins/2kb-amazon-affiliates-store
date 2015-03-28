@@ -6,7 +6,7 @@ Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Amazon Affiliate Store Plugin With Cart, Checkout, Custom Themes. Easy to manage and setup. Sell wide range of physical and digital products.
+Amazon Affiliate Store Plugin With Variants, Cart, Checkout, Custom Themes. Easy to manage and setup. Sell wide range of physical and digital products.
 
 == Description ==
 
@@ -36,6 +36,11 @@ This section describes how to install the plugin and get it working.
 == Screenshots ==
 
 == Changelog ==
+= 2.0.0 BETA 2=
+New Import loaded, custom categories are now working.
+Added option to limit Product Versions import on product create. Some books have 100+ versions and it could take much time to import. Now the cron job will finish the import.
+= 2.0.0 BETA 1=
+php < v5.3 syntax error fix
 = 2.0.0 BETA =
 Product Variants Added
 Product Versions Added

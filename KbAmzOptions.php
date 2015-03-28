@@ -29,7 +29,9 @@ function getKbAmzDefaultOptions()
        'amazonApiRequestDelay'              => 5,
        'allowVariants'                      => false,
        'showVariantsInListing'              => true,
-       
+       'cacheTtl'                           => 1800,
+       'maxVersionsNumberOnImport'          => 5,
+       'showProductsInAdminPosts'           => false,
        /**
         * DISMISABLE
         */

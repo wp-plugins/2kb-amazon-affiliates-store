@@ -1,0 +1,40 @@
+<form method="get" action="<?php echo $_SERVER['REQUEST_URI'];?>">
+    <input type="hidden" name="page" value="<?php echo $_GET['page'];?>"/>
+    <input type="hidden" name="kbAction" value="<?php echo $_GET['kbAction'];?>"/>
+    
+    <div id="callout-popover-multiline" class="bs-callout bs-callout-info">
+        <h4><b>Step 1</b></h4>
+        <p>
+            Select or create page. The page will be as the store base. You can create multiple pages to act like multiple store. For example: Books Store Page, Electronics Store Page and etc.
+        </p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <label>
+                Create Store For Selected Page
+                <br/>
+                <?php
+                $pages = get_pages();
+                wp_dropdown_pages(array(
+                    'orderby' => 'name',
+                    'class' => 'form-control',
+                    'name' => 'storePage',
+                    'selected' => $pages[key($pages)]->ID,
+                        //'show_option_none'    => __('Create store for page:')
+                ));
+                ?>
+            </label>
+        </div>
+        <div class="col-md-12 col-sm-12">
+            <label>
+                Or create new page (recommended)
+                <br/>
+                <input type="text" name="storePageCreate" class="form-control" placeholder="Enter Page Name"/>
+            </label>
+        </div>
+    </div>
+    
+    <button type="submit" name="submit" value="2" class="btn btn-primary">Step 2</button>
+
+</form>

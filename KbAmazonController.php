@@ -35,6 +35,9 @@ class KbAmzAdminController {
     {
         $asin     = $_POST['asin'];
         $importer = new KbAmazonImporter;
+        if (isset($_POST['post_category']) && !empty($_POST['post_category'])) {
+            $importer->setImportCategories($_POST['post_category']);
+        }
         $item     = $importer->find($asin);
         $result   = $importer->saveProduct($item);
         $view = new KbView(array('item' => $item), $this->getTemplatePath('kbAmzLoadItemPreview'));
@@ -580,6 +583,23 @@ class KbAmzAdminController {
             );
         }
     }
+    
+    public function createStorePageAction()
+    {
+        $view = new KbView(array());
+        
+        if (!getKbAmz()->getProductsCount()) {
+            $this->messages[] = array(
+                'Add product/s before you can start creating store page. Import at least 10 for best results.',
+                'alert-warning'
+            );
+            $view->setTemplate($this->getTemplatePath('createStorePageError'));
+            return $view;
+        }
+        
+        
+        return $view;
+    }
 
     protected function getActions() {
         return array(
@@ -603,6 +623,7 @@ class KbAmzAdminController {
                     array('action' => 'productsExcludeAttributes', 'label' => __('Exclude Attributes')),
                     array('action' => 'productsShortCodes', 'label' => __('Short Codes')),
                     array('action' => 'productsVisibility', 'label' => __('Visibility')),
+                    //array('action' => 'createStorePage', 'label' => __('Create Store Page')),
                 )
             ),
             array(

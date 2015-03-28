@@ -158,6 +158,14 @@ class KbAmazonItem {
         
         return $arr;
     }
+    
+    public function getVariantProducts()
+    {
+        if (isset($this->result['Items']['Item']['Variations'])) {
+            return $this->result['Items']['Item']['Variations'];
+        }
+        return array();
+    }
 
     protected function flatten($array, &$newArray, $parentKey = null)
     {
