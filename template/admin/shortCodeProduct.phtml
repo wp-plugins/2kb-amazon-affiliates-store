@@ -1,0 +1,49 @@
+<?php
+// var_dump($this->meta);die;
+?>
+<table class="kb-amz-product-shortcode">
+    <tr>
+        <td class="kb-amz-product-image-shortcode">
+            <?php
+            $img = getKbAmz()
+                 ->getProductImages($this->post->ID)
+                 ->getFirst();
+            
+            if (!empty($img)) {
+                echo sprintf(
+                    '<a href="%s" title="%s">%s</a>',
+                    get_permalink($this->post->ID),
+                    esc_attr($this->post->post_title),  
+                    $img
+                );
+            }
+            ?>
+        </td>
+        <td>
+            <h2 class="kb-amz-product-header-shortcode">
+                <a href="<?php echo get_permalink($this->post->ID);?>" title="<?php echo esc_attr($this->post->post_title);?>">
+                    <span>
+                        <?php echo get_the_title($this->post->ID); ?>
+                    </span>
+                </a>
+            </h2>
+            <div class="kb-amz-product-actions-shortcode">
+                <?php
+                echo kb_amz_product_attributes_func(
+                    array(
+                        'postId' => $this->post->ID
+                    )
+                );
+                ?>
+                <?php
+                echo kb_amz_product_actions_func(
+                    array(
+                        'postId' => $this->post->ID
+                    )
+                );
+                ?>
+            </div>
+        </td>
+    </tr>
+    
+</table>

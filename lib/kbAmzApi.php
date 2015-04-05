@@ -5,11 +5,19 @@ class KbAmzApi
     const API_URL           = 'http://www.2kblater.com';
     const PRODUCTS_CATEGORY = 86;
     
-    protected $apiKey = null;
-    
-    public function __construct($apiKey)
+    protected $apiKey   = null;
+    protected $apiKey2  = null;
+
+
+    public function __construct()
     {
-        $this->apiKey = $apiKey;
+        $this->apiKey   = getKbAmz()->getStoreId();
+
+    }
+    
+    public function setUser($data)
+    {
+        return $this->getRequest('setUser', $data);
     }
 
     public function getProductsCount()
@@ -21,6 +29,11 @@ class KbAmzApi
     public function getProductsListHtml()
     {
         return $this->getRequest('getProductsListHtml');
+    }
+    
+    public function getNetworkListHtml()
+    {
+        return $this->getRequest('getNetworkListHtml');
     }
     
     public function getOrderActivationData($purchaseId)
@@ -36,17 +49,22 @@ class KbAmzApi
     protected function getRequest($action, $params = array())
     {
         $params['2kbProductsApiAction'] = $action;
-        $params['cat'] = self::PRODUCTS_CATEGORY;
-        $params['type'] = 'json';
-        $params['apiType'] = 'kbAmz';
-        $params['apiKey'] = $this->apiKey;
+        $params['cat']                  = self::PRODUCTS_CATEGORY;
+        $params['type']                 = 'json';
+        $params['apiType']              = 'kbAmz';
+        $params['apiKey']               = $this->apiKey;
+        $params['requestTime']          = date('Y-m-d H:i:s');
         
         $requestUrl = sprintf(
             self::API_URL . '?%s',
             http_build_query($params)
         );
-        //echo $requestUrl;die;
-        $content = file_get_contents($requestUrl);
+        
+        $response = wp_remote_get($requestUrl);
+        $content  = '';
+        if (isset($response['body'])) {
+            $content = $response['body'];
+        }
         $data = array();
         if (!empty($content)) {
             $data = json_decode($content);

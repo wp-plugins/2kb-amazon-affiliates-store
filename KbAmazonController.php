@@ -29,6 +29,11 @@ class KbAmzAdminController {
         add_action('wp_ajax_kbAmzSetOption', array($this, 'kbAmzSetOption'));
         add_action('wp_ajax_kbAmzLoadItemPreview', array($this, 'kbAmzLoadItemPreviewAction'));
         add_action('wp_ajax_kbAmzImportItem', array($this, 'kbAmzImportItemAjaxAction'));
+        add_action('wp_ajax_kbAmzNetworkMembers', array($this, 'networkMembersAction'));
+        add_action('wp_ajax_kbAmzNetworkGetProductsToSync', array($this, 'kbAmzNetworkGetProductsToSyncAction'));
+        add_action('wp_ajax_kbAmzNetworkImportProduct', array($this, 'kbAmzNetworkImportProductAction'));
+        
+        
     }
     
     function kbAmzImportItemAjaxAction()
@@ -598,6 +603,159 @@ class KbAmzAdminController {
         }
         
         
+        return $view;
+    }
+    
+    public function kbAmzNetworkImportProductAction()
+    {
+        $response = array();
+        try {
+            $imported = [];
+            foreach ($_POST['items'] as $itemData) {
+                $item = unserialize(base64_decode($itemData['item']));
+                $importer = new KbAmazonImporter;
+                $importer->updateProductPrice($item);
+                $imported[] = array(
+                    'asin' => $itemData['asin']
+                );
+            }
+            
+            $response['items']   = $imported;
+            $response['success'] = true;
+        } catch (Exception $e) {
+            $response['success'] = false;
+            $response['error']   = $e->getMessage();
+            getKbAmz()->addException('Newtwork Product Fetch', $e->getMessage());
+            
+        }
+        echo json_encode($response);
+        die;
+    }
+
+    
+    public function kbAmzNetworkGetProductsToSyncAction()
+    {
+        $asins      = getKbAmz()->getProductsAsinsToUpdate(50);
+        $products   = array();
+        foreach ($asins as $asin) {
+            $products[$asin] = getKbAmz()->getProductByAsin($asin);
+        }
+        $sizes = get_intermediate_image_sizes();
+        $size = 'thumbnail';
+        if (in_array('small', $sizes)) {
+            $size = 'small';
+        } else if (in_array('medium', $sizes)) {
+            $size = 'medium';
+        }
+        
+        $view = new KbView(array());
+        $view->setTemplate($this->getTemplatePath('kbAmzNetworkGetProductsToSync'));
+        $view->products = $products;
+        $view->size     = $size;
+        echo $view;
+        die;
+    }
+
+    public function networkMembersAction()
+    {
+        
+        $api = new KbAmzApi(getKbAmz()->getStoreId());
+        $result =  $api->getNetworkListHtml();
+        if ($result->error) {
+            $data             = array();
+            $data['page']     = 'kbAmz';
+            $data['kbAction'] = 'network';
+            echo '<div role="alert" class="alert alert-danger">Unable to connect to the service server. <a href="?'.  http_build_query($data).'">Please reload the page</a>.</div>';
+        } else {
+            echo $result->content;
+        }
+        die;
+    }
+
+    public function networkAction()
+    {
+        $data         = array();
+        $user         = wp_get_current_user();
+        $data['user'] = wp_get_current_user();
+        $data['siteOwnerName'] = $user->data->display_name;
+        if (isset($user->data->first_name)
+        && !empty($user->data->first_name)
+        && isset($user->data->last_name)
+        && !empty($user->data->last_name)) {
+            $data['siteOwnerName'] = sprintf(
+                '%s %s',
+                $user->data->first_name,
+                $user->data->last_name
+            );
+        }
+        
+        $data['siteOwnerEmail']  = $user->data->user_email;
+        $data['siteName']        = get_bloginfo('name');
+        $data['siteUrl']         = get_bloginfo('url');
+        $data['siteInfo']        = get_bloginfo('description');
+
+        if (isset($_POST['submit'])) {
+            
+            $data  =
+            array(
+                'siteOwnerName'     => empty($_POST['siteOwnerName'])   ? $data['siteOwnerName']    : $_POST['siteOwnerName'],
+                'siteOwnerEmail'    => empty($_POST['siteOwnerEmail'])  ? $data['siteOwnerEmail']   : $_POST['siteOwnerEmail'],
+                'siteName'          => empty($_POST['siteName'])        ? $data['siteName']         : $_POST['siteName'],
+                'siteUrl'           => empty($_POST['siteUrl'])         ? $data['siteUrl']          : $_POST['siteUrl'],
+                'siteInfo'          => substr(empty($_POST['siteInfo'])        ? $data['siteInfo']         : $_POST['siteInfo'], 0, 250),
+                'siteActive'        => $_POST['submit'] == 'join',
+                'siteHealth'        => getKbAmzStoreHealth()
+            );
+            
+            getKbAmz()->setOption('siteNetwork', $data);
+            
+            $api = new KbAmzApi(getKbAmz()->getStoreId());
+            $result =  $api->setUser($data);
+            
+            if (isset($result->error) && $result->error) {
+                $this->messages[] = array('Unable to join the 2kb Amazon Network at this time. Error: ' .$result->error, 'alert-warning');
+            } else {
+                if ($_POST['submit'] == 'join') {
+                    $this->messages[] = array('You successfully <b>joined</b> 2kb Amazon Network', 'alert-success');
+                } else {
+                    $this->messages[] = array('You successfully <b>left</b> 2kb Amazon Network', 'alert-danger');
+                }
+            }
+        } else {
+            $siteNetwork = getKbAmz()->getOption('siteNetwork');
+            if (!empty($siteNetwork)) {
+                $data = $siteNetwork;
+            }
+        }
+        
+         
+        $data['canLeave'] = isset($data['siteActive']) && $data['siteActive'];
+        
+        $view = new KbView($data);
+        return $view;
+    }
+
+    public function shortCodeProductAction($atts)
+    {
+        $post = null;
+        if ($atts['asin']) {
+            $post = getKbAmz()->getProductByAsin($atts['asin']);
+            if (!$post) {
+                $_POST['asin'] = $atts['asin'];
+                $this->importByAsinAction();
+            }
+            $post = getKbAmz()->getProductByAsin($atts['asin']);
+        } else {
+            $post = get_post($atts['postId']);
+        }
+        
+        if (!$post) {
+            throw new Exception('Invalid product, check postId or asin');
+        }
+        $atts['post'] = $post;
+        $atts['meta'] = getKbAmz()->getProductMeta($post->ID);
+        $view = new KbView($atts);
+        $view->setTemplate($this->getTemplatePath('shortCodeProduct'));
         return $view;
     }
 

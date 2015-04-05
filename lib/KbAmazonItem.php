@@ -54,8 +54,7 @@ class KbAmazonItem {
         }
         
         $isValid = false;
-        if (!isset($this->item['ItemAttributes']['Title'])
-        ||  !isset($this->item['ASIN'])) {
+        if (!isset($this->item['ASIN'])) {
            $isValid = false; 
         } else {
             $isValid = true;

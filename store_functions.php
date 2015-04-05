@@ -483,3 +483,45 @@ function kbAmzGetArrayFromFlatten($array, $hasKey)
     
     return $output;
 }
+
+function getKbAmzStoreHealth()
+{
+    $hours = 0;
+    $count = getKbAmz()->getProductsToUpdateCount();
+    if ($count > 0) {
+        $per = getKbAmz()->getOption('updateProductsPriceCronNumberToProcess');
+        $interval = getKbAmz()->getOption('updateProductsPriceCronInterval');
+        $intervals = $count / $per;
+        $intervalHours = 1;
+        if ($interval == 'twicedaily') {
+            $intervalHours = 12;
+        } else if ($interval == 'daily') {
+            $intervalHours = 24;
+        }
+        $hours = ceil($intervals . $intervalHours);
+    }
+    
+    $h = round(($hours / 24) * 100);
+    return $h;
+}
+
+function getKbAmzStoreHealthHtml()
+{
+    $health = getKbAmzStoreHealth();
+    $class = 'danger';
+    if ($health > 80 && $health <= 100) {
+        $class = 'success';
+    } else if ($health > 50 && $health <= 100) {
+        $class = 'warning';
+    }
+    $percent = $health > 100 ? 100 : $health;
+    ob_start();
+    ?>
+    <div class="progress">
+        <div class="progress-bar progress-bar-<?php echo $class;?>" style="width: <?php echo $percent; ?>%;">
+          <?php echo $health; ?>%
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}

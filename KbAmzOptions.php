@@ -36,6 +36,7 @@ function getKbAmzDefaultOptions()
         * DISMISABLE
         */
        'KbAmzV2VariantsMessageSeen'         => false,
+       'AttributesCountMessageSeen'         => false,
    );
    
    $filtered = apply_filters('getKbAmzDefaultOptions', $options);

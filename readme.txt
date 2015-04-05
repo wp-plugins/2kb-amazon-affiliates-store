@@ -36,6 +36,11 @@ This section describes how to install the plugin and get it working.
 == Screenshots ==
 
 == Changelog ==
+= 2.0.0 BETA 3=
+Product Short Code added
+Prices Fixed
+Store Sync Health added
+Layout Update
 = 2.0.0 BETA 2=
 New Import loaded, custom categories are now working.
 Added option to limit Product Versions import on product create. Some books have 100+ versions and it could take much time to import. Now the cron job will finish the import.

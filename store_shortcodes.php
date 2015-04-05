@@ -1,10 +1,28 @@
 <?php
 !defined('ABSPATH') and exit;
 
+// [kb_amz_product]
+function kb_amz_product_func($atts)
+{
+	$atts = shortcode_atts( array(
+        'ID' => null,
+        'asin'   => null,
+	), $atts);
+    $atts['postId'] = $atts['ID'];
+    
+    if (!$atts['postId'] && !$atts['asin']) {
+        return new KbAmzErrorString('[kb_amz_product] - ID or asin parameter is required.');
+    }
+    
+    return getKbAmzAdminController()->shortCodeProductAction($atts);
+}
+
+add_shortcode('kb_amz_product', 'kb_amz_product_func');
+
 // [kb_amz_product_attributes]
 function kb_amz_product_attributes_func($atts) {
 	$atts = shortcode_atts( array(
-            'post_id' => get_the_ID()
+        'postId' => get_the_ID()
 	), $atts);
         
         $shortCodes = getKbAmz()->getShortCodes();
@@ -26,15 +44,11 @@ HTML;
 HTML;
         
         
-        $meta = getKbAmz()->getProductMeta($atts['post_id']);
+        $meta = getKbAmz()->getProductMeta($atts['postId']);
         $attributes = getKbAmz()->getShortCodeAttributes();
         $markup = '';
         foreach ($attributes as $attr => $label) {
             if (isset($meta[$attr]) && !empty($meta[$attr])) {
-                
-                
-                // kb-amz-item-price
-                
                 $markup .= sprintf(
                     $htmlList,
                     strtolower(str_replace('.', '-', $attr)),

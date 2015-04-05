@@ -1,64 +1,63 @@
 <div id="kb-amz-admin" class="<?php echo $this->bodyClass; ?>">
-    <br/>
     <?php
     $params = array();
     $params['page'] = $_GET['page'];
     ?>
     <div id="kb-amz-header">
-        <ul class="nav nav-tabs">
-        <?php
-            $query = array(
-                'page' => $_GET['page'],
-                'kbAction' => $_GET['kbAction']
-            );
-            $i = 0;
-            foreach($this->actions as $action):
-                if (isset($action['pages'])) {
-                    $isActive = false;
-                    $subMenuStr = '';
-                    foreach ($action['pages'] as $page) {
-                        $subPageAction = false;
-                        if (isset($_GET['kbAction']) && $_GET['kbAction'] == $page['action']) {
-                            $isActive = $subPageAction = true;
-                        } 
-                        $subMenuStr .= sprintf(
-                            '<li class="%s"><a href="?%s">%s</a></li>',
-                            $subPageAction ? 'active' : '',
-                            http_build_query(array_merge($query, array('kbAction' => $page['action']))),
-                            $page['label']
+        <nav class="navbar navbar-default">
+            <ul class="nav navbar-nav">
+            <?php
+                $query = array(
+                    'page' => $_GET['page'],
+                    'kbAction' => $_GET['kbAction']
+                );
+                $i = 0;
+                foreach($this->actions as $action):
+                    if (isset($action['pages'])) {
+                        $isActive = false;
+                        $subMenuStr = '';
+                        foreach ($action['pages'] as $page) {
+                            $subPageAction = false;
+                            if (isset($_GET['kbAction']) && $_GET['kbAction'] == $page['action']) {
+                                $isActive = $subPageAction = true;
+                            } 
+                            $subMenuStr .= sprintf(
+                                '<li class="%s"><a href="?%s">%s</a></li>',
+                                $subPageAction ? 'active' : '',
+                                http_build_query(array_merge($query, array('kbAction' => $page['action']))),
+                                $page['label']
+                            );
+                        }
+
+                        echo sprintf(
+                            '<li class="dropdown %s"><a class="dropdown-toggle" data-toggle="dropdown" href="#">%s %s</a><ul class="dropdown-menu">%s</ul></li>',
+                            $isActive ? 'active' : '',
+                            (isset($action['icon']) ? '<span class="glyphicon '.$action['icon'].'"></span>' : ''),
+                            $action['label'],
+                            $subMenuStr
+                        );
+                    } else {
+                        $isActive = false;
+                        if (isset($_GET['kbAction']) && $_GET['kbAction'] == $action['action']) {
+                            $isActive= true;
+                        } else if (!isset($_GET['kbAction']) && ++$i == 1) {
+                            $isActive= true;
+                        }
+                        echo sprintf(
+                            '<li class="%s"><a href="?%s">%s %s</a></li>',
+                            $isActive ? 'active' : '',
+                            http_build_query(array_merge($query, array('kbAction' => $action['action']))),
+                            (isset($action['icon']) ? '<span class="glyphicon '.$action['icon'].'"></span>' : ''),
+                            $action['label']
                         );
                     }
-
-                    echo sprintf(
-                        '<li class="dropdown %s"><a class="dropdown-toggle" data-toggle="dropdown" href="#">%s %s</a><ul class="dropdown-menu">%s</ul></li>',
-                        $isActive ? 'active' : '',
-                        (isset($action['icon']) ? '<span class="glyphicon '.$action['icon'].'"></span>' : ''),
-                        $action['label'],
-                        $subMenuStr
-                    );
-                } else {
-                    $isActive = false;
-                    if (isset($_GET['kbAction']) && $_GET['kbAction'] == $action['action']) {
-                        $isActive= true;
-                    } else if (!isset($_GET['kbAction']) && ++$i == 1) {
-                        $isActive= true;
-                    }
-                    echo sprintf(
-                        '<li class="%s"><a href="?%s">%s %s</a></li>',
-                        $isActive ? 'active' : '',
-                        http_build_query(array_merge($query, array('kbAction' => $action['action']))),
-                        (isset($action['icon']) ? '<span class="glyphicon '.$action['icon'].'"></span>' : ''),
-                        $action['label']
-                    );
-                }
-            endforeach;
-        ?>
-        </ul>
-
+                endforeach;
+            ?>
+            </ul>
+        </nav>
     </div>
 
     <div id="kb-amz-content">
-        <br/>
         <?php
         if (!empty($this->messages)) {
             foreach ($this->messages as $m) {
@@ -114,6 +113,7 @@
                     alert('Unable to connect to the server. Please try again.');
                 });
             });
+            $('[data-toggle="tooltip"]').tooltip()
         });
     })(jQuery, '<?php echo getKbAmzAjaxUrl(); ?>');
 </script>

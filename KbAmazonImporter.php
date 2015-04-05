@@ -389,7 +389,41 @@ class KbAmazonImporter
         getKbAmz()->setCache(self::getCacheItemKey($data->getAsin()), $data);
     }
 
-    /**
+    public function getResponseGroup()
+    {
+        return
+        array(
+            'Large',
+            'Offers',
+            'OfferFull',
+            'OfferSummary',
+            'OfferListings',
+            'PromotionSummary',
+            'Variations',
+            'VariationImages',
+            'VariationSummary',
+            'VariationMatrix',
+            'VariationOffers',
+            'ItemAttributes',
+            'Accessories',
+            'EditorialReview',
+            'SalesRank',
+            'BrowseNodes',
+            'Images',
+            'Similarities',
+            'Reviews',
+            'SearchInside',
+            'PromotionalTag',
+            'AlternateVersions',
+            'Collections',
+            'ShippingCharges',
+            //'RelatedItems',
+            // No access
+            //'ShippingOptions',
+        );
+    }
+
+        /**
      * 
      * @param str $asin
      * @return array|null
@@ -397,35 +431,7 @@ class KbAmazonImporter
     public function find($asin, $responseGroup = false)
     {
         if (!$responseGroup) {
-            $responseGroup = array(
-                'Large',
-                'Offers',
-                'OfferFull',
-                'OfferSummary',
-                'OfferListings',
-                'PromotionSummary',
-                'Variations',
-                'VariationImages',
-                'VariationSummary',
-                'VariationMatrix',
-                'VariationOffers',
-                'ItemAttributes',
-                'Accessories',
-                'EditorialReview',
-                'SalesRank',
-                'BrowseNodes',
-                'Images',
-                'Similarities',
-                'Reviews',
-                'SearchInside',
-                'PromotionalTag',
-                'AlternateVersions',
-                'Collections',
-                'ShippingCharges',
-                //'RelatedItems',
-                // No access
-                //'ShippingOptions',
-            );
+            $responseGroup = $this->getResponseGroup();
         } else {
             $responseGroup = is_array($responseGroup) ? $responseGroup : array($responseGroup);
         }
@@ -448,9 +454,7 @@ class KbAmazonImporter
             try {
                 $result = getKbAmazonApi()
                           ->responseGroup(implode(',', $responseGroup))
-                          ->optionalParameters(array('MerchantId' => 'All'))
                           ->lookup($asin);
-                
             } catch (Exception $e) {
                 if ($sleep) {
                     sleep($sleep);
@@ -584,32 +588,27 @@ class KbAmazonImporter
         $meta['PriceAmount']          = 0;
         $meta['PriceAmountFormatted'] = 0;
         
-//        if (isset($meta['Offers.Offer.OfferListing.Price.FormattedPrice'])) {
-//            $meta['PriceAmount']          = $meta['Offers.Offer.OfferListing.Price.Amount'];
-//            $meta['PriceAmountFormatted'] = $meta['Offers.Offer.OfferListing.Price.FormattedPrice'];
-//        } else {
-//            $sort = array();
-//            foreach ($this->pricePairs as $pair) {
-//                if (isset($meta[$pair[0]])
-//                && isset($meta[$pair[1]])) {
-//                    $sort[] = array(
-//                        'PriceAmountFormatted'  => $meta[$pair[0]],
-//                        'PriceAmount'           => $meta[$pair[1]],
-//                        'order'                 => $meta[$pair[1]],
-//                    );
-//                }
-//            }
-//            if (!empty($sort)) {
-//                usort($sort, 'kbAmzSortOrder');
-//                $pair = $sort[key($sort)];
-//                $meta['PriceAmount']          = $pair['PriceAmount'];
-//                $meta['PriceAmountFormatted'] = $pair['PriceAmountFormatted'];
-//            }
-//        }
-        /**
-         * Old version
-         */
-        if (isset($meta['Offers.Offer.OfferListing.Price.FormattedPrice'])) {
+        //1. OfferSummary.LowestNewPrice.FormattedPrice
+        //2. Offers.Offer.OfferListing.SalePrice.FormattedPrice
+        //3. Offers.Offer.OfferListing.Price.FormattedPrice
+        //4. ItemAttributes.ListPrice.FormattedPrice
+        
+        if (isset($meta['Offers.Offer.OfferListing.SalePrice.FormattedPrice'])) {
+            $meta['PriceAmountFormatted'] = $meta['Offers.Offer.OfferListing.SalePrice.FormattedPrice'];
+            $meta['PriceAmount']          = $meta['Offers.Offer.OfferListing.SalePrice.Amount'];
+        } else if (isset($meta['OfferSummary.LowestNewPrice'])) {
+            $meta['PriceAmountFormatted'] = $meta['OfferSummary.LowestNewPrice.FormattedPrice'];
+            $meta['PriceAmount']          = $meta['OfferSummary.LowestNewPrice.Amount'];
+        } else if (isset($meta['Offers.Offer.OfferListing.Price'])) {
+            $meta['PriceAmountFormatted'] = $meta['Offers.Offer.OfferListing.Price.FormattedPrice'];
+            $meta['PriceAmount']          = $meta['Offers.Offer.OfferListing.Price.Amount'];
+        } else if (isset($meta['ItemAttributes.ListPrice.FormattedPrice'])) {
+            $meta['PriceAmountFormatted'] = $meta['ItemAttributes.ListPrice.FormattedPrice'];
+            $meta['PriceAmount']          = $meta['ItemAttributes.ListPrice.Amount'];
+        } else if (isset($meta['Offers.Offer.OfferListing.Price.FormattedPrice'])) {
+            /**
+             * @TODO CHECK BELOW!
+             */
             $meta['PriceAmount']          = $meta['Offers.Offer.OfferListing.Price.Amount'];
             $meta['PriceAmountFormatted'] = $meta['Offers.Offer.OfferListing.Price.FormattedPrice'];
         } else if (isset($meta['OfferSummary.LowestNewPrice.FormattedPrice'])) {
@@ -628,7 +627,7 @@ class KbAmazonImporter
             $meta['PriceAmountFormatted'] = $meta['OfferSummary.LowestCollectiblePrice.FormattedPrice'];
             $meta['PriceAmount'] = $meta['OfferSummary.LowestCollectiblePrice.Amount'];
         }
-        
+
         $meta['PriceAmount'] = self::paddedNumberToDecial($meta['PriceAmount']);
     }
     
@@ -650,7 +649,7 @@ class KbAmazonImporter
     }
 
 
-    public function saveProduct(KbAmazonItem $item, $isSimilar = false)
+    public function saveProduct(KbAmazonItem $item, $isSimilar = false, $disableEvents = false)
     {
         $postExists = $this->itemExists($item);
         
@@ -659,7 +658,9 @@ class KbAmazonImporter
         $std->postExists    = $postExists;
         $std->item          = $item;
         
-        do_action('KbAmazonImporter::preSaveProduct', $std);
+        if (!$disableEvents) {
+            do_action('KbAmazonImporter::preSaveProduct', $std);
+        }
         
         $postExists         = $std->postId;
         $item               = $std->item;
@@ -806,8 +807,9 @@ class KbAmazonImporter
         $std->item        = $item;
         $std->importer    = $this;
         $std->postExists  = $postExists;
-        
-        do_action('KbAmazonImporter::saveProduct', $std);
+        if (!$disableEvents) {
+            do_action('KbAmazonImporter::saveProduct', $std);
+        }
         
         return array(
             'post_id' => $postId,

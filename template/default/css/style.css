@@ -482,6 +482,39 @@ ul.kb-products-list > li{
     width: 100%;
     z-index: 1000;
 }
+.kb-amz-product-shortcode{
+    border: none!important;
+}
+.kb-amz-product-shortcode td{
+    vertical-align: top;
+}
+.kb-amz-product-header-shortcode{
+    font-size: 10pt;
+    line-height: 1.25;
+    margin: 0 0 5px;
+}
+.kb-amz-product-header-shortcode a{
+    line-height: inherit;
+}
+.kb-amz-product-image-shortcode{
+    max-width: 160px;
+    padding-right: 20px!important;
+}
+.kb-amz-product-image-shortcode img
+{
+    border: none;
+    margin: 0;
+    padding: 0;
+    outline: none;
+}
+.kb-amz-product-shortcode .kb-product-attributes
+{
+    line-height: 1.2;
+}
+.kb-amz-product-shortcode .kb-product-attribute-label
+{
+    font-size: 0.8em;
+}
 /*TB*/
 .row {
     margin-left: -15px;

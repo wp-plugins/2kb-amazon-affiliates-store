@@ -1,0 +1,287 @@
+<div class="row">
+    <div class="col-md-8 text-center">
+        <h4>2kb Amazon Network</h4>
+    </div>
+    <div class="col-md-4 text-center">
+        <h4>Join 2kb Amazon Network</h4>
+    </div>
+</div>
+<hr/>
+<div class="row">
+    <div class="col-md-8" style="max-height: 430px;overflow: auto;">
+        <div id="kb-amz-network-members">
+            <div class="progress progress-striped active">
+                <div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                <span class="sr-only">45% Complete</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 text-center" style="height: 430px;">
+        <form class="" method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
+            <label class="text-left">
+                Your name<br/>
+                <input type="text" name="siteOwnerName" placeholder="Your name" class="form-control" value="<?php echo $this->siteOwnerName; ?>"/>
+            </label>
+            <br/>
+            <label class="text-left">
+                Your email<br/>
+                <input type="text" name="siteOwnerEmail" placeholder="Your email" class="form-control" value="<?php echo $this->siteOwnerEmail; ?>"/>
+            </label>
+            <br/>
+            <label class="text-left">
+                Site name<br/>
+                <input type="text" name="siteName" placeholder="Your site name" class="form-control" value="<?php echo $this->siteName; ?>"/>
+            </label>
+            <br/>
+            <label class="text-left">
+                Site url<br/>
+                <input type="text" name="siteUrl" placeholder="Your site name" class="form-control" value="<?php echo $this->siteUrl; ?>" disabled="disabled"/>
+            </label>
+            <br/>
+            <label class="text-left">
+                Site info<br/>
+                <textarea name="siteInfo" placeholder="Your site info" class="form-control" rows="3"><?php echo $this->siteInfo; ?></textarea>
+            </label>
+            <br/>
+            <label class="text-left">
+                <?php if ($this->canLeave) : ?>
+                    <button type="submit" class="btn btn-success" name="submit" value="join">Update</button>
+                    <button type="submit" class="btn btn-danger pull-right" name="submit" value="leave">Leave</button>
+                <?php else: ?>
+                    <button type="submit" class="btn btn-success" name="submit" value="join">Join</button>
+                <?php endif; ?>
+            </label>
+        </form>
+    </div>
+</div>
+<hr/>
+<div>
+    <div id="error" role="alert" class="alert alert-danger" style="display: none;">
+        <strong>Error</strong> connectiong to the 2kb Amazon Network. Reload the page and try again.
+    </div>
+    <div class="text-center">
+        <button id="start-sync" type="button" class="btn btn-success btn-lg" <?php echo $this->canLeave ? '' : 'disabled';?>>
+            <?php echo $this->canLeave ? 'Start 2kb Amazon Store Synchronization' : 'Join 2kb Amazon Network to Start';?>
+        </button>
+    </div>
+    <br/>
+    <div id="stats" class="text-center">
+        <span class="label label-default">Downloaded: <span class="val stats-to-downladed">0</span></span>
+        <span class="label label-default">Updated to WP: <span class="val stats-imported">0</span></span>
+        <span class="label label-default">Total to Sync: <span class="val stats-total-to-sync"><?php echo getKbAmz()->getProductsToUpdateCount();?></span></span>
+        <span class="label label-default">Requests: <span class="val stats-to-requests">0</span></span>
+    </div>
+    <br/>
+    <div id="sync-container">
+        
+    </div>
+</div>
+
+<script>
+    (function($, url, store) {
+        var $std                    = $('.stats-to-downladed');
+        var $str                    = $('.stats-to-requests');
+        
+        var productsLeft            = 0;
+        var productsToSyncAtOnce    = 10;
+        var productsToImportAtOnce  = 20;
+        var serviceRestingTime      = 5000;
+        
+        var network = new function Network()
+        {
+            var self                = this;
+            var interval            = null;
+            var services            = [];
+            var loadingProducts     = false;
+            var productsToImport    = [];
+            var isImportingProducts = false;
+            
+            this.startSync = function (data)
+            {
+                services = [];
+                for (var i in data) {
+                    var row = data[i];
+                    row.id   = (new Date()).getTime();
+                    row.time = row.id;
+                    row.used = false;
+                    services.push(row);
+                }
+                loadProducts();
+            };
+            
+            function importProduct(item, asin)
+            {
+                $std.html(parseInt($std.html()) + 1);
+                productsToImport.push({asin : asin, item : item});
+                var products = productsToImport;
+                if (isImportingProducts || products.length < productsToImportAtOnce) {
+                    return;
+                }
+                
+                isImportingProducts = true;
+                productsToImport = [];
+                $str.html(parseInt($str.html()) + 1);
+                
+                $.ajax({
+                    type: "POST",
+                    url : url,
+                    data: {
+                        'action' : 'kbAmzNetworkImportProduct',
+                        'items'   : products
+                    }
+                }).done(function(data) {
+                    $.each(products, function (key, val) {
+                        $('.kb-amz-product-sync[data-asin="'+val.asin+'"]').remove();
+                    }); 
+                }).error(function(){
+                    $.each(products, function (key, val) {
+                        $('.kb-amz-product-sync[data-asin="'+val.asin+'"]').remove();
+                    });
+                }).always(function () {
+                    isImportingProducts = false;
+                    //$e.remove();
+                });
+            }
+            
+            function productSync()
+            {
+                var $els = $('.kb-amz-product-sync[data-asin]:not(.loading)');
+                if ($els.size() === 0) {
+                    clearInterval(interval);
+                } else if ($els.size() < 50 && !loadingProducts) {
+                    loadProducts();
+                    loadingProducts = true;
+                }
+                var $e = $els.first();
+                var asin         = $e.data('asin');
+                var service      = getService();
+                if (!service) {
+                    return;
+                }
+                service.used     = true;
+                setService(service);
+                $e.addClass('loading');
+                var url = service.siteUrl;
+                url = url + (url.indexOf('?') === -1 ? '?' : '&') + 'kbAction=KbAmzNetworkGetProduct'
+                $.ajax({
+                    type: "GET",
+                    url: service.siteUrl,
+                    data: {
+                        kbAction : 'KbAmzNetworkGetProduct',
+                        asin     : asin
+                    },
+                    dataType: 'jsonp'
+                }).done(function (data) {
+                    if (data && data['success']) {
+                        importProduct(data.item, asin);
+                    } else {
+                        $e.remove();
+                    }
+                }).error(function () {
+                    $e.remove();
+                }).always(function () {
+                    service.used = false;
+                    setService(service);
+                    $str.html(parseInt($str.html()) + 1);
+                });
+            }
+            
+            function allSync()
+            {
+                if (interval) {
+                    return;
+                }
+                
+                interval =
+                setInterval(function () {
+                    productSync();
+                }, 60);
+                
+            }
+            
+            function loadProducts()
+            {
+                $.ajax({
+                    type: "POST",
+                    url : url,
+                    data: {
+                        'action' : 'kbAmzNetworkGetProductsToSync'
+                    }
+                }).done(function(data) {
+                    $('#sync-container').append(data);
+                    allSync();
+                    loadingProducts = false;
+                }).error(function(){
+                    setTimeout(function () {
+                        loadProducts();
+                    }, 1000);
+                });
+            }
+            
+            function getService()
+            {
+                services.sort(function (a,b) {
+                    if (a.time < b.time)
+                       return -1;
+                    if (a.time > b.time)
+                      return 1;
+                    return 0;
+                });
+                
+                for (var i in services) {
+                    if (!services[i].used && services[i].time + serviceRestingTime < (new Date()).getTime()) {
+                        services[i].time = (new Date()).getTime();
+                        return services[i];
+                    }
+                }
+            }
+            
+            function setService(s)
+            {
+                for (var i in services) {
+                    if (services[i].id === s.id) {
+                        services[i] = s;
+                        return;
+                    }
+                }
+            }
+        };
+        
+        
+        
+
+        
+        
+        $('#start-sync').click(function () {
+            $.ajax({
+                type: "GET",
+                url: 'http://www.2kblater.com/?2kbProductsApiAction=networkMembers&apiKey=' + store,
+                dataType: 'jsonp'
+            }).done(function (data) {
+                if (!data || !data['services']) {
+                    $('#error').show();
+                } else {
+                    network.startSync(data['services']);
+                }
+            }).error(function () {
+                $('#error').show();
+            });
+        });
+        
+        
+        $(function() {
+            $.ajax({
+                type: "POST",
+                url : url,
+                data: {
+                    'action' : 'kbAmzNetworkMembers'
+                }
+            }).done(function(data) {
+                $('#kb-amz-network-members').html(data);
+            }).error(function(){
+                // alert('Unable to connect to the server. Please try again.');
+            });
+        });
+    })(jQuery, '<?php echo getKbAmzAjaxUrl(); ?>', '<?php echo getKbAmz()->getStoreId()?>');
+</script>

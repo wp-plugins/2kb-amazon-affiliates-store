@@ -22,6 +22,25 @@ function kb_amz_admin_menu()
 /**
  * CRONS
  */
+if (!wp_next_scheduled('kbAmzSyncNetwork') ) {
+    wp_schedule_event(
+        time(),
+        86400,
+        'kbAmzSyncNetwork'
+    );
+}
+add_action('kbAmzSyncNetwork', 'kbAmzSyncNetworkFunction');
+
+function kbAmzSyncNetworkFunction()
+{
+    $data = getKbAmz()->getOption('siteNetwork');
+    if (!empty($data) && $data['siteActive']) {
+        $api = new KbAmzApi(getKbAmz()->getStoreId());
+        $data['siteHealth'] = getKbAmzStoreHealth();
+        $api->setUser($data);
+    }
+}
+
 if (!wp_next_scheduled('kbAmzDownloadProductsCron') ) {
     wp_schedule_event(
         time(),
@@ -29,7 +48,6 @@ if (!wp_next_scheduled('kbAmzDownloadProductsCron') ) {
         'kbAmzDownloadProductsCron'
     );
 }
-
 add_action('kbAmzDownloadProductsCron', 'kbAmzDownloadProductsCronFunction');
 
 function kbAmzDownloadProductsCronFunction($execute = false)
@@ -150,8 +168,6 @@ if (isset($_GET['kbAction'])
         die('Kb Amz Update Cron Done. ' . date('Y-m-d H:i:s'));
     }
 }
-
-
 
 
 /**
@@ -309,4 +325,44 @@ function kbAmzPostsPageFilters($query)
     }
     
     return $query;
+}
+
+
+if (isset($_GET['kbAction'])
+&& $_GET['kbAction'] == 'KbAmzNetworkGetProduct'
+&& isset($_GET['asin'])) {
+    
+    add_action('init', 'kbAmzTriggerManualUpdateCronJobs');
+    function kbAmzTriggerManualUpdateCronJobs()
+    {
+        $response = array();
+        $asin     = $_GET['asin'];
+        $responseGroup = array(
+            'Offers',
+            'OfferFull',
+            'OfferSummary',
+            'OfferListings',
+        );
+        try {
+            $importer = new KbAmazonImporter;
+            $result = getKbAmazonApi()
+                      ->responseGroup(implode(',', $responseGroup))
+                      ->lookup($asin);
+            $item   = new KbAmazonItem($result);
+            $response['item']    = $item->isValid() ? base64_encode(serialize($item)) : null;
+            $response['success'] = $item->isValid();
+        } catch (Exception $e) {
+            $response['success'] = false;
+            $response['error']   = $e->getMessage();
+            getKbAmz()->addException('Newtwork Product Fetch', $e->getMessage());
+        }
+        echo sprintf(
+            ';%s%s(%s);',
+            PHP_EOL,
+            $_GET['callback'],
+            json_encode($response)
+        );
+        http_response_code(200);
+        die;
+    }
 }

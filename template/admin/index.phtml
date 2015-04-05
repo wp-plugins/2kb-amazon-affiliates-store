@@ -6,6 +6,26 @@
         <b><a href="?<?php echo http_build_query(array_merge($_GET, array('kbAction' => 'info')))?>#variants">Check the docs</a></b>
     </div>
 <?php endif; ?>
+
+<?php if (!getKbAmz()->getOption('AttributesCountMessageSeen') && count(getKbAmz()->getOption('productAttributes')) < 5) : ?>
+    <div class="alert alert-warning" role="alert">
+        <button aria-label="Close" data-dismiss="alert" class="close" type="button" data-option="AttributesCountMessageSeen" data-option-value="1"><span aria-hidden="true">×</span></button>
+        Your products show only
+        <?php
+        $count = count(getKbAmz()->getOption('productAttributes'));
+        echo sprintf(
+            '%s %s.',
+            $count,
+            $count == 1 ? 'Attribute' : 'Attributes'
+        );
+        ?>
+        Consider adding more attributes for better selling performance.
+        <b><a href="?<?php echo http_build_query(array_merge($_GET, array('kbAction' => 'productsAttributes')))?>">Add more attributes</a></b>
+    </div>
+<?php endif; ?>
+
+
+
 <div class="row homepage">
     <div class="col-sm-3">
         <img src="<?php echo getKbPluginUrl(); ?>/template/admin/img/2kb-amazon-affiliate-product-logo.png" />
@@ -14,22 +34,22 @@
         <div class="row">
             <div class="col-sm-12" style="font-size: 16px;">
                 <div>
-                    <span class="label label-info">
-                        <span class="glyphicon glyphicon-usd"></span> Products:
+                    <span class="label label-primary" title="Products" data-toggle="tooltip" data-placement="top">
+                        <span class="glyphicon glyphicon-usd"></span>
                         <?php echo getKbAmz()->getProductsCount(); ?>
                     </span>
-                    &nbsp;&nbsp;
-                    <span class="label label-info">
-                        <span class="glyphicon glyphicon-download-alt"></span> To Download:
+                    &nbsp;
+                    <span class="label label-primary" title="Products to download" data-toggle="tooltip" data-placement="top">
+                        <span class="glyphicon glyphicon-download-alt"></span>
                         <?php echo getKbAmz()->getProductsToDownloadCount(); ?>
                     </span>
-                    &nbsp;&nbsp;
-                    <span class="label label-info">
-                        <span class="glyphicon glyphicon-refresh"></span> To Update:
+                    &nbsp;
+                    <span class="label label-primary" title="Products to update" data-toggle="tooltip" data-placement="top">
+                        <span class="glyphicon glyphicon-refresh"></span>
                         <?php echo getKbAmz()->getProductsToUpdateCount(); ?>
                     </span>
-                    &nbsp;&nbsp;
-                    <span class="label label-info">
+                    &nbsp;
+                    <span class="label label-primary" title="Time to update" data-toggle="tooltip" data-placement="top">
                         <?php
                         $hours = 0;
                         $count = getKbAmz()->getProductsToUpdateCount();
@@ -47,22 +67,25 @@
                         }
 
                         ?>
-                        <span class="glyphicon glyphicon-time"></span> Time To Update:
+                        <span class="glyphicon glyphicon-time"></span>
                         <?php echo $hours; ?>h
                     </span>
-                    &nbsp;&nbsp;
-                    <span class="label label-info">
-                        <span class="glyphicon glyphicon-repeat"></span> Requests/Avg. Time:
+                    &nbsp;
+                    <span class="label label-primary" title="Requests/Avg. Time" data-toggle="tooltip" data-placement="top">
+                        <span class="glyphicon glyphicon-signal"></span>
                         <?php echo getKbAmz()->getOption('AmazonRequests', 1); ?>
                         /
                         <?php echo getKbAmz()->getOption('averageTimeToFetch', 1) * 1000; ?>ms
                     </span>
-                </div>
-                <div>
-                    <span class="label label-info">
-                        <span class="glyphicon glyphicon-time"></span> Cron Last Run:
+                    &nbsp;
+                    <span class="label label-primary" title="Cron last run" data-toggle="tooltip" data-placement="top">
+                        <span class="glyphicon glyphicon-time"></span>
                         <?php echo getKbAmz()->getOption('LastCronRun', '-'); ?>
                     </span>
+                    &nbsp;
+                    <div title="Amazon Sync Health" data-toggle="tooltip" data-placement="top" style="width: 100px;display: inline-block;margin-bottom: 0px;vertical-align: middle;">
+                        <?php echo getKbAmzStoreHealthHtml();?>
+                    </div>
                 </div>
                 <br/>
             </div>
@@ -221,20 +244,54 @@
         $tips[] = 'Did you know that you can check the values of all product attributes from <a href="?'.http_build_query(array_merge($_GET, array('kbAction' => 'productsExplodeAttributes'))).'">Explore Attributes</a>.';
         $tips[] = 'Every variant is inserted as new post (the same as none variable products). Product with 3 Sizes and 8 Colors will result in inserting 25 posts.(1st the main product and 3x8 Variants)';
         $tips[] = 'From where to get ASIN. <a href="?'.http_build_query(array_merge($_GET, array('kbAction' => 'info'))).'#get-asin">Click here to find</a>.';
+        ?>
         
+        <?php if (count(getKbAmz()->getOption('productAttributes')) < 5) : ?>
+            <?php ob_start();?>
+            Your products show only
+            <?php
+            $count = count(getKbAmz()->getOption('productAttributes'));
+            echo sprintf(
+                '%s %s.',
+                $count,
+                $count == 1 ? 'Attribute' : 'Attributes'
+            );
+            ?>
+            Consider adding more attributes for better selling performance.
+            <b><a href="?<?php echo http_build_query(array_merge($_GET, array('kbAction' => 'productsAttributes')))?>">Add more attributes</a></b>
+            <?php
+            $tips[] = ob_get_clean();
+            ?>
+        <?php endif; ?>
+
+        
+        <?php
         if (!empty($tips)) {
             $tip = $tips[rand(0, count($tips) - 1)];
             echo '<div class="alert alert-info" role="alert"><span aria-hidden="true" class="glyphicon glyphicon-heart-empty"></span> '.$tip.'</div>';
         }
         ?>
-<!--        <div class="row icons-actions">
-            <div class="col-md-3">
-                <a href="?<?php echo http_build_query(array_merge($_GET, array('kbAction' => 'createStorePage')));?>" class="btn btn-default">
-                    <span aria-hidden="true" class="glyphicon glyphicon-home" style="font-size: 50px;display: block;"></span>
-                    Create Store Page
-                </a>
-            </div>
-        </div>-->
+        <div class="icons-actions">
+<!--            <a href="?<?php echo http_build_query(array_merge($_GET, array('kbAction' => 'createStorePage')));?>" class="btn btn-default">
+                <span aria-hidden="true" class="glyphicon glyphicon-home" style="font-size: 50px;display: block;"></span>
+                Create Store Page
+            </a>
+            &nbsp;-->
+            <?php
+            $siteNetwork = getKbAmz()->getOption('siteNetwork');
+            $joined      = isset($siteNetwork['siteActive']) && $siteNetwork['siteActive'];
+            ?>
+            <a href="?<?php echo http_build_query(array_merge($_GET, array('kbAction' => 'network')));?>" class="btn btn-default" title="<?php echo !$joined ? 'Join to 2kb Amazon Network' : 'Joined to 2kb Amazon Network';?>" data-toggle="tooltip" data-placement="bottom">
+                <span aria-hidden="true" class="glyphicon glyphicon-globe" style="font-size: 50px;display: block;"></span>
+                2kb Amazon Network<br/>(beta, tests only)
+                <?php
+                echo sprintf(
+                    '<span class="kb-amz-icon-action-dot %s">&nbsp;</span>',
+                    $joined ? 'active' : 'not-active'
+                );
+                ?>
+            </a>
+        </div>
     </div>
 </div>
 

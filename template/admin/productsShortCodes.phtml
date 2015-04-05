@@ -18,13 +18,20 @@
                         <?php
                             $params = array();
                             foreach ($code['params'] as $nameParamName => $avaialbe) {
-                                $params[] = $nameParamName . '="'.$avaialbe.'"';
+                                if ($nameParamName) {
+                                    $params[] = $nameParamName . '="'.$avaialbe.'"';
+                                } else {
+                                    $params[] = $avaialbe;
+                                }
+                                
                             }
                             echo implode(' ', $params);
                         ?>
                     </td>
                     <td>
+                        <?php if ($code['active'] !== null) : ?>
                         <input type="checkbox" value="1" name="<?php echo $name; ?>[active]" <?php echo $code['active'] ? 'checked="checked"' : '';?>/>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

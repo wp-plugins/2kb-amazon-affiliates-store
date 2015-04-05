@@ -1,0 +1,17 @@
+<?php
+//if (empty($this->products)) {
+//    return;
+//}
+?>
+
+
+<?php
+foreach ($this->products as $asin => $product)
+{
+    echo sprintf(
+        '<div class="kb-amz-product-sync" data-asin="%s">%s%s</div>',
+        $asin,
+        getKbAmz()->getProductImages($product->ID)->getFirst($this->size),
+        $asin
+    );
+}

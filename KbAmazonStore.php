@@ -107,7 +107,16 @@ class KbAmazonStore
                 'height' => '<b>300px</b> / any valid css value',
             ),
             'active' => false,
-        ) 
+        ),
+        'product' => array(
+            'code' => 'kb_amz_product',
+            'params' => array(
+                ''              => '<span class="label label-success">NEW</span>',
+                'asin'          => 'Use asin or post id',
+                'ID'            => 'Use post id or asin'
+            ),
+            'active' => null,
+        ),
     );
 
     /**
