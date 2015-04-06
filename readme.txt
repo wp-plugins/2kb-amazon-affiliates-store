@@ -36,6 +36,8 @@ This section describes how to install the plugin and get it working.
 == Screenshots ==
 
 == Changelog ==
+= 2.0.0 BETA 4=
+php < 5.3 bug fix
 = 2.0.0 BETA 3=
 Product Short Code added
 Prices Fixed

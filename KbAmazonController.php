@@ -610,7 +610,7 @@ class KbAmzAdminController {
     {
         $response = array();
         try {
-            $imported = [];
+            $imported = array();
             foreach ($_POST['items'] as $itemData) {
                 $item = unserialize(base64_decode($itemData['item']));
                 $importer = new KbAmazonImporter;
