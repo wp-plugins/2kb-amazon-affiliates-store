@@ -7,16 +7,13 @@ class KbAmazonItems
     protected $result;
     protected $items = array();
     
-    public function __construct($result, $cache = false)
+    public function __construct($result)
     {
         $this->result = $result;
         if ($this->isValid() && isset($result['Items']['Item'])) {
             foreach ($result['Items']['Item'] as $item) {
                 $item = new KbAmazonItem(array('Items' => array('Item' => $item)));
                 $this->items[] = $item;
-                if ($cache) {
-                    KbAmazonImporter::cacheItem($item);
-                }
             }
         }
     }

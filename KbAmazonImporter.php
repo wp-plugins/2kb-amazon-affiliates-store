@@ -471,7 +471,7 @@ class KbAmazonImporter
                   ->search($search, $nodeId);
         
         $this->countAmazonRequest();
-        return new KbAmazonItems($result, true);
+        return new KbAmazonItems($result);
     }
 
     public function import($asins, $isSimilar = false)
