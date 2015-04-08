@@ -9,7 +9,7 @@
             <?php
                 $query = array(
                     'page' => $_GET['page'],
-                    'kbAction' => $_GET['kbAction']
+                    'kbAction' => isset($_GET['kbAction']) ? $_GET['kbAction'] : 'home'
                 );
                 $i = 0;
                 foreach($this->actions as $action):

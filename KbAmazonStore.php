@@ -1129,19 +1129,26 @@ HTML;
         $wpdb->query($sql);
     }
     
-    public function getProductsWithNoQuantity()
+    public function getProductsWithNoQuantity($count = false)
     {
         global $wpdb;
-        
+        $select = 't.ID';
+        if ($count) {
+            $select = 'COUNT(DISTINCT t.ID) AS count';
+        }
         $sql = "
-           SELECT t.ID
+           SELECT $select
            FROM $wpdb->posts AS t
            JOIN $wpdb->postmeta AS t1 ON t.ID = t1.post_id AND t1.meta_key = 'KbAmzOfferSummary.TotalNew'
            WHERE t.post_status ='pending' AND t1.meta_value <= 0
            ORDER BY t.post_modified ASC
         ";
         
-        return $this->getSqlResult($sql);
+        $result = $this->getSqlResult($sql);
+        if ($count) {
+            $result = isset($result[0]->count) ? $result[0]->count : 0;
+        }
+        return $result;
     }
 
     public function getProductsCount()
@@ -1366,17 +1373,27 @@ HTML;
     }
 
 
-    public function getProductsAsinsToUpdate($limit = null)
+    public function getProductsAsinsToUpdate($limit = null, $haveParents = true, $notAsins = array())
     {
         global $wpdb;
         $add = getKbAmz()->getOption('uproductsUpdateOlderThanHours', KbAmazonImporter::SECONDS_BEFORE_UPDATE);
-        $time = time();// - $add;
+        $time = time() - $add;
         $sqlLimit = $limit === null ? '' : ' LIMIT ' . intval($limit);
+        $where = '';
+        if (!$haveParents) {
+            $where = ' AND t.post_parent = 0 ';
+        }
+        
+        if (!empty($notAsins)) {
+            $where .= " AND t1.meta_value NOT IN('".implode("','", $notAsins)."') ";
+        }
+        
         $sql = "
            SELECT t1.meta_value AS asin
            FROM $wpdb->posts AS t
            JOIN $wpdb->postmeta AS t1 ON t.ID = t1.post_id AND t1.meta_key = 'KbAmzASIN'
            WHERE t.post_modified < '".date('Y-m-d H:i:s', $time)."'
+           $where
            ORDER BY t.post_modified ASC
            $sqlLimit
         ";
@@ -1422,6 +1439,8 @@ HTML;
 
     public function getCache($key)
     {
+        $key = $this->getCacheKey($key);
+        
         if (isset($_SESSION['2kb-amazon-affiliates-store']['cache'])) {
             if (!is_array($_SESSION['2kb-amazon-affiliates-store']['cache'])) {
                 $_SESSION['2kb-amazon-affiliates-store']['cache']
@@ -1432,25 +1451,28 @@ HTML;
             }
         }
         
-        $key = sha1($key);
-        return wp_cache_get($key, 'kb-amz-' . KbAmazonDropShipManagerNumber);
+        return wp_cache_get($key, 'kb-amz-' . KbAmazonVersion);
     }
     
     public function setCache($key, $data)
     {
-        $key = sha1($key);
+        $key  = $this->getCacheKey($key);
         $data = empty($data) ? null : $data;
-        
         if (isset($_SESSION['2kb-amazon-affiliates-store']['cache'])) {
             if (!is_array($_SESSION['2kb-amazon-affiliates-store']['cache'])) {
                 $_SESSION['2kb-amazon-affiliates-store']['cache']
                 = unserialize($_SESSION['2kb-amazon-affiliates-store']['cache']);
             }
-             $_SESSION['2kb-amazon-affiliates-store']['cache'][$key] = $data;
+            $_SESSION['2kb-amazon-affiliates-store']['cache'][$key] = $data;
         }
-        wp_cache_set($key, $data, 'kb-amz-' . KbAmazonDropShipManagerNumber, $this->getOption('cacheTtl'));
+        wp_cache_set($key, $data, 'kb-amz-' . KbAmazonVersion, $this->getOption('cacheTtl'));
     }
     
+    public function getCacheKey($str)
+    {
+        return sha1('kb-amz-' . $str . KbAmazonVersion);
+    }
+
     public function removeFromAjaxCart()
     {
         $response = array(

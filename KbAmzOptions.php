@@ -26,7 +26,7 @@ function getKbAmzDefaultOptions()
        'deleteProductOnNoQuantity'          => false,
        'sendStatsData'                      => false,
        'showStatsDataJoinModal'             => true,
-       'amazonApiRequestDelay'              => 5,
+       'amazonApiRequestPerSec'             => 1,
        'allowVariants'                      => false,
        'showVariantsInListing'              => true,
        'cacheTtl'                           => 1800,

@@ -1,3 +1,7 @@
+<div role="alert" class="alert alert-info">
+    Before start using Start 2kb Amazon Store Synchronization, keep in mind that we need 100+ members to have fast sync.
+</div>
+
 <div class="row">
     <div class="col-md-8 text-center">
         <h4>2kb Amazon Network</h4>
@@ -44,14 +48,16 @@
                 <textarea name="siteInfo" placeholder="Your site info" class="form-control" rows="3"><?php echo $this->siteInfo; ?></textarea>
             </label>
             <br/>
-            <label class="text-left">
+            <div class="text-left" style="width: 300px;margin: 0 auto;">
                 <?php if ($this->canLeave) : ?>
                     <button type="submit" class="btn btn-success" name="submit" value="join">Update</button>
-                    <button type="submit" class="btn btn-danger pull-right" name="submit" value="leave">Leave</button>
+                    <button type="submit" class="btn btn-danger pull-right" name="submit" value="leave" <?php echo$this->joined + 86000 < time() ? '' : 'disabled';?>>
+                        <?php echo$this->joined + 86000 < time() ? 'Leave' : 'You can leave 1 day after join'?>
+                    </button>
                 <?php else: ?>
                     <button type="submit" class="btn btn-success" name="submit" value="join">Join</button>
                 <?php endif; ?>
-            </label>
+            </div>
         </form>
     </div>
 </div>

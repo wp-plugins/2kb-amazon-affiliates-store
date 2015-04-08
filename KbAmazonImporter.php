@@ -16,8 +16,12 @@ class KbAmazonImporter
     const SECONDS_BEFORE_UPDATE = 86400;
     
     protected $lastApiRequestTime;
-    protected $apiRequestSleep;
-    
+    protected $requestPerSec;
+    protected $requests     = array();
+    protected $request      = array();
+    protected $requestKey   = '';
+
+
     protected $requiredParams = array(
         // AMZ ARRAY WP ATTR
         'ASIN' => 'ASIN'
@@ -261,59 +265,39 @@ class KbAmazonImporter
             
         )
     );
-    
-    protected $pricePairs = array(
-        array(
-            'OfferSummary.LowestNewPrice.FormattedPrice',
-            'OfferSummary.LowestNewPrice.Amount',
-        ),
-        array(
-            'OfferSummary.LowestNewPrice.FormattedPrice',
-            'OfferSummary.LowestNewPrice.Amount',
-        ),
-        array(
-            'ItemAttributes.ListPrice.FormattedPrice',
-            'ItemAttributes.ListPrice.Amount',
-        ),
-        array(
-            'OfferSummary.LowestRefurbishedPrice.FormattedPrice',
-            'OfferSummary.LowestRefurbishedPrice.Amount',
-        ),
-        array(
-            'OfferSummary.LowestUsedPrice.FormattedPrice',
-            'OfferSummary.LowestUsedPrice.Amount',
-        ),
-        array(
-            'OfferSummary.LowestCollectiblePrice.FormattedPrice',
-            'OfferSummary.LowestCollectiblePrice.Amount',
-        ),
-        array(
-            'Offers.Offer.OfferListing.Price.FormattedPrice',
-            'Offers.Offer.OfferListing.Price.Amount',
-        ),
-        array(
-            'VariationSummary.LowestPrice.FormattedPrice',
-            'VariationSummary.LowestPrice.Amount',
-        ),
-        array(
-            'VariationSummary.HighestPrice.FormattedPrice',
-            'VariationSummary.HighestPrice.Amount',
-        ),
-        array(
-            'Offers.Offer.OfferListing.SalePrice.FormattedPrice',
-            'Offers.Offer.OfferListing.SalePrice.Amount',
-        ),
-        array(
-            'VariationSummary.LowestSalePrice.FormattedPrice',
-            'VariationSummary.LowestSalePrice.Amount',
-        ),   
-    );
 
     public function __construct()
     {
-        $this->setApiRequestSleep(getKbAmz()->getOption('amazonApiRequestDelay'));
+        add_action('shutdown', array($this, 'saveRequests'));
+        $this->requestPerSec = getKbAmz()->getOption('amazonApiRequestPerSec');
+        
+        $requests = getKbAmz()->getOption('amazonApiRequests', array());
+        $key      = $this->requestKey = date('YmdH');
+        
+        if (empty($requests) || !isset($requests[$key])) {
+            $requests = array(
+                $key => array(
+                    'perSec'    => $this->requestPerSec,
+                    'count'     => 0,
+                    'lastRun'   => microtime(true) - 1 / $this->requestPerSec,
+                    'limit'     => $this->requestPerSec * 3600
+                )
+            );
+        }
+        
+        $this->request  = $requests[$key];
     }
     
+    public function saveRequests()
+    {
+        getKbAmz()->setOption(
+            'amazonApiRequests',
+            array(
+                $this->requestKey => $this->request
+            )
+        );
+    }
+
     /**
      * 
      * @param type $sleep
@@ -379,15 +363,6 @@ class KbAmazonImporter
         return $cats;
     }
     
-    public static function getCacheItemKey($asin)
-    {
-        return 'kbAmzStoreFind' . $asin;
-    }
-    
-    public static function cacheItem(KbAmazonItem $data)
-    {
-        getKbAmz()->setCache(self::getCacheItemKey($data->getAsin()), $data);
-    }
 
     public function getResponseGroup()
     {
@@ -437,33 +412,23 @@ class KbAmazonImporter
         }
 
         
-        $key = $this->getCacheItemKey($asin);
+        $key = $asin . serialize($responseGroup);
         if (!$data = getKbAmz()->getCache($key)) {
-            $sleep = $this->apiRequestSleep;
-            if ($sleep) {
-                if (!$this->lastApiRequestTime) {
-                    $this->lastApiRequestTime = time();
-                } else if ($this->lastApiRequestTime + $sleep > time()) {
-                    sleep($this->lastApiRequestTime + $sleep - time());
-                }
-                $this->lastApiRequestTime = time();
+            $time = microtime(true);
+            if ($this->request['lastRun'] + 1 / $this->requestPerSec > $time) {
+                sleep(1);
             }
+            
+            $this->request['count'] = $this->request['count'] + 1;
             
             $this->countAmazonRequest();
-            $time = microtime(true);
-            try {
-                $result = getKbAmazonApi()
-                          ->responseGroup(implode(',', $responseGroup))
-                          ->lookup($asin);
-            } catch (Exception $e) {
-                if ($sleep) {
-                    sleep($sleep);
-                    return $this->find($asin);
-                }
-                throw $e;
-            }
 
+            $result = getKbAmazonApi()
+                      ->responseGroup(implode(',', $responseGroup))
+                      ->lookup($asin);
             
+            $this->request['lastRun'] = microtime(true);
+            $this->saveRequests();
             /**
              * STATS
              */
@@ -477,8 +442,10 @@ class KbAmazonImporter
              * STATS END
              */
             $data = new KbAmazonItem($result);
-            self::cacheItem($data);
+            getKbAmz()->setCache($key, $data);
+            
         }
+        
         if (!$data instanceof KbAmazonItem) {
             $data = new KbAmazonItem(array('ASIN' => $asin));
         } else if (!$data->isValid()) {
@@ -807,15 +774,19 @@ class KbAmazonImporter
         $std->item        = $item;
         $std->importer    = $this;
         $std->postExists  = $postExists;
+        $std->return      = array(
+            'post_id'     => $postId,
+            'updated'     => (bool) $postExists,
+            'error'       => null,
+            'children'    => array()
+        );
+        
+        
         if (!$disableEvents) {
             do_action('KbAmazonImporter::saveProduct', $std);
         }
         
-        return array(
-            'post_id' => $postId,
-            'updated' => (bool) $postExists,
-            'error' => null
-        );
+        return $std->return;
     }
     
     public function checkAvailableAction($postId, &$deleted = false)

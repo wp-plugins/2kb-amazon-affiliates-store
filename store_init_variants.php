@@ -120,6 +120,7 @@ function kbAmzVariantsProductpreSaveAlternateVersions($std)
         $versionItem->setPostParent($postId);
         $saveResult = $importer->saveProduct($versionItem);
         $importer->updateProductPostMeta($meta, $saveResult['post_id']);
+        $std->result['children'][] = $postId;
     }
     
     $importer->updateProductPostMeta($meta, $postId);
@@ -159,7 +160,6 @@ function kbAmzVariantsProductSave($std)
     || empty($parentItem['Variations'])) {
         return;
     }
-    
     $variations = $parentItem['Variations'];
     $items      = $variations['Item'];
     unset($parentItem['Variations'], $variations['Item']);
@@ -203,6 +203,7 @@ function kbAmzVariantsProductSave($std)
         $saveResult = $importer->saveProduct($variantItem);
         if (isset($saveResult['post_id'])
         && $saveResult['post_id']) {
+            $std->result['children'][] = $saveResult['post_id'];
             wp_update_post(
                 array(
                     'ID'            => $saveResult['post_id'],

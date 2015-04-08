@@ -36,6 +36,9 @@ This section describes how to install the plugin and get it working.
 == Screenshots ==
 
 == Changelog ==
+= 2.0.0 BETA 5=
+Manu important fixes.
+List with full changes will be added on realise.
 = 2.0.0 BETA 4=
 php < 5.3 bug fix
 = 2.0.0 BETA 3=

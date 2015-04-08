@@ -278,8 +278,8 @@ class KbAmzAdminController {
         if (isset($_POST['amazon']) && !empty($_POST['amazon'])) {
             getKbAmz()->setOptions(
                 array(
-                    'amazonApiRequestDelay' => $_POST['amazonApiRequestDelay'],
-                    'amazon'                => $_POST['amazon']
+                    'amazonApiRequestPerSec' => $_POST['amazonApiRequestPerSec'],
+                    'amazon'                 => $_POST['amazon']
                 )
             );
 //            try {
@@ -498,8 +498,7 @@ class KbAmzAdminController {
         } else {
             $this->messages[] = array(__('Full post data delete may be slow. Expect to delete about 1000-2000 products (depending on the images settings) per request.'), 'alert-success');
         }
-        $productsNoQuantity = getKbAmz()->getProductsWithNoQuantity();
-        $data['productsNoQuantityCount'] = count($productsNoQuantity);
+        $data['productsNoQuantityCount'] = getKbAmz()->getProductsWithNoQuantity(true);
         
         $view = new KbView($data);
         return $view;
@@ -635,7 +634,7 @@ class KbAmzAdminController {
     
     public function kbAmzNetworkGetProductsToSyncAction()
     {
-        $asins      = getKbAmz()->getProductsAsinsToUpdate(50);
+        $asins      = getKbAmz()->getProductsAsinsToUpdate(50, false);
         $products   = array();
         foreach ($asins as $asin) {
             $products[$asin] = getKbAmz()->getProductByAsin($asin);
@@ -660,6 +659,9 @@ class KbAmzAdminController {
     {
         
         $api = new KbAmzApi(getKbAmz()->getStoreId());
+        $siteNetwork               = getKbAmz()->getOption('siteNetwork');
+        $siteNetwork['siteHealth'] = getKbAmzStoreHealth();
+        $api->setUser($siteNetwork);
         $result =  $api->getNetworkListHtml();
         if ($result->error) {
             $data             = array();
@@ -702,12 +704,13 @@ class KbAmzAdminController {
                 'siteOwnerEmail'    => empty($_POST['siteOwnerEmail'])  ? $data['siteOwnerEmail']   : $_POST['siteOwnerEmail'],
                 'siteName'          => empty($_POST['siteName'])        ? $data['siteName']         : $_POST['siteName'],
                 'siteUrl'           => empty($_POST['siteUrl'])         ? $data['siteUrl']          : $_POST['siteUrl'],
-                'siteInfo'          => substr(empty($_POST['siteInfo'])        ? $data['siteInfo']         : $_POST['siteInfo'], 0, 250),
+                'siteInfo'          => substr(empty($_POST['siteInfo']) ? $data['siteInfo']         : $_POST['siteInfo'], 0, 250),
                 'siteActive'        => $_POST['submit'] == 'join',
-                'siteHealth'        => getKbAmzStoreHealth()
+                'siteHealth'        => getKbAmzStoreHealth(),
             );
             
             getKbAmz()->setOption('siteNetwork', $data);
+            getKbAmz()->setOption('siteNetworkJoined', time());
             
             $api = new KbAmzApi(getKbAmz()->getStoreId());
             $result =  $api->setUser($data);
@@ -722,7 +725,7 @@ class KbAmzAdminController {
                 }
             }
         } else {
-            $siteNetwork = getKbAmz()->getOption('siteNetwork');
+            $siteNetwork               = getKbAmz()->getOption('siteNetwork');
             if (!empty($siteNetwork)) {
                 $data = $siteNetwork;
             }
@@ -730,6 +733,7 @@ class KbAmzAdminController {
         
          
         $data['canLeave'] = isset($data['siteActive']) && $data['siteActive'];
+        $data['joined']   = getKbAmz()->getOption('siteNetworkJoined');
         
         $view = new KbView($data);
         return $view;

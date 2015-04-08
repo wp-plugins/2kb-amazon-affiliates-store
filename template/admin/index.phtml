@@ -49,6 +49,11 @@
                         <?php echo getKbAmz()->getProductsToUpdateCount(); ?>
                     </span>
                     &nbsp;
+                    <span class="label label-primary" title="Products with no quantity" data-toggle="tooltip" data-placement="top">
+                        <span class="glyphicon glyphicon-flag"></span>
+                        <?php echo getKbAmz()->getProductsWithNoQuantity(true); ?>
+                    </span>
+                    &nbsp;
                     <span class="label label-primary" title="Time to update" data-toggle="tooltip" data-placement="top">
                         <?php
                         $hours = 0;

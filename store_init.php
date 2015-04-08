@@ -58,7 +58,6 @@ function kbAmzDownloadProductsCronFunction($execute = false)
     }
     getKbAmz()->setIsCronRunnig(true);
     $importer = new KbAmazonImporter;
-    // $importer->setApiRequestSleep(getKbAmz()->getOption('amazonApiRequestDelay'));
     
     $products = getKbAmz()->getOption('ProductsToDownload', array());
     $numberToProcess = (int) getKbAmz()->getOption('downloadProductsCronNumberToProcess', KbAmazonImporter::CRON_NUMBER_OF_PRODUCTS_TO_PROCESS);
@@ -109,14 +108,11 @@ function kbAmzkbAmzProductsUpdateCronFunction($execute = false)
     );
     
     $importer = new KbAmazonImporter;
-    
-    for ($i = 0; $i <= $numberOfProductsToUpdate; $i++) {
-        $asins = getKbAmz()->getProductsAsinsToUpdate(1);
-        if (empty($asins)) {
-            break;
-        }
+
+    $asins = getKbAmz()->getProductsAsinsToUpdate($numberOfProductsToUpdate, false);
+    foreach ($asins as $asin) {
         try {
-            $importer->updatePrice($asins[key($asins)]);
+            $importer->import($asin);
         } catch (Exception $e) {
             getKbAmz()->addException('Cron Update Product', $e->getMessage());
         }
@@ -222,6 +218,10 @@ function kbAmzSerializeSession()
 {
     if (isset($_SESSION['2kb-amazon-affiliates-store']['cache'])
     && is_array($_SESSION['2kb-amazon-affiliates-store']['cache'])) {
+        if (count($_SESSION['2kb-amazon-affiliates-store']['cache']) > 100) {
+            $_SESSION['2kb-amazon-affiliates-store']['cache']
+            = array_slice($_SESSION['2kb-amazon-affiliates-store']['cache'], -100);
+        }
         $_SESSION['2kb-amazon-affiliates-store']['cache']
         = serialize($_SESSION['2kb-amazon-affiliates-store']['cache']);
     } else {
@@ -344,11 +344,40 @@ if (isset($_GET['kbAction'])
             'OfferListings',
         );
         try {
-            $importer = new KbAmazonImporter;
-            $result = getKbAmazonApi()
-                      ->responseGroup(implode(',', $responseGroup))
-                      ->lookup($asin);
-            $item   = new KbAmazonItem($result);
+           
+            $data = getKbAmz()->getOption('siteNetwork');
+            if (empty($data) || !$data['siteActive']) {
+                throw new Exception('Not Joined');
+            }
+             
+            $requests = getKbAmz()->getOption('amazonApiRequests', array());
+            $key      = date('YmdH');
+            $limit    = 1800;
+            if (!empty($requests)) {
+                $r = $requests[key($requests)];
+                if (isset($r['limit']) && $r['limit'] / 2 > $limit) {
+                    $limit = $r['limit'] / 2;
+                }
+            }
+            
+            $requests = getKbAmz()->getOption('networkRequests', array());
+            if (empty($requests) || !isset($requests[$key])) {
+                $requests = array(
+                    $key => array(
+                        'count' => 0
+                    )
+                );
+            }
+           
+            if ($requests[$key]['count'] > $limit) {
+                throw new Exception('Limit');
+            }
+            
+            $requests[$key]['count']++;
+            getKbAmz()->setOption('networkRequests', $requests);
+            
+            $importer            = new KbAmazonImporter;
+            $item                = $importer->find($asin, $responseGroup);
             $response['item']    = $item->isValid() ? base64_encode(serialize($item)) : null;
             $response['success'] = $item->isValid();
         } catch (Exception $e) {
@@ -356,6 +385,7 @@ if (isset($_GET['kbAction'])
             $response['error']   = $e->getMessage();
             getKbAmz()->addException('Newtwork Product Fetch', $e->getMessage());
         }
+        
         echo sprintf(
             ';%s%s(%s);',
             PHP_EOL,

@@ -31,11 +31,12 @@
     </div>
     
     <div class="form-group">
-        <label class="control-label" for="amazonApiRequestDelay">
-            <?php echo __('Delay between requests in seconds. This option will lower the Amazon API Exception: `You are submitting requests too quickly. Please retry your requests at a slower rate.`'); ?>
+        <label class="control-label" for="amazonApiRequestPerSec" style="width: 100%;">
+            <?php echo __('Requests per second. This option will lower the Amazon API Exception: `You are submitting requests too quickly. Please retry your requests at a slower rate.`'); ?>
+            <a href="https://affiliate-program.amazon.com/gp/advertising/api/detail/faq.html" target="_blank"><span aria-hidden="true" class="glyphicon glyphicon-question-sign"></span></a>
         </label>
-        <select value="<?php echo getKbPostVar('amazonApiRequestDelay', getKbAmz()->getOption('amazonApiRequestDelay'));?>" name="amazonApiRequestDelay" class="form-control">
-            <?php echo kbAmzSelect(array(0 => 0, 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7, 8 => 8, 9 => 9, 10 => 10), getKbPostVar('amazonApiRequestDelay', getKbAmz()->getOption('amazonApiRequestDelay'))); ?>
+        <select value="<?php echo getKbPostVar('amazonApiRequestPerSec', getKbAmz()->getOption('amazonApiRequestPerSec'));?>" name="amazonApiRequestPerSec" class="form-control">
+            <?php echo kbAmzSelect(array(1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7, 8 => 8, 9 => 9, 10 => 10), getKbPostVar('amazonApiRequestPerSec', getKbAmz()->getOption('amazonApiRequestPerSec'))); ?>
         </select>
     </div>
     
