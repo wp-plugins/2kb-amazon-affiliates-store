@@ -400,8 +400,14 @@ ul.kb-products-list > li{
     -moz-border-radius: 3px;
     border-radius: 3px;
 }
+.kb-amz-version-attributes{
+    margin-top: -10px;
+}
 .kb-amz-version-attributes .kb-amz-version-attribute.kb-amz-version-offset{
-    margin-bottom: 10px;
+    margin-top: 10px;
+}
+.kb-amz-product-shortcode .kb-product-attributes{
+    margin-bottom: 5px;
 }
 .kb-amz-version-attributes .kb-amz-version-active .kb-amz-version{
     border-color: #e77600;
@@ -437,7 +443,7 @@ ul.kb-products-list > li{
 }
 .kb-product-actions .kb-amz-actions-see-all-formats{
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 .kb-product-actions .kb-amz-format-price{
     text-align: right;

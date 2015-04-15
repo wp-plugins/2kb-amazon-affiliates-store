@@ -20,8 +20,9 @@ getKbAmzAdminController();
 class KbAmzAdminController {
 
     protected $messages = array();
+    protected $menuPage = null;
 
-    
+
     public function __construct()
     {
         add_action('wp_ajax_kbAmzPremiumAction', array($this, 'premiumAction'));
@@ -112,7 +113,7 @@ class KbAmzAdminController {
         } else {
             $view = new KbView(array(), $this->getTemplatePath('index'));
         }
-        $view->setLayout(KbAmazonStorePluginPath . '/template/admin/layout');
+        $view->setLayout($this->getLayout());
         $view->actions = $this->getActions();
         $view->messages = $this->messages;
         $view->bodyClass = $action;
@@ -454,7 +455,7 @@ class KbAmzAdminController {
         }
         $data['cronTime'] = array();
         foreach (wp_get_schedules() as $timeStr => $opts) {
-            $data['cronTime'][$timeStr] = $timeStr;
+            $data['cronTime'][$timeStr] = isset($opts['display']) ? $opts['display'] : $timeStr;
         }
         $data['hoursOld'] = array();
         for ($i = 1; $i<= 24 * 30; $i++) {
@@ -762,6 +763,12 @@ class KbAmzAdminController {
         $view->setTemplate($this->getTemplatePath('shortCodeProduct'));
         return $view;
     }
+    
+    public function examplesAction()
+    {
+        $view = new KbView(array());
+        return $view;
+    }
 
     protected function getActions() {
         return array(
@@ -813,7 +820,7 @@ class KbAmzAdminController {
                     array('action' => 'settingsGeneral', 'label' => __('General')),
                     array('action' => 'settingsAmazonApi', 'label' => __('Amazon API')),
                     array('action' => 'settingsErrorLog', 'label' => __('Error Log')),
-                )
+                ),
             ),
             array(
                 'action' => 'support',
@@ -823,7 +830,12 @@ class KbAmzAdminController {
             array(
                 'action' => 'info',
                 'icon' => 'glyphicon glyphicon-folder-open',
-                'label' => __('Docs & FAQ')
+                'label' => __('More...'),
+                'pages' => array(
+                    array('action' => 'info', 'label' => __('Docs & FAQ')),
+                    array('action' => 'network', 'label' => __('2kb Amazon Network')),
+                    array('action' => 'examples', 'label' => __('Examples')),
+                ),
             ),
             array(
                 'action' => 'version',
@@ -832,9 +844,25 @@ class KbAmzAdminController {
             
         );
     }
+    
+    public function getLayout()
+    {
+        return KbAmazonStorePluginPath . '/template/admin/layout';
+    }
 
-    protected function getTemplatePath($addup) {
-        return KbAmazonStorePluginPath . '/template/admin/' . $addup;
+    public function setMenuPage($menuPage)
+    {
+        $this->menuPage = $menuPage;
+    }
+    
+    public function getMenuPage()
+    {
+        return $this->menuPage;
+    }
+    
+    protected function getTemplatePath($addup)
+    {
+        return KbAmazonStorePluginPath . 'template/admin/' . $addup;
     }
 
 }

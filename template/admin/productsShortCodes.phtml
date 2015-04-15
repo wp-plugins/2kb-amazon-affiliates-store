@@ -4,7 +4,6 @@
             <tr>
                 <th>#</th>
                 <th><?php echo __('Short Code'); ?></th>
-                <th><?php echo __('Params'); ?></th>
                 <th><?php echo __('Enabled'); ?></th>
             </tr>
         </thead>
@@ -13,20 +12,19 @@
             <?php foreach ($this->shortCodes as $name => $code): ?>
                 <tr>
                     <td><?php echo $i++; ?></td>
-                    <td>[<?php echo $code['code']; ?>]</td>
-                    <td>
+                    <td>[<?php echo $code['code']; ?>
                         <?php
                             $params = array();
                             foreach ($code['params'] as $nameParamName => $avaialbe) {
                                 if ($nameParamName) {
-                                    $params[] = $nameParamName . '="'.$avaialbe.'"';
+                                    $params[] = "<code>$nameParamName</code>" . '="'.$avaialbe.'"';
                                 } else {
                                     $params[] = $avaialbe;
                                 }
                                 
                             }
                             echo implode(' ', $params);
-                        ?>
+                        ?>]
                     </td>
                     <td>
                         <?php if ($code['active'] !== null) : ?>
@@ -35,6 +33,11 @@
                     </td>
                 </tr>
             <?php endforeach; ?>
+                <tr>
+                    <td colspan="2">
+                        Legend: <code>Parameter</code>, <b>Default Value</b>
+                    </td>
+                </tr>
         </tbody>
     </table>
     <div class="form-group">

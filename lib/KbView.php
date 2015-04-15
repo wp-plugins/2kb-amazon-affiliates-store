@@ -79,12 +79,10 @@ class KbView
 
     protected function getTemplate()
     {
-        return $this->template.'.phtml';
-//        
-//        if (strpos($this->template, KbAmazonStoreFolderName) !== false) {
-//            return $this->template.'.phtml';
-//        } else {
-//            return KbAmazonStorePluginPath . 'template/view/' . $this->template.'.phtml';
-//        }
+        return str_replace(
+            '.phtml.phtml',
+            '.phtml',
+            $this->template.'.phtml'
+        );
     }
 }

@@ -66,13 +66,27 @@ class KbAmazonImages
                 
                 $meta = $image->getMeta();
                 if (isset($meta['_wp_attachment_metadata'])) {
-                    $attr['width']  = $meta['_wp_attachment_metadata']['width'];
-                    $attr['height'] = $meta['_wp_attachment_metadata']['height'];
+                    if (!array_key_exists('width', $attr)) {
+                        $attr['width']  = $meta['_wp_attachment_metadata']['width'];
+                    }
+                    if (!array_key_exists('height', $attr)) {
+                        $attr['height'] = $meta['_wp_attachment_metadata']['height'];
+                    }
                 }
-
                 $attrs = array();
                 foreach ($attr as $key => $val) {
                     $attrs[] = $key . '="' . $val . '"';
+                }
+                
+                $styleData = array();
+                if (isset($attr['width']) && $attr['width']) {
+                    $styleData[] = 'width:' . intval($attr['width']) . 'px;';
+                }
+                if (isset($attr['height']) && $attr['height']) {
+                    $styleData[] = 'height:' . intval($attr['height']) . 'px;';
+                }
+                if (!empty($styleData)) {
+                    $attrs[] = 'style="' . implode('', $styleData) . '"';
                 }
                 
                 $attrs[] = 'alt="'. htmlspecialchars($this->getPost()->post_title) .'"';

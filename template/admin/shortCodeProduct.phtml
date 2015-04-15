@@ -7,7 +7,14 @@
             <?php
             $img = getKbAmz()
                  ->getProductImages($this->post->ID)
-                 ->getFirst();
+                 ->getFirst(
+                'thumbnail',
+                null,
+                array(
+                    'width'     => $this->image_width,
+                    'height'    => $this->image_height
+                ) 
+            );
             
             if (!empty($img)) {
                 echo sprintf(
@@ -31,14 +38,15 @@
                 <?php
                 echo kb_amz_product_attributes_func(
                     array(
-                        'postId' => $this->post->ID
+                        'postId'        => $this->post->ID
                     )
                 );
                 ?>
                 <?php
                 echo kb_amz_product_actions_func(
                     array(
-                        'postId' => $this->post->ID
+                        'postId'        => $this->post->ID,
+                        'variations'    => $this->variations
                     )
                 );
                 ?>

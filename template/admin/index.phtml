@@ -296,6 +296,19 @@
                 );
                 ?>
             </a>
+            <?php
+            $count = getKbAmz()->getProductsCount();
+            ?>
+            <a href="?<?php echo http_build_query(array_merge($_GET, array('kbAction' => 'examples')));?>" class="btn btn-default" title="<?php echo $count ? 'How to user your store the best way.' : 'Import some products before using the examples.';?>" data-toggle="tooltip" data-placement="bottom">
+                <span aria-hidden="true" class="glyphicon glyphicon-book" style="font-size: 50px;display: block;"></span>
+                Examples<br/>Use your store smart!
+                <?php
+                echo sprintf(
+                    '<span class="kb-amz-icon-action-dot %s">&nbsp;</span>',
+                    $count ? 'active' : 'not-active'
+                );
+                ?>
+            </a>
         </div>
     </div>
 </div>

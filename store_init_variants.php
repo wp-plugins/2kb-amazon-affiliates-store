@@ -235,7 +235,8 @@ function kbAmzVariantsProductSave($std)
 add_action('kb_amz_product_add_actions', 'kbAmzProductVariansActions');
 function kbAmzProductVariansActions($std)
 {
-    if (!getKbAmz()->getOption('allowVariants')) {
+    if (!getKbAmz()->getOption('allowVariants')
+    || !$std->atts['variations']) {
         return $std;
     }
     
@@ -386,7 +387,8 @@ HTML;
 add_action('kb_amz_product_add_actions', 'kbAmzProductVersionsActions');
 function kbAmzProductVersionsActions($std)
 {
-    if (!getKbAmz()->getOption('allowVariants')) {
+    if (!getKbAmz()->getOption('allowVariants')
+    || !$std->atts['variations']) {
         return $std;
     }
     

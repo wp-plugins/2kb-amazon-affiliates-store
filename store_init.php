@@ -8,6 +8,7 @@
 add_action('admin_menu','kb_amz_admin_menu', 100);
 function kb_amz_admin_menu()
 {
+    $page = 
     add_menu_page(
         __( '2kb Amazon Store'),
         __( '2kb Amazon Store'),
@@ -18,6 +19,14 @@ function kb_amz_admin_menu()
         84
     );
 }
+
+add_action('cron_schedules','kb_amz_cron_schedules', 100);
+function kb_amz_cron_schedules($schedules)
+{
+    $schedules['twicehourly'] = array( 'interval' => HOUR_IN_SECONDS / 2,      'display' => __( 'Twice Hourly' ) );
+    return $schedules;
+}
+
 
 /**
  * CRONS

@@ -79,6 +79,9 @@ float: right;
 .homepage .label{
     display: inline-block;
     margin-bottom: 5px;
+    min-width: 75px;
+    height: 20px;
+    text-align: left;
 }
 .info-items a{
     display: block;
@@ -124,6 +127,9 @@ float: right;
 }
 .icons-actions a
 {
+    width: 200px;
+    height: 145px;
+    margin-right: 8px;
     position: relative;
     display: inline-block;
     padding: 20px;

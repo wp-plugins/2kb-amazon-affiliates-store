@@ -112,8 +112,11 @@ class KbAmazonStore
             'code' => 'kb_amz_product',
             'params' => array(
                 ''              => '<span class="label label-success">NEW</span>',
-                'asin'          => 'Use asin or post id',
-                'ID'            => 'Use post id or asin'
+                'asin'          => 'Use asin or post id (if product with asin does not exists, it will be <b>imported</b>.)',
+                'ID'            => 'Use post id or asin',
+                'variations'    => '<b>Yes</b>/No',
+                'image_width'   => 'auto',
+                'image_height'  => 'auto',
             ),
             'active' => null,
         ),
@@ -380,9 +383,14 @@ class KbAmazonStore
     
     public function setOptions(array $data)
     {
+        $this->getOptions(true);
         foreach ($data as $name => $val) {
-            $this->setOption($name, $val);
+            $this->options[$name] = $val;
         }
+        $opts = base64_encode(json_encode($this->options));
+        add_option('kbAmzStore', $opts);
+        update_option('kbAmzStore', $opts);  
+        return $this;
     }
 
     public function getDefaultAttributes()

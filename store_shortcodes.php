@@ -5,10 +5,14 @@
 function kb_amz_product_func($atts)
 {
 	$atts = shortcode_atts( array(
-        'ID' => null,
-        'asin'   => null,
+        'ID'            => null,
+        'asin'          => null,
+        'variations'    => true,
+        'image_width'   => null,
+        'image_height'  => null,
 	), $atts);
-    $atts['postId'] = $atts['ID'];
+    $atts['postId']         = $atts['ID'];
+    $atts['variations']     = kbAmzShortCodeBool($atts['variations']);
     
     if (!$atts['postId'] && !$atts['asin']) {
         return new KbAmzErrorString('[kb_amz_product] - ID or asin parameter is required.');
@@ -182,7 +186,8 @@ add_shortcode( 'kb_amz_product_content', 'kb_amz_product_content_func' );
 // [kb_amz_product_actions]
 function kb_amz_product_actions_func($atts) {
     $atts = shortcode_atts( array(
-        'postId' => get_the_ID()
+        'postId'        => get_the_ID(),
+        'variations'    => true
     ), $atts);
 
     $shortCodes = getKbAmz()->getShortCodes();
@@ -190,6 +195,8 @@ function kb_amz_product_actions_func($atts) {
     && !$shortCodes['actions']['active']) {
         return;
     }
+    
+    $atts['variations'] = kbAmzShortCodeBool($atts['variations']);
     
     $actions = array();
     $actions[] = array(
@@ -455,7 +462,13 @@ add_shortcode( 'kb_amz_product_reviews', 'kb_amz_product_reviews_func' );
 
 function kbAmzShortCodeBool($str)
 {
-    return strtolower($str) == 'yes' ? true : false;
+    $test = strtolower($str);
+    if ($test == 'yes') {
+        return true;
+    } else if ($test == 'no') {
+        return false;
+    }
+    return $str;
 }
 
 

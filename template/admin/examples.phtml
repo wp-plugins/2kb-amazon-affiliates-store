@@ -1,0 +1,29 @@
+<h3>Showing single product</h3>
+<br/>
+
+<code>[kb_amz_product asin="B00A9ZHLVM"]</code> or <code>[kb_amz_product ID="4521"]</code>
+<?php echo kbAmzExampleImage('example-1'); ?>
+
+
+<br/>
+<code>[kb_amz_product asin="B00A9ZHLVM" variations="No"]</code>
+<?php echo kbAmzExampleImage('example-2'); ?>
+
+<br/>
+If you need to fill the opened space, add some <a href="?page=kbAmz&kbAction=productsAttributes">product attributes</a>.
+<?php echo kbAmzExampleImage('example-3'); ?>
+
+<br/>
+And then we want to make it more tide.
+<code>[kb_amz_product asin="B00A9ZHLVM" variations="No" image_height="140"]</code>
+<?php echo kbAmzExampleImage('example-4'); ?>
+
+<br/>
+WORK IN PROGRESS
+
+<?php
+function kbAmzExampleImage($name)
+{
+    return '<img src="'.getKbPluginUrl().'/template/admin/img/examples/'.$name.'.jpg" style="display:block;margin:5px 0;"/>';
+}
+?>
