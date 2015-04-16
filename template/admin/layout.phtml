@@ -31,7 +31,7 @@
                         }
 
                         echo sprintf(
-                            '<li class="dropdown %s"><a class="dropdown-toggle" data-toggle="dropdown" href="#">%s %s</a><ul class="dropdown-menu">%s</ul></li>',
+                            '<li class="dropdown %s"><a class="dropdown-toggle" data-toggle="dropdown" href="#">%s %s <span class="caret"></span></a><ul class="dropdown-menu">%s</ul></li>',
                             $isActive ? 'active' : '',
                             (isset($action['icon']) ? '<span class="glyphicon '.$action['icon'].'"></span>' : ''),
                             $action['label'],
@@ -115,7 +115,11 @@
                     alert('Unable to connect to the server. Please try again.');
                 });
             });
-            $('[data-toggle="tooltip"]').tooltip()
+            $('[data-toggle="tooltip"]').tooltip();
+            $('.nav-tabs > a').click(function (e) {
+              e.preventDefault();
+              $(this).tab('show');
+            });
         });
     })(jQuery, '<?php echo getKbAmzAjaxUrl(); ?>');
 </script>

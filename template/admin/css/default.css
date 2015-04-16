@@ -79,7 +79,7 @@ float: right;
 .homepage .label{
     display: inline-block;
     margin-bottom: 5px;
-    min-width: 75px;
+    /*min-width: 75px;*/
     height: 20px;
     text-align: left;
 }

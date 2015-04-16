@@ -1,29 +1,92 @@
-<h3>Showing single product</h3>
+<ul role="tablist" class="nav nav-tabs">
+    <li role="presentation" class="active">
+        <a href="#single" aria-expanded="true" aria-controls="home" data-toggle="tab" role="tab">Showing Single Product</a>
+    </li>
+    <li role="presentation">
+        <a href="#listing" aria-expanded="true" aria-controls="home" data-toggle="tab" role="tab">Showing Listings</a>
+    </li>
+</ul>
 <br/>
+<div class="tab-content pricing">
+    <div id="single" class="tab-pane active">
+        <code>[kb_amz_product asin="B00A9ZHLVM"]</code> or <code>[kb_amz_product ID="4521"]</code>
+        <?php echo kbAmzExampleImage('example-1'); ?>
 
-<code>[kb_amz_product asin="B00A9ZHLVM"]</code> or <code>[kb_amz_product ID="4521"]</code>
-<?php echo kbAmzExampleImage('example-1'); ?>
 
+        <br/>
+        <code>[kb_amz_product asin="B00A9ZHLVM" variations="No"]</code>
+        <?php echo kbAmzExampleImage('example-2'); ?>
 
-<br/>
-<code>[kb_amz_product asin="B00A9ZHLVM" variations="No"]</code>
-<?php echo kbAmzExampleImage('example-2'); ?>
+        <br/>
+        If you need to fill the opened space, add some <a href="?page=kbAmz&kbAction=productsAttributes">product attributes</a>.
+        <?php echo kbAmzExampleImage('example-3'); ?>
 
-<br/>
-If you need to fill the opened space, add some <a href="?page=kbAmz&kbAction=productsAttributes">product attributes</a>.
-<?php echo kbAmzExampleImage('example-3'); ?>
-
-<br/>
-And then we want to make it more tide.
-<code>[kb_amz_product asin="B00A9ZHLVM" variations="No" image_height="140"]</code>
-<?php echo kbAmzExampleImage('example-4'); ?>
-
-<br/>
-WORK IN PROGRESS
+        <br/>
+        And then we want to make it more tide.
+        <code>[kb_amz_product asin="B00A9ZHLVM" variations="No" image_height="140"]</code>
+        <?php echo kbAmzExampleImage('example-4'); ?>
+    </div>
+    <div id="listing" class="tab-pane">
+        Simple listing<br/>
+        <code>[kb_amz_list_products]</code>
+        <br/><br/>
+        
+        Standard options<br/>
+        <code>[kb_amz_list_products items_per_row="4" posts_per_page="4" pagination="Yes"]</code>
+        <br/><br/>
+        
+        Latest products<br/>
+        <code>[kb_amz_list_products items_per_row="4" posts_per_page="4" pagination="Yes" orderby="date" order="DESC"]</code>
+        <br/><br/>
+        
+        <?php
+        $argsStr = '';
+        $args = array(
+            'posts_per_page'   => 5,
+            'offset'           => 0,
+            'category'         => '',
+            'category_name'    => '',
+            'orderby'          => 'post_date',
+            'order'            => 'DESC',
+            'include'          => '',
+            'exclude'          => '',
+            'meta_key'         => '',
+            'meta_value'       => '',
+            'post_type'        => 'post',
+            'post_mime_type'   => '',
+            'post_parent'      => '',
+            'post_status'      => 'publish',
+            'suppress_filters' => true 
+        );
+        
+        foreach ($args as $name => $val) {
+            $argsStr .= ' ' . $name . '="'.$val.'"';
+        }
+        ?>
+        Query arguments<br/>
+        <code>[kb_amz_list_products<?php echo $argsStr?>]</code>
+        <br/><br/>
+        
+        Listing best sellers<br/>
+        <code>[kb_amz_list_products meta_key="KbAmzSalesRank" orderby="meta_value" order="DESC"]</code>
+        <br/><br/>
+        
+        List new products<br/>
+        <code>[kb_amz_list_products attribute_key="KbAmzNewProduct" attribute_value="yes" attribute_compare="="]</code>
+        <br/><br/>
+        
+        Show related products (only for product(post) content)<br/>
+        <code>[kb_amz_list_products category="getKbAmzProductBottomCategory()" items_per_row="4" posts_per_page="4" pagination="No"]</code>
+        <br/><br/>
+        Need more examples, having problem listing specific products? <a href="?page=kbAmz&kbAction=support">Contact us and share your problem</a>.
+        <br/><br/>
+    </div>
+</div>
 
 <?php
+
 function kbAmzExampleImage($name)
 {
-    return '<img src="'.getKbPluginUrl().'/template/admin/img/examples/'.$name.'.jpg" style="display:block;margin:5px 0;"/>';
+    return '<img src="' . getKbPluginUrl() . '/template/admin/img/examples/' . $name . '.jpg" style="display:block;margin:5px 0;"/>';
 }
 ?>
