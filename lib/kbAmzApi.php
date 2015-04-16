@@ -62,7 +62,7 @@ class KbAmzApi
         
         $response = wp_remote_get($requestUrl);
         $content  = '';
-        if (isset($response['body'])) {
+        if (is_array($response) && isset($response['body'])) {
             $content = $response['body'];
         }
         $data = array();
@@ -71,6 +71,9 @@ class KbAmzApi
         } else {
             $data['success'] = false;
             $data['error'] = 'Server connection error.';
+            if ($response instanceof WP_Error) {
+                $data['error'] .= $response->get_error_message();
+            }
         }
         return $data;
     }
