@@ -182,6 +182,7 @@
         }
         
         $('#submit-ajax').click(function () {
+            $(this).attr('disabled', 'disabled').text('Importing...');
             $('#kb-amz-categories-products label').addClass('loaded');
             //$loader.find('.progress-bar').width(0);
             setTimeout(function () {

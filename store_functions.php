@@ -502,6 +502,9 @@ function getKbAmzStoreHealth()
     }
     
     $h = round(($hours / 24) * 100);
+    if (empty($h)) {
+        $h = 100;
+    }
     return $h;
 }
 

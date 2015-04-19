@@ -2,11 +2,11 @@
 Tags: amazon, affiliate, associate, online store, selling products
 Requires at least: 4.0
 Tested up to: 4.1
-Stable tag: 1.2.0
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Amazon Affiliate Store Plugin With Variants, Cart, Checkout, Custom Themes. Easy to manage and setup. Sell wide range of physical and digital products.
+Amazon Affiliate Store With Variants, Cart, Checkout, Custom Themes. Easy to manage and setup. Sell wide range of physical and digital products.
 
 == Description ==
 
@@ -36,6 +36,10 @@ This section describes how to install the plugin and get it working.
 == Screenshots ==
 
 == Changelog ==
+= 2.0.0 =
+Product Variants and Product Versions are here!
+Examples added.
+2kb Amazon Network for products fast sync
 = 2.0.0 BETA 5=
 Manu important fixes.
 List with full changes will be added on realise.

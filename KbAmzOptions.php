@@ -37,6 +37,7 @@ function getKbAmzDefaultOptions()
         */
        'KbAmzV2VariantsMessageSeen'         => false,
        'AttributesCountMessageSeen'         => false,
+       'KbAmzV2RateUs'                      => false,
    );
    
    $filtered = apply_filters('getKbAmzDefaultOptions', $options);

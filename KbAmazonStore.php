@@ -372,22 +372,25 @@ class KbAmazonStore
     
     public function setOption($key, $val)
     {
-        // load the options
-        $this->getOptions(true);
-        $this->options[$key] = $val;
-        $opts = base64_encode(json_encode($this->options));
-        add_option('kbAmzStore', $opts);
-        update_option('kbAmzStore', $opts);
+        $this->setOptions(
+            array(
+                $key => $val
+            )
+        );
         return $this;
     }
     
     public function setOptions(array $data)
     {
+        global $wpdb;
+        wp_cache_flush();
         $this->getOptions(true);
         foreach ($data as $name => $val) {
             $this->options[$name] = $val;
         }
         $opts = base64_encode(json_encode($this->options));
+        
+        
         add_option('kbAmzStore', $opts);
         update_option('kbAmzStore', $opts);  
         return $this;

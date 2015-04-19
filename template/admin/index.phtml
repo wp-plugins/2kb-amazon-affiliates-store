@@ -1,8 +1,18 @@
+<?php if (!getKbAmz()->getOption('KbAmzV2RateUs')) : ?>
+    <div class="alert alert-warning" role="alert">
+        <button aria-label="Close" data-dismiss="alert" class="close" type="button" data-option="KbAmzV2RateUs" data-option-value="1"><span aria-hidden="true">×</span></button>
+        <span class="label label-success"><span aria-hidden="true" class="glyphicon glyphicon-heart"></span></span>
+        2kb Amazon Affiliate Store Plugin Team, worked hard to bring you many new features in v2 of the plugin.
+        We want to ask you to add a quick review of our work on <a href="https://wordpress.org/plugins/2kb-amazon-affiliates-store/">https://wordpress.org/plugins/2kb-amazon-affiliates-store/</a>
+        
+    </div>
+<?php endif; ?>
+
 <?php if (!getKbAmz()->getOption('KbAmzV2VariantsMessageSeen')) : ?>
     <div class="alert alert-warning" role="alert">
         <button aria-label="Close" data-dismiss="alert" class="close" type="button" data-option="KbAmzV2VariantsMessageSeen" data-option-value="1"><span aria-hidden="true">×</span></button>
         <span class="label label-success">NEW</span>
-        (Beta Testing) Product Variants and Versions are added. Take a look before you activate them!
+        Product Variants and Versions are added. Take a look before you activate them!
         <b><a href="?<?php echo http_build_query(array_merge($_GET, array('kbAction' => 'info')))?>#variants">Check the docs</a></b>
     </div>
 <?php endif; ?>
@@ -23,7 +33,6 @@
         <b><a href="?<?php echo http_build_query(array_merge($_GET, array('kbAction' => 'productsAttributes')))?>">Add more attributes</a></b>
     </div>
 <?php endif; ?>
-
 
 
 <div class="row homepage">
@@ -104,7 +113,7 @@
                     <div class="alert alert-danger">
                         <span class="glyphicon glyphicon-fire"></span>
                         <a href="?page=kbAmz&kbAction=settingsAmazonApi">
-                            <?php echo __('Click to setup you Amazon API Configuration.'); ?>
+                            <?php echo __('Click to setup you Amazon API Configuration. <b>FIST TIME USERS - START FROM HERE</b>'); ?>
                         </a>
                     </div>
                     <?php

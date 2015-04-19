@@ -5,7 +5,7 @@
                 <label for="ListItemsPerRow" class="control-label">
                     <?php echo __('Number of items per row.'); ?>
                 </label>
-                <select value="<?php echo getKbPostVar('ListItemsPerRow', getKbAmz()->getOption('ListItemsPerRow'));?>" name="ListItemsPerRow" class="form-control">
+                <select value="<?php echo getKbPostVar('ListItemsPerRow', getKbAmz()->getOption('ListItemsPerRow'));?>" autocomplete="off" name="ListItemsPerRow" class="form-control">
                     <?php echo kbAmzSelect(array(6 => 6, 4 => 4, 3 => 3), getKbPostVar('ListItemsPerRow', getKbAmz()->getOption('ListItemsPerRow'))); ?>
                 </select>
             </div>
@@ -15,7 +15,7 @@
                 <label for="enableSalePrice" class="control-label">
                     <?php echo __('Show the original price of the product.'); ?>
                 </label>
-                <select value="<?php echo getKbPostVar('enableSalePrice', getKbAmz()->getOption('enableSalePrice'));?>" name="enableSalePrice" class="form-control">
+                <select value="<?php echo getKbPostVar('enableSalePrice', getKbAmz()->getOption('enableSalePrice'));?>" autocomplete="off" name="enableSalePrice" class="form-control">
                     <?php echo kbAmzSelect(array(1 => __('Yes'), 0 => __('No')), getKbPostVar('enableSalePrice', getKbAmz()->getOption('enableSalePrice'))); ?>
                 </select>
             </div>
@@ -28,7 +28,7 @@
                 <label for="productListImageSize" class="control-label">
                     <?php echo __('List Products Image Sizes.'); ?>
                 </label>
-                <select value="<?php echo getKbPostVar('enableSalePrice', getKbAmz()->getOption('productListImageSize'));?>" name="productListImageSize" class="form-control">
+                <select value="<?php echo getKbPostVar('enableSalePrice', getKbAmz()->getOption('productListImageSize'));?>" autocomplete="off" name="productListImageSize" class="form-control">
                     <?php echo kbAmzSelect(getKbAmz()->getImageSizes(), getKbPostVar('productListImageSize', getKbAmz()->getOption('productListImageSize'))); ?>
                 </select>
             </div>
@@ -38,7 +38,7 @@
                 <label for="replaceThumbnailWithGallery" class="control-label">
                     <?php echo __('Replace Thumbnail With Gallery.'); ?>
                 </label>
-                <select value="<?php echo getKbPostVar('replaceThumbnailWithGallery', getKbAmz()->getOption('replaceThumbnailWithGallery'));?>" name="replaceThumbnailWithGallery" class="form-control">
+                <select value="<?php echo getKbPostVar('replaceThumbnailWithGallery', getKbAmz()->getOption('replaceThumbnailWithGallery'));?>" autocomplete="off" name="replaceThumbnailWithGallery" class="form-control">
                     <?php echo kbAmzSelect(array(1 => __('Yes'), 0 => __('No')), getKbPostVar('replaceThumbnailWithGallery', getKbAmz()->getOption('replaceThumbnailWithGallery'))); ?>
                 </select>
             </div>
@@ -51,7 +51,7 @@
                 <label for="replaceThumbnailWithGallery" class="control-label">
                     <?php echo __('Download images from Amazon.'); ?>
                 </label>
-                <select value="<?php echo getKbPostVar('downloadImages', getKbAmz()->getOption('downloadImages'));?>" name="downloadImages" class="form-control">
+                <select value="<?php echo getKbPostVar('downloadImages', getKbAmz()->getOption('downloadImages'));?>" autocomplete="off" name="downloadImages" class="form-control">
                     <?php echo kbAmzSelect(array(1 => __('Yes'), 0 => __('No')), getKbPostVar('downloadImages', getKbAmz()->getOption('downloadImages'))); ?>
                 </select>
             </div>
@@ -61,7 +61,7 @@
                 <label for="imageHoverSwitch" class="control-label">
                     <?php echo __('Switch images on hover in the listing.'); ?>
                 </label>
-                <select value="<?php echo getKbPostVar('imageHoverSwitch', getKbAmz()->getOption('imageHoverSwitch'));?>" name="imageHoverSwitch" class="form-control">
+                <select value="<?php echo getKbPostVar('imageHoverSwitch', getKbAmz()->getOption('imageHoverSwitch'));?>" autocomplete="off" name="imageHoverSwitch" class="form-control">
                     <?php echo kbAmzSelect(array(1 => __('Yes'), 0 => __('No')), getKbPostVar('imageHoverSwitch', getKbAmz()->getOption('imageHoverSwitch'))); ?>
                 </select>
             </div>
@@ -74,7 +74,7 @@
                 <label for="numberImagesToDownload" class="control-label">
                     <?php echo __('Max Number of Images to Download. Lower Number = Faster'); ?>
                 </label>
-                <input value="<?php echo getKbPostVar('numberImagesToDownload', getKbAmz()->getOption('numberImagesToDownload'));?>" name="numberImagesToDownload" class="form-control"/>
+                <input value="<?php echo getKbPostVar('numberImagesToDownload', getKbAmz()->getOption('numberImagesToDownload'));?>" autocomplete="off" name="numberImagesToDownload" class="form-control"/>
             </div>
         </div>
         <div class="col-md-6 col-xs-6">
@@ -82,7 +82,7 @@
                 <label for="canImportFreeItems" class="control-label">
                     <?php echo __('Import Free Items (Price = 0 for example Kindle Books)'); ?>
                 </label>
-                <select value="<?php echo getKbPostVar('canImportFreeItems', getKbAmz()->getOption('canImportFreeItems'));?>" name="canImportFreeItems" class="form-control">
+                <select value="<?php echo getKbPostVar('canImportFreeItems', getKbAmz()->getOption('canImportFreeItems'));?>" autocomplete="off" name="canImportFreeItems" class="form-control">
                     <?php echo kbAmzSelect(array(1 => __('Yes'), 0 => __('No')), getKbPostVar('canImportFreeItems', getKbAmz()->getOption('canImportFreeItems'))); ?>
                 </select>
             </div>
@@ -95,7 +95,7 @@
                 <label for="loadSimilarItems" class="control-label">
                     <?php echo __('Load Similar Items Strategy. Increases product import time.'); ?>
                 </label>
-                <select value="<?php echo getKbPostVar('loadSimilarItems', getKbAmz()->getOption('loadSimilarItems'));?>" name="loadSimilarItems" class="form-control">
+                <select value="<?php echo getKbPostVar('loadSimilarItems', getKbAmz()->getOption('loadSimilarItems'));?>" autocomplete="off" name="loadSimilarItems" class="form-control">
                     <?php
                     $values = array(
                         KbAmazonImporter::SIMILAR_ITEM_LOAD_IMMEDIATELY => __('Load Similar Products On Import'),
@@ -112,7 +112,7 @@
                 <label for="deleteProductOnNoQuantity" class="control-label">
                     <?php echo __('Delete Product(post) on no quantity.'); ?>
                 </label>
-                <select value="<?php echo getKbPostVar('deleteProductOnNoQuantity', getKbAmz()->getOption('deleteProductOnNoQuantity'));?>" name="deleteProductOnNoQuantity" class="form-control">
+                <select value="<?php echo getKbPostVar('deleteProductOnNoQuantity', getKbAmz()->getOption('deleteProductOnNoQuantity'));?>" autocomplete="off" name="deleteProductOnNoQuantity" class="form-control">
                     <?php echo kbAmzSelect(array(1 => __('Yes'), 0 => __('No')), getKbPostVar('deleteProductOnNoQuantity', getKbAmz()->getOption('deleteProductOnNoQuantity'))); ?>
                 </select>
             </div>
@@ -126,7 +126,7 @@
                             <span class="label label-success">NEW</span>
                             <a href="?<?php echo http_build_query(array_merge($_GET, array('kbAction' => 'info')))?>#variants" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-question-sign"></span></a>
                         </label>
-                        <select value="<?php echo getKbPostVar('allowVariants', getKbAmz()->getOption('allowVariants'));?>" name="allowVariants" class="form-control">
+                        <select value="<?php echo getKbPostVar('allowVariants', getKbAmz()->getOption('allowVariants'));?>" autocomplete="off" name="allowVariants" class="form-control">
                             <?php echo kbAmzSelect(array(0 => __('No'), 1 => __('Yes')), getKbPostVar('allowVariants', getKbAmz()->getOption('allowVariants'))); ?>
                         </select>
                     </div>
@@ -137,7 +137,7 @@
                             <?php echo __('Show Variants in Listings'); ?>
                             <span class="label label-success">NEW</span>
                         </label>
-                        <select value="<?php echo getKbPostVar('showVariantsInListing', getKbAmz()->getOption('showVariantsInListing'));?>" name="showVariantsInListing" class="form-control">
+                        <select value="<?php echo getKbPostVar('showVariantsInListing', getKbAmz()->getOption('showVariantsInListing'));?>" autocomplete="off" name="showVariantsInListing" class="form-control">
                             <?php echo kbAmzSelect(array(1 => __('Yes'), 0 => __('No')), getKbPostVar('showVariantsInListing', getKbAmz()->getOption('showVariantsInListing'))); ?>
                         </select>
                     </div>
@@ -148,7 +148,7 @@
                             <?php echo __('Max Versions to Import on Product Create'); ?>
                             <span class="label label-success">NEW</span>
                         </label>
-                        <select value="<?php echo getKbPostVar('maxVersionsNumberOnImport', getKbAmz()->getOption('maxVersionsNumberOnImport'));?>" name="maxVersionsNumberOnImport" class="form-control">
+                        <select value="<?php echo getKbPostVar('maxVersionsNumberOnImport', getKbAmz()->getOption('maxVersionsNumberOnImport'));?>" autocomplete="off" name="maxVersionsNumberOnImport" class="form-control">
                             <?php echo kbAmzSelect(array(5 => 5, 10 => 10, 15 => 15, 20 => 20), getKbPostVar('maxVersionsNumberOnImport', getKbAmz()->getOption('maxVersionsNumberOnImport'))); ?>
                         </select>
                     </div>
@@ -160,7 +160,7 @@
                 <label for="cacheTtl" class="control-label">
                     <?php echo __('Cache Expire in Seconds. 0 for disabled.'); ?>
                 </label>
-                <select value="<?php echo getKbPostVar('cacheTtl', getKbAmz()->getOption('cacheTtl'));?>" name="cacheTtl" class="form-control">
+                <select value="<?php echo getKbPostVar('cacheTtl', getKbAmz()->getOption('cacheTtl'));?>" autocomplete="off" name="cacheTtl" class="form-control">
                     <?php echo kbAmzSelect(array(0 => 0, 600 => 600, 1800 => 1800, 3600 => 3600), getKbPostVar('cacheTtl', getKbAmz()->getOption('cacheTtl'))); ?>
                 </select>
             </div>
@@ -170,7 +170,7 @@
                 <label for="sendStatsData" class="control-label">
                     <?php echo __('Participate The Plugin Experience Program'); ?>
                 </label>
-                <select value="<?php echo getKbPostVar('sendStatsData', getKbAmz()->getOption('sendStatsData'));?>" name="sendStatsData" class="form-control">
+                <select value="<?php echo getKbPostVar('sendStatsData', getKbAmz()->getOption('sendStatsData'));?>" autocomplete="off" name="sendStatsData" class="form-control">
                     <?php echo kbAmzSelect(array(0 => __('No'), 1 => __('Yes')), getKbPostVar('sendStatsData', getKbAmz()->getOption('sendStatsData'))); ?>
                 </select>
             </div>
@@ -183,7 +183,7 @@
                 <label for="enableImportInTopCategories" class="control-label">
                     <?php echo __('ENABLE Products import for comma separated Amazon category names. High priority.'); ?>
                 </label>
-                <textarea  name="enableImportInTopCategories" class="form-control" style="min-height: 4em!important;"><?php echo getKbPostVar('enableImportInTopCategories', getKbAmz()->getOption('enableImportInTopCategories'));?></textarea>
+                <textarea  autocomplete="off" name="enableImportInTopCategories" class="form-control" style="min-height: 4em!important;"><?php echo getKbPostVar('enableImportInTopCategories', getKbAmz()->getOption('enableImportInTopCategories'));?></textarea>
             </div>
         </div> 
         <div class="col-xs-6">
@@ -191,7 +191,7 @@
                 <label for="disableImportInTopCategories" class="control-label">
                     <?php echo __('DISABLE Products import for comma separated Amazon category names. Low priority.'); ?>
                 </label>
-                <textarea  name="disableImportInTopCategories" class="form-control" style="min-height: 4em!important;"><?php echo getKbPostVar('disableImportInTopCategories', getKbAmz()->getOption('disableImportInTopCategories'));?></textarea>
+                <textarea  autocomplete="off" name="disableImportInTopCategories" class="form-control" style="min-height: 4em!important;"><?php echo getKbPostVar('disableImportInTopCategories', getKbAmz()->getOption('disableImportInTopCategories'));?></textarea>
             </div>
         </div>
     </div>
@@ -202,7 +202,7 @@
                 <label for="isCronEnabled" class="control-label">
                     <?php echo __('Is Cron Enabled.'); ?>
                 </label>
-                <select value="<?php echo getKbPostVar('isCronEnabled', getKbAmz()->getOption('isCronEnabled'));?>" name="isCronEnabled" class="form-control">
+                <select value="<?php echo getKbPostVar('isCronEnabled', getKbAmz()->getOption('isCronEnabled'));?>" autocomplete="off" name="isCronEnabled" class="form-control">
                     <?php echo kbAmzSelect(array(1 => __('Yes'), 0 => __('No')), getKbPostVar('isCronEnabled', getKbAmz()->getOption('isCronEnabled'))); ?>
                 </select>
             </div>
@@ -215,7 +215,7 @@
                 <label for="downloadProductsCronInterval" class="control-label">
                     <?php echo __('Download Products Cron Interval'); ?>
                 </label>
-                <select value="<?php echo getKbPostVar('downloadProductsCronInterval', getKbAmz()->getOption('downloadProductsCronInterval'));?>" name="downloadProductsCronInterval" class="form-control">
+                <select value="<?php echo getKbPostVar('downloadProductsCronInterval', getKbAmz()->getOption('downloadProductsCronInterval'));?>" autocomplete="off" name="downloadProductsCronInterval" class="form-control">
                     <?php echo kbAmzSelect($this->cronTime, getKbPostVar('canImportFreeItems', getKbAmz()->getOption('downloadProductsCronInterval'))); ?>
                 </select>
             </div>
@@ -225,7 +225,7 @@
                 <label for="downloadProductsCronNumberToProcess" class="control-label">
                     <?php echo __('Number Of Products To Process At Once'); ?>
                 </label>
-                <input value="<?php echo getKbPostVar('downloadProductsCronNumberToProcess', getKbAmz()->getOption('downloadProductsCronNumberToProcess', KbAmazonImporter::CRON_NUMBER_OF_PRODUCTS_TO_PROCESS));?>" name="downloadProductsCronNumberToProcess" class="form-control" />
+                <input value="<?php echo getKbPostVar('downloadProductsCronNumberToProcess', getKbAmz()->getOption('downloadProductsCronNumberToProcess', KbAmazonImporter::CRON_NUMBER_OF_PRODUCTS_TO_PROCESS));?>" autocomplete="off" name="downloadProductsCronNumberToProcess" class="form-control" />
             </div>
         </div> 
     </div>
@@ -235,7 +235,7 @@
                 <label for="updateProductsPriceCronInterval" class="control-label">
                     <?php echo __('Update Products (Price Interval and etc.)'); ?>
                 </label>
-                <select value="<?php echo getKbPostVar('updateProductsPriceCronInterval', getKbAmz()->getOption('updateProductsPriceCronInterval', getKbCronFirstInterval()));?>" name="updateProductsPriceCronInterval" class="form-control">
+                <select value="<?php echo getKbPostVar('updateProductsPriceCronInterval', getKbAmz()->getOption('updateProductsPriceCronInterval', getKbCronFirstInterval()));?>" autocomplete="off" name="updateProductsPriceCronInterval" class="form-control">
                     <?php echo kbAmzSelect($this->cronTime, getKbPostVar('updateProductsPriceCronInterval', getKbAmz()->getOption('updateProductsPriceCronInterval', getKbCronFirstInterval()))); ?>
                 </select>
             </div>
@@ -245,7 +245,7 @@
                 <label for="updateProductsPriceCronNumberToProcess" class="control-label">
                     <?php echo __('Number Of Products To Process At Once'); ?>
                 </label>
-                <input value="<?php echo getKbPostVar('updateProductsPriceCronNumberToProcess', getKbAmz()->getOption('updateProductsPriceCronNumberToProcess', KbAmazonImporter::CRON_NUMBER_OF_PRODUCTS_PRICE_TO_UPDATE));?>" name="updateProductsPriceCronNumberToProcess" class="form-control"/>
+                <input value="<?php echo getKbPostVar('updateProductsPriceCronNumberToProcess', getKbAmz()->getOption('updateProductsPriceCronNumberToProcess', KbAmazonImporter::CRON_NUMBER_OF_PRODUCTS_PRICE_TO_UPDATE));?>" autocomplete="off" name="updateProductsPriceCronNumberToProcess" class="form-control"/>
             </div>
         </div>
         <div class="col-xs-4">
@@ -253,7 +253,7 @@
                 <label for="uproductsUpdateOlderThanHours" class="control-label">
                     <?php echo __('Update Price If Last Update Older Than'); ?>
                 </label>
-                <select value="<?php echo getKbPostVar('uproductsUpdateOlderThanHours', getKbAmz()->getOption('uproductsUpdateOlderThanHours', KbAmazonImporter::SECONDS_BEFORE_UPDATE));?>" name="uproductsUpdateOlderThanHours" class="form-control">
+                <select value="<?php echo getKbPostVar('uproductsUpdateOlderThanHours', getKbAmz()->getOption('uproductsUpdateOlderThanHours', KbAmazonImporter::SECONDS_BEFORE_UPDATE));?>" autocomplete="off" name="uproductsUpdateOlderThanHours" class="form-control">
                     <?php echo kbAmzSelect(array(
                         $this->hoursOld,
                     ), getKbPostVar('uproductsUpdateOlderThanHours', getKbAmz()->getOption('uproductsUpdateOlderThanHours', KbAmazonImporter::SECONDS_BEFORE_UPDATE))); ?>
@@ -276,7 +276,7 @@
     <div class="row">
         <div class="col-md-6 col-xs-6">
             <div class="form-group">
-                <button type="submit" class="btn btn-primary" name="update" value="load"><?php echo __('Update'); ?></button>
+                <button type="submit" class="btn btn-primary" autocomplete="off" name="update" value="load"><?php echo __('Update'); ?></button>
             </div> 
         </div>
     </div>    
