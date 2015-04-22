@@ -34,7 +34,16 @@ This section describes how to install the plugin and get it working.
 == Frequently Asked Questions ==
 
 == Screenshots ==
-
+1. /assets/screenshot-1.jpg
+2. /assets/screenshot-2.jpg
+3. /assets/screenshot-3.jpg
+4. /assets/screenshot-4.jpg
+5. /assets/screenshot-5.jpg
+6. /assets/screenshot-6.jpg
+7. /assets/screenshot-7.jpg
+8. /assets/screenshot-8.jpg
+9. /assets/screenshot-9.jpg
+10. /assets/screenshot-10.jpg
 == Changelog ==
 = 2.0.0 =
 Product Variants and Product Versions are here!
