@@ -315,7 +315,7 @@ function kbAmzPostsPageFilters($query)
     }
     
     if (isset($_GET['kbAmzShowProductsFilter'])) {
-        getKbAmz()->setOption('showProductsInAdminPosts', boolval($_GET['kbAmzShowProductsFilter']));
+        getKbAmz()->setOption('showProductsInAdminPosts', (bool)$_GET['kbAmzShowProductsFilter']);
     }
     
     if ((isset($_GET['kbAmzShowProductsFilter']) && $_GET['kbAmzShowProductsFilter'])
