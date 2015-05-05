@@ -4,7 +4,7 @@
         <button type="submit" class="btn btn-primary" name="clearAllProducts" value="clearAllProducts"><?php echo __('Clear All Products'); ?></button>
     </div>
     <div class="form-group">
-        <label><?php echo __('Delete All Products That Have post_status = pending And KbAmzOfferSummary.TotalNew <= 0');?></label><br/>
+        <label><?php echo __('Delete All Products That Have post_status = pending And KbAmzPriceQuantity <= 0');?></label><br/>
         <button type="submit" class="btn btn-primary" name="clearAllProductsNoQuantity" value="clearAllProducts">
             <?php
             echo sprintf(

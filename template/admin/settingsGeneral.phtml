@@ -175,6 +175,15 @@
                 </select>
             </div>
         </div>
+        <div class="col-md-6 col-xs-6">
+            <div class="form-group">
+                <label for="defaultProductQuantity" class="control-label">
+                    <?php echo __('Default Item Quantity. (If not is supplied from Amazon)'); ?>
+                    <span class="label label-success">NEW</span>
+                </label>
+                <input value="<?php echo getKbPostVar('defaultProductQuantity', getKbAmz()->getOption('defaultProductQuantity'));?>" autocomplete="off" name="defaultProductQuantity" class="form-control"/>
+            </div>
+        </div>
     </div>
     
     <div class="row">

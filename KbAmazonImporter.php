@@ -20,14 +20,7 @@ class KbAmazonImporter
     protected $requests     = array();
     protected $request      = array();
     protected $requestKey   = '';
-
-
-    protected $requiredParams = array(
-        // AMZ ARRAY WP ATTR
-        'ASIN' => 'ASIN'
-        
-    );
-    
+   
     protected $importCategories = array();
     
     protected $amazonCategoryGroups = array(
@@ -404,7 +397,7 @@ class KbAmazonImporter
      * @return array|null
      */
     public function find($asin, $responseGroup = false)
-    {
+    {  
         if (!$responseGroup) {
             $responseGroup = $this->getResponseGroup();
         } else {
@@ -412,8 +405,8 @@ class KbAmazonImporter
         }
 
         
-        $key = $asin . serialize($responseGroup);
-        if (!$data = getKbAmz()->getCache($key)) {
+        $key = is_array($asin) ? implode(' ', $asin) : $asin . serialize($responseGroup);
+        //if (!$data = getKbAmz()->getCache($key)) {
             $time = microtime(true);
             if ($this->request['lastRun'] + 1 / $this->requestPerSec > $time) {
                 sleep(1);
@@ -425,7 +418,7 @@ class KbAmazonImporter
 
             $result = getKbAmazonApi()
                       ->responseGroup(implode(',', $responseGroup))
-                      ->lookup($asin);
+                      ->lookup($asin, array('Condition' => 'New', 'Availability' => 'Available'));
             
             $this->request['lastRun'] = microtime(true);
             $this->saveRequests();
@@ -441,16 +434,21 @@ class KbAmazonImporter
             /**
              * STATS END
              */
-            $data = new KbAmazonItem($result);
+            if (is_array($asin)) {
+                $data = new KbAmazonItems($result);
+            } else {
+                $data = new KbAmazonItem($result);
+            }
             getKbAmz()->setCache($key, $data);
             
-        }
+       // }
         
-        if (!$data instanceof KbAmazonItem) {
-            $data = new KbAmazonItem(array('ASIN' => $asin));
-        } else if (!$data->isValid()) {
-            $data->setAsin($asin);
-        }
+//        LEGACY
+//        if (!$data instanceof KbAmazonItem) {
+//            $data = new KbAmazonItem(array('ASIN' => $asin));
+//        } else if (!$data->isValid()) {
+//            $data->setAsin($asin);
+//        }
         
         return apply_filters('KbAmazonImporter::find', $data);
     }
@@ -474,33 +472,62 @@ class KbAmazonImporter
         return new KbAmazonItems($result);
     }
 
-    public function import($asins, $isSimilar = false)
+    public function import($importAsins, $isSimilar = false, $updatePrice = false)
     {
         $ids = array();
-        if (!is_array($asins)) {
-            $asins = array($asins);
+        if (!is_array($importAsins)) {
+            $importAsins = array($importAsins);
         }
-        foreach ($asins as $asin) {
-            $item = $this->find($asin);
-            if (getKbAmz()->getOption('allowVariants')
-            && $item->getParentAsin()) {
-                $parentAsin = $item->getParentAsin();
-                if (!getKbAmz()->getProductByAsin($parentAsin)) {
-                    $parentItem = $this->find($parentAsin);
-                    $ids[] = $this->saveProduct($parentItem, $isSimilar);
-                    continue;
+        
+        $groups = array_chunk($importAsins, 10);
+
+        foreach ($groups as $asins) {
+            
+            $result = $this->find($asins);
+            
+            $items  = array();
+            if ($result instanceof KbAmazonItems) {
+                $items = $result->getItems();
+            } else if ($result instanceof KbAmazonItem) {
+                $items[] = $result;
+            } else {
+                trigger_error('Invalid result for asins: ' . implode(',', $asins));
+            }
+            
+            foreach ($items as $item) {
+                if (getKbAmz()->getOption('allowVariants')
+                && $item->getParentAsin()
+                && $item->getParentAsin() != $item->getAsin()) {
+                    $parentAsin = $item->getParentAsin();
+                    if (!getKbAmz()->getProductByAsin($parentAsin)) {
+                        $parentItem = $this->find($parentAsin);
+                        if ($updatePrice) {
+                            $ids[] = $this->updateProduct($parentItem);
+                        } else {
+                            /**
+                             * Dont download all variations
+                             */
+                            $ids[] = $this->saveProduct($parentItem, $isSimilar, false);
+                        }
+                        continue;
+                    }
+                }
+                if ($item->isValid()) {
+                    if ($updatePrice) {
+                        $ids[] = $this->updateProduct($item);
+                    } else {
+                        $ids[] = $this->saveProduct($item, $isSimilar);
+                    }
+                } else {
+                    $ids[] = array(
+                        'post_id' => null,
+                        'updated' => null,
+                        'error' => $item->getError()
+                    );
                 }
             }
-            if ($item->isValid()) {
-                $ids[] = $this->saveProduct($item, $isSimilar);
-            } else {
-                $ids[] = array(
-                    'post_id' => null,
-                    'updated' => null,
-                    'error' => $item->getError()
-                );
-            }
         }
+    
         return $ids;
     }
     
@@ -510,21 +537,7 @@ class KbAmazonImporter
      */
     public function updatePrice($asins)
     {
-        $responseGroup = array(
-            'Offers',
-            'OfferFull',
-            'OfferSummary',
-            'OfferListings',
-        );
-        if (!is_array($asins)) {
-            $asins = array($asins);
-        }
-        foreach ($asins as $asin) {
-            $item = $this->find($asin, $responseGroup);
-            if (!$item->getError()) {
-                $this->updateProductPrice($item);
-            }
-        }
+        return $this->import($asins, false, true);
     }
 
     public function itemExists(KbAmazonItem $item)
@@ -533,45 +546,32 @@ class KbAmazonImporter
         return $post ? $post->ID : null;
     }
     
-    /**
-     * 
-     * @param KbAmazonItem $item
-     */
-    public function updateProductPrice(KbAmazonItem $item)
-    {
-        $postId = $this->itemExists($item);
-        if ($postId) {
-            $meta = $item->getFlattenArray();
-            $this->priceToMeta($meta);
-            $this->updateProductPostMeta($meta, $postId);
-            wp_update_post(array('ID' => $postId, 'post_modified' => date('Y-m-d H:i:s')));
-            $this->checkAvailableAction($postId);
-            do_action('KbAmazonImporter::updateProductPrice', $postId, $item);
-        }
-    }
-
     protected function priceToMeta(&$meta)
     {
         $meta['PriceAmount']          = 0;
         $meta['PriceAmountFormatted'] = 0;
+        $meta['PriceQuantity']        = getKbAmz()->getOption('defaultProductQuantity');
+        if (empty($meta['PriceQuantity'])) {
+            $meta['PriceQuantity']     = 1;
+        }
         
         //1. OfferSummary.LowestNewPrice.FormattedPrice
         //2. Offers.Offer.OfferListing.SalePrice.FormattedPrice
         //3. Offers.Offer.OfferListing.Price.FormattedPrice
         //4. ItemAttributes.ListPrice.FormattedPrice
-        
+
         if (isset($meta['Offers.Offer.OfferListing.SalePrice.FormattedPrice'])) {
             $meta['PriceAmountFormatted'] = $meta['Offers.Offer.OfferListing.SalePrice.FormattedPrice'];
             $meta['PriceAmount']          = $meta['Offers.Offer.OfferListing.SalePrice.Amount'];
-        } else if (isset($meta['OfferSummary.LowestNewPrice'])) {
-            $meta['PriceAmountFormatted'] = $meta['OfferSummary.LowestNewPrice.FormattedPrice'];
-            $meta['PriceAmount']          = $meta['OfferSummary.LowestNewPrice.Amount'];
-        } else if (isset($meta['Offers.Offer.OfferListing.Price'])) {
+        } else if (isset($meta['Offers.Offer.OfferListing.Price.FormattedPrice'])) {
             $meta['PriceAmountFormatted'] = $meta['Offers.Offer.OfferListing.Price.FormattedPrice'];
             $meta['PriceAmount']          = $meta['Offers.Offer.OfferListing.Price.Amount'];
         } else if (isset($meta['ItemAttributes.ListPrice.FormattedPrice'])) {
             $meta['PriceAmountFormatted'] = $meta['ItemAttributes.ListPrice.FormattedPrice'];
             $meta['PriceAmount']          = $meta['ItemAttributes.ListPrice.Amount'];
+        } else if (isset($meta['OfferSummary.LowestNewPrice.FormattedPrice'])) {
+            $meta['PriceAmountFormatted'] = $meta['OfferSummary.LowestNewPrice.FormattedPrice'];
+            $meta['PriceAmount']          = $meta['OfferSummary.LowestNewPrice.Amount'];
         } else if (isset($meta['Offers.Offer.OfferListing.Price.FormattedPrice'])) {
             /**
              * @TODO CHECK BELOW!
@@ -596,6 +596,10 @@ class KbAmazonImporter
         }
 
         $meta['PriceAmount'] = self::paddedNumberToDecial($meta['PriceAmount']);
+
+//        
+//        $meta['PriceAmount']          = rand(1, 999);
+//        $meta['PriceAmountFormatted'] = '$' . $meta['PriceAmount'];
     }
     
     /**
@@ -607,23 +611,85 @@ class KbAmazonImporter
         foreach ($meta as $key => $val) {
            $metaToInsert['KbAmz' . $key] = $val;
         }
+        
+        $attsToRemove = array(
+            'KbAmzOffers',
+            'KbAmzOfferSummary',
+            'KbAmzVariationSummary',
+        );
+        
+        $currentMeta = getKbAmz()->getProductMeta($postId);
+        foreach ($currentMeta as $name => $val) {
+            foreach ($attsToRemove as $attName) {
+                if (substr($name, 0, strlen($attName)) == $attName) {
+                    delete_post_meta($postId, $name);
+                    break;
+                }
+            }
+        }
+        
         kbAmzFilterAttributes($metaToInsert);
+        
         foreach ($metaToInsert as $key => $val) {
             update_post_meta($postId, $key, $val);
         }
         
         return $metaToInsert;
     }
-
+    
+    public function updateProduct(KbAmazonItem $item)
+    {
+        $postExists = $this->itemExists($item);
+        if (!$postExists) {
+            return $this->saveProduct($item);
+        }
+      
+        $postId = $postExists;
+        
+        $std                = new stdClass;
+        $std->postId        = $postId;
+        $std->postExists    = $postExists;
+        $std->item          = $item;
+        $std->update        = true;
+        
+        do_action('KbAmazonImporter::preUpdateProduct', $std);
+           
+        $meta = $item->getFlattenArray();
+        $this->priceToMeta($meta);
+        $this->updateProductPostMeta($meta, $postId);
+        
+        wp_update_post(array('ID' => $postId, 'post_modified' => date('Y-m-d H:i:s')));
+        $this->checkAvailableAction($postId);
+        
+        $std              = new stdClass;
+        $std->postId      = $postId;
+        $std->post        = get_post($postId);
+        $std->meta        = getKbAmz()->getProductMeta($postId, true);
+        $std->item        = $item;
+        $std->importer    = $this;
+        $std->postExists  = $postExists;
+        $std->update      = false;
+        $std->return      = array(
+            'post_id'     => $postId,
+            'updated'     => (bool) $postExists,
+            'error'       => null,
+            'children'    => array()
+        );
+        
+        do_action('KbAmazonImporter::updateProduct', $std);
+        
+        return $std->return;
+    }
 
     public function saveProduct(KbAmazonItem $item, $isSimilar = false, $disableEvents = false)
     {
         $postExists = $this->itemExists($item);
-        
+
         $std                = new stdClass;
         $std->postId        = $postExists;
         $std->postExists    = $postExists;
         $std->item          = $item;
+        $std->update        = false;
         
         if (!$disableEvents) {
             do_action('KbAmazonImporter::preSaveProduct', $std);
@@ -637,7 +703,10 @@ class KbAmazonImporter
         $this->priceToMeta($meta);
         
         $canImportFreeItems = getKbAmz()->getOption('canImportFreeItems', true);
-        if (!$canImportFreeItems && empty($meta['PriceAmountFormatted']) && !$postExists) {
+        if (!$item->hasVariants()
+        && !$canImportFreeItems
+        && empty($meta['PriceAmountFormatted'])
+        && !$postExists) {
             return array(
                 'post_id' => null,
                 'updated' => null,
@@ -728,7 +797,7 @@ class KbAmazonImporter
         if (getKbAmz()->isProductFree($metaToInsert, true)) {
             $specialMeta['KbAmzFreeProduct'] = 'yes';
         }
-        
+
         foreach ($specialMeta as $key => $val) {
             update_post_meta($postId, $key, $val);
         }
@@ -771,9 +840,11 @@ class KbAmazonImporter
         $std              = new stdClass;
         $std->postId      = $postId;
         $std->post        = get_post($postId);
+        $std->meta        = getKbAmz()->getProductMeta($postId, true);
         $std->item        = $item;
         $std->importer    = $this;
         $std->postExists  = $postExists;
+        $std->update      = false;
         $std->return      = array(
             'post_id'     => $postId,
             'updated'     => (bool) $postExists,
@@ -786,6 +857,10 @@ class KbAmazonImporter
             do_action('KbAmazonImporter::saveProduct', $std);
         }
         
+        if ($postExists) {
+            do_action('KbAmazonImporter::updateProduct', $std);
+        }
+        
         return $std->return;
     }
     
@@ -793,11 +868,15 @@ class KbAmazonImporter
     {
         // update status
         if (!getKbAmz()->isProductAvailable($postId)) {
-            wp_update_post(array('ID' => $postId, 'post_status' => 'pending'));
             if (getKbAmz()->getOption('deleteProductOnNoQuantity')) {
                 getKbAmz()->clearProduct($postId);
                 $deleted = true;
+            } else {
+                wp_update_post(array('ID' => $postId, 'post_status' => 'pending'));
+                update_post_meta($postId, 'KbAmzPriceQuantity', 0);
             }
+        } else {
+            wp_update_post(array('ID' => $postId, 'post_status' => getKbAmz()->getOption('defaultPostStatus', 'publish')));     
         }
     }
     
@@ -873,8 +952,8 @@ class KbAmazonImporter
                 if (!is_dir( $uploads_path )) {
                     mkdir( $uploads_path );
                 }
-
-                $fileExt = end(explode(".", $imageUrl));
+                $fileParts = explode(".", $imageUrl);
+                $fileExt = end($fileParts);
 
                 $filename = $asinNum . '-' . $item->getTitle();
                 $filename = sanitize_title($filename);

@@ -56,6 +56,7 @@ class KbAmazonImages
 
     public function getIndex($index, $size = 'thumbnail', $icon = null, $attr = array())
     {
+        
         if (isset($this->images[$index])) {
             $image = $this->images[$index];
             if ($image->isDownloaded()) {
@@ -91,7 +92,7 @@ class KbAmazonImages
                 
                 $attrs[] = 'alt="'. htmlspecialchars($this->getPost()->post_title) .'"';
                 $attrs[] = 'data-image="' .$image->getImageSrc() .'"';
-       
+               
                 return sprintf(
                     '<img src="%s" %s/>',
                     $image->getImageSrc(),

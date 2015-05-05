@@ -5,7 +5,13 @@
     <div class="caption">
         <div class="import-title">
             <a><?php echo htmlspecialchars($this->item->getTitle());?></a><br/>
-            <span><?php echo $this->item->getAsin();?></span>
+            <span>
+                <?php echo $this->item->getAsin(); ?>
+            </span>
+            <br/>
+            <span>
+                <?php echo $this->item->hasVariants() ? ' Variants Parent' : '&nbsp;'; ?>
+            </span>
         </div>
     </div>
 </div>

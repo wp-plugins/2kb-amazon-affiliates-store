@@ -153,6 +153,7 @@ function kbAmzVariantsProductSave($std)
     $postId   = $std->postId;
     $post     = get_post($postId);
     $item     = $std->item;
+    $isUpdate = $std->update;
     $result   = $item->getResult();
     
     $parentItem = $result['Items']['Item'];
@@ -168,19 +169,17 @@ function kbAmzVariantsProductSave($std)
         if (!isset($item['ASIN'])) {
             continue;
         }
-//        NOT WORKING
-//        $cacheItem = new KbAmazonItem(array('Items' => array('Item' => $item)));
-//        $importer::cacheItem($cacheItem);
+        
         
         $variations['Items'][] = array(
             'ASIN' => $item['ASIN']
         );
         
-        $variantItem = $importer->find($item['ASIN']);
-        if (!$variantItem->isValid()) {
-            continue;
-        }
-        $item = array_merge($item, $variantItem->getItem());
+//        $variantItem = $importer->find($item['ASIN']);
+//        if (!$variantItem->isValid()) {
+//            continue;
+//        }
+        
         $item['IsVariant'] = true;
         if (!isset($item['VariationAttributes']['VariationAttribute'][0])) {
             $item['VariationAttributes']['VariationAttribute'] = array($item['VariationAttributes']['VariationAttribute']);
@@ -200,7 +199,13 @@ function kbAmzVariantsProductSave($std)
             )
         );
         $variantItem = new KbAmazonItem($variantItemData);
-        $saveResult = $importer->saveProduct($variantItem);
+        
+        if ($importer->itemExists($variantItem) && $isUpdate) {
+            $saveResult = $importer->updateProduct($variantItem);
+        } else {
+            $saveResult = $importer->saveProduct($variantItem);
+        }
+        
         if (isset($saveResult['post_id'])
         && $saveResult['post_id']) {
             $std->result['children'][] = $saveResult['post_id'];
@@ -228,8 +233,31 @@ function kbAmzVariantsProductSave($std)
     return $std;
 }
 
+/**
+ * Update post parent
+ */
+add_action('KbAmazonImporter::saveProduct', 'kbAmzVariantsParent');
+function kbAmzVariantsParent($std)
+{
+    if (!getKbAmz()->getOption('allowVariants')) {
+        return $std;
+    }
+    
+    $postId     = $std->postId;
+    $parentAsin = $std->item->getParentAsin();
 
-
+    if (!$std->post->post_parent && $parentAsin) {
+        $parentPost = getKbAmz()->getProductByAsin($parentAsin);
+        if ($parentPost) {
+            wp_update_post(
+                array(
+                    'ID'            => $postId,
+                    'post_parent'   => $parentPost->ID
+                )
+            );
+        }
+    }
+}
 
 
 add_action('kb_amz_product_add_actions', 'kbAmzProductVariansActions');
@@ -286,7 +314,14 @@ function kbAmzProductVariansActions($std)
                 $typeVariants[] = $variant;
             }
             if (count($typeVariants) > 1) {
-                $html[] = $funct($typeVariants, array('type' => $type, 'label' => $productMeta['KbAmzItemAttributes.' . $type]), $post);
+                $html[] = $funct(
+                    $typeVariants,
+                    array(
+                        'type' => $type,
+                        'label' => isset($productMeta['KbAmzItemAttributes.' . $type]) ? $productMeta['KbAmzItemAttributes.' . $type] : null
+                    ),
+                    $post
+                );
             }
         }
         
@@ -316,7 +351,7 @@ HTML;
         $str    = $images->getFirst(null, null, array('class' => 'kb-amz-variant-attribute-image'));
         $imagesStr[] = sprintf(
             '<a href="%s" title="%s" class="kb-amz-attribute-image-link%s">%s</a>',
-            get_permalink($variant->ID),
+            wp_get_shortlink($variant->ID),
             esc_attr($variant->post_title),
             ($isActive ? ' kb-amz-active' : ''),
             $str
@@ -327,7 +362,7 @@ HTML;
         $html,
         strtolower($type['type']),
         __($type['type']),
-        __($type['value']),
+        __($type['label']),
         implode('', $imagesStr)
     );
 }
@@ -357,13 +392,13 @@ HTML;
         $options .= sprintf(
             '<option class="kb-amz-variant-select%s" value="%s"%s>%s</option>',
             (getKbAmz()->isProductAvailable($variant->ID) ? ' kb-amz-available' : ' kb-amz-not-available'),
-            get_permalink($variant->ID),
+            wp_get_shortlink($variant->ID),
             ($active->ID == $variant->ID ? ' selected="selected"' : ''),
             $value
         );
     }
     
-    $select = '<select name="product_variant_'.  strtolower($type['type']).'" style="width: '.$maxLenghth.'em;" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">';
+    $select = '<select name="product_variant_'.  strtolower($type['type']).'" style="width: '.($maxLenghth + 2).'em;" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">';
     $select .= $options;
     $select .= '</select>';
     $select .= sprintf(
@@ -372,11 +407,12 @@ HTML;
         __('Size Chart'),
         __('Size Chart')
     );
+    
     return sprintf(
         $html,
         strtolower($type['type']),
         __($type['type']),
-        __($type['value']),
+        __($type['label']),
         $select
     );
     
@@ -450,7 +486,7 @@ function kbAmzProductVersionsActions($std)
                 'kb-amz-version-attribute col-md-3',
                 (count($meta['KbAmzVersions']) > 4 ? ' kb-amz-version-offset' : ''),
                 ($current->ID == $post->ID ? ' kb-amz-version-active' : ''),
-                get_permalink($post->ID),
+                wp_get_shortlink($post->ID),
                 esc_attr($post->post_title),
                 $title,
                 getKbAmz()->getProductPriceHtml($post->ID)
@@ -501,7 +537,7 @@ function kbAmzProductVersionsActions($std)
                         $rows .= sprintf(
                             '<tr><td><a%s href="%s" title="%s">%s</a></td><td class="kb-amz-format-price"><div class="kb-amz-item-price">%s</div></td></tr>',
                             ($isActive ? ' class="kb-amz-format-active"' : ''),
-                            get_permalink($verison['post']->ID),
+                            wp_get_shortlink($verison['post']->ID),
                             esc_attr($verison['post']->post_title),
                             $verison['meta']['KbAmzItemAttributes.Binding'] . ' ' . date('d M Y', getKbAmz()->getProductDate($verison['post']->ID, true)),
                             getKbAmz()->getProductPriceHtml($verison['post']->ID)

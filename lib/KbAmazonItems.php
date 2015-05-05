@@ -11,10 +11,15 @@ class KbAmazonItems
     {
         $this->result = $result;
         if ($this->isValid() && isset($result['Items']['Item'])) {
-            foreach ($result['Items']['Item'] as $item) {
-                $item = new KbAmazonItem(array('Items' => array('Item' => $item)));
-                $this->items[] = $item;
+            if (isset($result['Items']['Item']['ASIN'])) {
+                $this->items[] = new KbAmazonItem(array('Items' => array('Item' => $result['Items']['Item'])));
+            } else {
+                foreach ($result['Items']['Item'] as $item) {
+                    $item = new KbAmazonItem(array('Items' => array('Item' => $item)));
+                    $this->items[] = $item;
+                }
             }
+
         }
     }
     

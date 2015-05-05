@@ -405,3 +405,16 @@ if (isset($_GET['kbAction'])
         die;
     }
 }
+
+
+
+//add_action('init', function () {
+//    
+//    $asins      = getKbAmz()->getProductsAsinsToUpdate(50, false);
+//    $importer   = new KbAmazonImporter;
+//    $result = $importer->import($asins);
+//    
+//    var_dump($asins);die;
+//    die('asfaf');
+//    kbAmzkbAmzProductsUpdateCronFunction(true);
+//});

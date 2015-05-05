@@ -32,6 +32,7 @@ function getKbAmzDefaultOptions()
        'cacheTtl'                           => 1800,
        'maxVersionsNumberOnImport'          => 5,
        'showProductsInAdminPosts'           => false,
+       'defaultProductQuantity'             => 10,
        /**
         * DISMISABLE
         */

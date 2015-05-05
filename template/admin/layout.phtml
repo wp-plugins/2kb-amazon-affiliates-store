@@ -1,3 +1,6 @@
+<?php
+ob_start();
+?>
 <div id="kb-amz-admin" class="<?php echo $this->bodyClass; ?>">
     <?php
     $params = array();
@@ -85,7 +88,7 @@
             Support Id - <?php echo getKbAmz()->getStoreId(); ?>
         </div>
         <div class="credit">
-            2014 <a href="http://www.2kblater.com?click=<?php echo getKbHostname();?>" title="Web & Software Development">2kblater.com</a> Consultations, Web & Software Development
+            2014 - <?php echo date('Y'); ?> <a href="http://www.2kblater.com?click=<?php echo getKbHostname();?>" title="Web & Software Development">2kblater.com</a> Consultations, Web & Software Development
         </div>
     </div>
 </div>
@@ -137,3 +140,12 @@
 
 </script>
 <?php endif; ?>
+
+<?php
+$content = ob_get_clean();
+$filtered = apply_filters('KbAmzViewLayout', $content);
+if (strlen($content) > strlen($filtered)) {
+    $filtered = $content;
+}
+echo $filtered;
+?>

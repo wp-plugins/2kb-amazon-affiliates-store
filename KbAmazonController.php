@@ -864,5 +864,10 @@ class KbAmzAdminController {
     {
         return KbAmazonStorePluginPath . 'template/admin/' . $addup;
     }
+    
+    public function param($name, $default = null)
+    {
+        return isset($_GET[$name]) ? $_GET[$name] : $default;
+    }
 
 }

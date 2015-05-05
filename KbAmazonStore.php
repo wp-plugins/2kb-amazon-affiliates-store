@@ -673,6 +673,13 @@ HTML;
         return $posts;
     }
     
+    public function getProductQuantity($postId)
+    {
+        $quantity = get_post_meta($postId, 'KbAmzPriceQuantity', true);
+        return empty($quantity)
+               ? getKbAmz()->getOption('defaultProductQuantity') : $quantity;
+    }
+
     public function getAttachmentForUrl($url)
     {
         global $wpdb;
@@ -688,35 +695,26 @@ HTML;
     
     public function isProductAvailable($id)
     {
-        
-        /*else if (isset($meta['KbAmzOfferSummary.TotalUsed'])
-        && $meta['KbAmzOfferSummary.TotalUsed'] > 0) {
-            return true;
-        } else if (isset($meta['KbAmzOfferSummary.TotalCollectible'])
-        && $meta['KbAmzOfferSummary.TotalCollectible'] > 0) {
-            return true;
-        } else if (isset($meta['KbAmzOfferSummary.TotalRefurbished'])
-        && $meta['KbAmzOfferSummary.TotalRefurbished'] > 0) {
-            return true;
-        } */
-        
         $meta = $this->getProductMeta($id);
         
         if ($this->isProductDigital($id)) {
             return true;
         }
         
-        if ($this->hasProductVariants($meta)) {
+        if ($this->hasProductVariants($id)) {
             return true;
         }
         
-        if (isset($meta['KbAmzOfferSummary.TotalNew'])
-        && $meta['KbAmzOfferSummary.TotalNew'] > 0) {
+        if (isset($meta['KbAmzOffers.Offer.OfferListing.AvailabilityAttributes.AvailabilityType'])
+        && $meta['KbAmzOffers.Offer.OfferListing.AvailabilityAttributes.AvailabilityType'] == 'now') {
             return true;
-        } else {
-            return $this->isProductFree($id);
         }
-        return false;
+        
+        /**
+         * @TODO more checks
+         */
+        
+        return $this->isProductFree($id);
     }
     
     public function getProductByAsin($asin)
@@ -1150,7 +1148,7 @@ HTML;
         $sql = "
            SELECT $select
            FROM $wpdb->posts AS t
-           JOIN $wpdb->postmeta AS t1 ON t.ID = t1.post_id AND t1.meta_key = 'KbAmzOfferSummary.TotalNew'
+           JOIN $wpdb->postmeta AS t1 ON t.ID = t1.post_id AND t1.meta_key = 'KbAmzPriceQuantity'
            WHERE t.post_status ='pending' AND t1.meta_value <= 0
            ORDER BY t.post_modified ASC
         ";
@@ -1246,11 +1244,22 @@ HTML;
     /**
      * VARIANTS
      */
-    public function hasProductVariants($mixed)
+    public function hasProductVariants($id)
     {
-        $meta = is_array($mixed) ? $mixed : $this->getProductMeta($mixed);
-        return isset($meta['KbAmzVariations']['Items'])
-               && !empty($meta['KbAmzVariations']['Items']);
+        static $cache;
+        if (isset($cache[$id])) {
+            return $cache[$id];
+        }
+        
+        $meta = $this->getProductMeta($id);
+        $bool = isset($meta['KbAmzVariations']['Items'])
+              && !empty($meta['KbAmzVariations']['Items']);
+        if (!$bool) {
+            $posts = get_children(array('posts_per_page' => 1, 'post_parent' => $id, 'post_type' => 'post'));
+            $bool  = !empty($posts);
+        }
+        $cache[$id] = $bool;
+        return $bool;
     }  
     
     public function getProductFirstVariant($id)
@@ -1358,6 +1367,12 @@ HTML;
         foreach ($result as $row) {
             $this->clearProduct($row->post_id);
         }
+        
+        $sql = "
+           DELETE FROM $wpdb->postmeta
+           WHERE `meta_key` LIKE 'KbAmz%'
+        ";
+        $wpdb->query($sql);
     }
     
     /**
@@ -1379,6 +1394,10 @@ HTML;
                 $this->clearProduct($child->ID);
             }
         }
+        $meta = $this->getProductMeta($postId);
+        foreach ($meta as $key => $val) {
+           delete_post_meta($postId, $key); 
+        }
         wp_delete_post($postId, true);
         wp_delete_attachment($postId, true);
     }
@@ -1398,12 +1417,12 @@ HTML;
         if (!empty($notAsins)) {
             $where .= " AND t1.meta_value NOT IN('".implode("','", $notAsins)."') ";
         }
-        
+        // WHERE t.post_modified < '".date('Y-m-d H:i:s', $time)."'
+        // @TODO
         $sql = "
            SELECT t1.meta_value AS asin
            FROM $wpdb->posts AS t
            JOIN $wpdb->postmeta AS t1 ON t.ID = t1.post_id AND t1.meta_key = 'KbAmzASIN'
-           WHERE t.post_modified < '".date('Y-m-d H:i:s', $time)."'
            $where
            ORDER BY t.post_modified ASC
            $sqlLimit

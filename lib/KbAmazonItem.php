@@ -80,7 +80,9 @@ class KbAmazonItem {
     
     public function getParentAsin()
     {
-        return isset($this->item['ParentASIN']) ? $this->item['ParentASIN'] : null;
+        return isset($this->item['ParentASIN'])
+               && $this->item['ParentASIN'] != $this->getAsin()
+               ? $this->item['ParentASIN'] : null;
     }
 
     public function setAsin($asin)
@@ -161,9 +163,33 @@ class KbAmazonItem {
     public function getVariantProducts()
     {
         if (isset($this->result['Items']['Item']['Variations'])) {
+            if (isset($this->result['Items']['Item']['Variations']['Item']['ASIN'])) {
+                $this->result['Items']['Item']['Variations']['Item'] =
+                array(
+                    $this->result['Items']['Item']['Variations']['Item']
+                );
+            }
             return $this->result['Items']['Item']['Variations'];
         }
         return array();
+    }
+    
+    public function getVariantProductItems()
+    {
+        $items = array();
+        $variants = $this->getVariantProducts();
+        if (isset($variants['Item']) && !empty($variants['Item'])) {
+            foreach ($variants['Item'] as $item) {
+                $items[] = new KbAmazonItem(array('Items' => array('Item' => $item)));
+            }
+        }
+        return $items;
+    }
+
+    public function hasVariants()
+    {
+        $variants = $this->getVariantProducts();
+        return !empty($variants);
     }
 
     protected function flatten($array, &$newArray, $parentKey = null)
