@@ -1417,13 +1417,12 @@ HTML;
         if (!empty($notAsins)) {
             $where .= " AND t1.meta_value NOT IN('".implode("','", $notAsins)."') ";
         }
-        // WHERE t.post_modified < '".date('Y-m-d H:i:s', $time)."'
-        // @TODO
+        
         $sql = "
            SELECT t1.meta_value AS asin
            FROM $wpdb->posts AS t
            JOIN $wpdb->postmeta AS t1 ON t.ID = t1.post_id AND t1.meta_key = 'KbAmzASIN'
-           $where
+           WHERE t.post_modified < '".date('Y-m-d H:i:s', $time)."'
            ORDER BY t.post_modified ASC
            $sqlLimit
         ";
