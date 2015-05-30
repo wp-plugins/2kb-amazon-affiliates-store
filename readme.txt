@@ -45,6 +45,8 @@ This section describes how to install the plugin and get it working.
 9. /assets/screenshot-9.jpg
 10. /assets/screenshot-10.jpg
 == Changelog ==
+= 2.0.2 =
+Css fixes
 = 2.0.1 =
 Import optimization
 = 2.0.0 =

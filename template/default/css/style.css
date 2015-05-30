@@ -227,6 +227,17 @@ ul.kb-products-list > li{
     padding-left: 0;
     padding-right: 0;
 }
+.kb-amz-item-actions .kb-add-to-cart span,
+.kb-amz-item-actions .kb-checkout span
+{
+    background: none;
+    color: inherit;
+    font-size: inherit;
+    padding: 0;
+    margin: 0;
+    display: initial;
+    text-transform: initial;
+}
 .kb-add-to-cart img.loading{
     visibility: hidden;
     position: absolute;
